@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/react";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { useEffect } from "react";
 
@@ -7,7 +6,6 @@ import { TypingAnimation } from "#/components/ui/magic/typing-animation";
 export default function Error(props: ErrorComponentProps) {
   useEffect(() => {
     console.error(props.error);
-    Sentry.captureException(props.error);
   }, [props.error]);
 
   return (

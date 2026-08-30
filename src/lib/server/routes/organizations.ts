@@ -2,28 +2,12 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import {
-  organizationCountExtras,
-  serviceCountExtras,
-} from "#/lib/database/query-fragments.js";
-import {
-  order,
-  organization as organizationTable,
-  organizationLike,
-} from "#/lib/database/schema.js";
+import { organizationCountExtras, serviceCountExtras } from "#/lib/database/query-fragments.js";
+import { order, organization as organizationTable, organizationLike } from "#/lib/database/schema.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
-import {
-  database,
-  insertEmbedding,
-  searchRecords,
-} from "#/lib/server/integrations/database.js";
+import { database, insertEmbedding, searchRecords } from "#/lib/server/integrations/database.js";
 import { indexEmbeddings } from "#/lib/server/lib/embeddings.js";
-import {
-  checkMembership,
-  getOrganizationId,
-  safeParseInt,
-  searchOrganizations,
-} from "#/lib/server/lib/utils.js";
+import { checkMembership, getOrganizationId, safeParseInt, searchOrganizations } from "#/lib/server/lib/utils.js";
 
 const organizations = new Hono();
 
@@ -61,9 +45,7 @@ organizations.get("/", async (c) => {
       ? {
           where: {
             id: {
-              in: (await searchRecords("organization", query, 1, 100)).map(
-                (row) => row.id,
-              ),
+              in: (await searchRecords("organization", query, 1, 100)).map((row) => row.id),
             },
           },
         }
@@ -125,10 +107,7 @@ organizations.put("/:id", async (c) => {
   const authorized = await checkMembership(auth.userId, id);
 
   if (!authorized) {
-    return c.json(
-      { message: "You are not a member of this organization." },
-      403,
-    );
+    return c.json({ message: "You are not a member of this organization." }, 403);
   }
 
   const body = await c.req.json();
@@ -150,10 +129,7 @@ organizations.put("/:id", async (c) => {
     return c.json({ message: "Invalid request body." }, 400);
   }
 
-  await database
-    .update(organizationTable)
-    .set(data)
-    .where(eq(organizationTable.id, id));
+  await database.update(organizationTable).set(data).where(eq(organizationTable.id, id));
   const organization = await database.query.organization.findFirst({
     where: { id },
     extras: organizationCountExtras,
@@ -196,8 +172,7 @@ organizations.get("/:id", async (c) => {
     },
   });
 
-  if (!organization)
-    return c.json({ message: "Organization not registered." }, 404);
+  if (!organization) return c.json({ message: "Organization not registered." }, 404);
 
   return c.json({
     ...organization,
@@ -268,18 +243,11 @@ organizations.get("/:id/orders", async (c) => {
   const authorized = await checkMembership(auth.userId, id);
 
   if (!authorized) {
-    return c.json(
-      { message: "You are not a member of this organization." },
-      403,
-    );
+    return c.json({ message: "You are not a member of this organization." }, 403);
   }
 
   const filterValue = c.req.query("filter");
-  const filter = z
-    .enum(["pending", "confirmed", "completed"])
-    .safeParse(filterValue).success
-    ? filterValue
-    : undefined;
+  const filter = z.enum(["pending", "confirmed", "completed"]).safeParse(filterValue).success ? filterValue : undefined;
 
   const orders = await database.query.order.findMany({
     where: {
@@ -317,31 +285,18 @@ organizations.get("/:id/orders/statistics", async (c) => {
   const authorized = await checkMembership(auth.userId, id);
 
   if (!authorized) {
-    return c.json(
-      { message: "You are not a member of this organization." },
-      403,
-    );
+    return c.json({ message: "You are not a member of this organization." }, 403);
   }
 
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-  const [totalOrders, pendingConfirmation, pendingCompletion, completedOrders] =
-    await Promise.all([
-      database.$count(order, eq(order.organizationId, id)),
-      database.$count(
-        order,
-        and(eq(order.organizationId, id), eq(order.status, "pending")),
-      ),
-      database.$count(
-        order,
-        and(eq(order.organizationId, id), eq(order.status, "confirmed")),
-      ),
-      database.$count(
-        order,
-        and(eq(order.organizationId, id), eq(order.status, "completed")),
-      ),
-    ]);
+  const [totalOrders, pendingConfirmation, pendingCompletion, completedOrders] = await Promise.all([
+    database.$count(order, eq(order.organizationId, id)),
+    database.$count(order, and(eq(order.organizationId, id), eq(order.status, "pending"))),
+    database.$count(order, and(eq(order.organizationId, id), eq(order.status, "confirmed"))),
+    database.$count(order, and(eq(order.organizationId, id), eq(order.status, "completed"))),
+  ]);
 
   return c.json({
     totalOrders,
@@ -377,15 +332,10 @@ organizations.post("/:id/like", async (c) => {
   }));
 
   if (likeExists) {
-    return c.json(
-      { message: "You have already liked this organization." },
-      400,
-    );
+    return c.json({ message: "You have already liked this organization." }, 400);
   }
 
-  await database
-    .insert(organizationLike)
-    .values({ organizationId: id, userId: auth.userId });
+  await database.insert(organizationLike).values({ organizationId: id, userId: auth.userId });
 
   return c.json({
     ...organization,
@@ -425,12 +375,7 @@ organizations.post("/:id/unlike", async (c) => {
 
   await database
     .delete(organizationLike)
-    .where(
-      and(
-        eq(organizationLike.userId, auth.userId),
-        eq(organizationLike.organizationId, id),
-      ),
-    );
+    .where(and(eq(organizationLike.userId, auth.userId), eq(organizationLike.organizationId, id)));
 
   return c.json({
     ...organization,

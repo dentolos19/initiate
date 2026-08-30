@@ -129,14 +129,13 @@ export default function AdvisorProvider(props: LayoutProps) {
 
     // auto-generate summary immediately if callback is provided
     if (callback) {
-      await notifyLoading(
+      const summary = await notifyLoading(
         "Generating problem statement summary...",
-        backend.ai.generateProblemStatementSummary(chat.messages).then((summary) => {
-          callback(summary);
-          hideAdvisorDialog();
-          toast.success("Summary generated and applied successfully!");
-        }),
+        backend.ai.generateProblemStatementSummary(chat.messages),
       );
+      callback(summary);
+      hideAdvisorDialog();
+      toast.success("Summary generated and applied successfully!");
     }
   }
 

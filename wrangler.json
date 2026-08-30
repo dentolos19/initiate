@@ -1,53 +1,28 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "account_id": "d910f54eba4cf3d1634aa41c3d9a93bc",
   "name": "initiate",
   "main": "src/server.ts",
-  "compatibility_date": "2026-08-30",
+  "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat"],
-  "dev": {
-    "port": 3000,
-  },
   "observability": {
-    "enabled": true,
-    "logs": {
-      "head_sampling_rate": 1,
-    },
-    "traces": {
-      "enabled": true,
-      "head_sampling_rate": 0.01,
-    },
+    "enabled": true
   },
   "routes": [
     {
       "pattern": "initiate.dennise.me",
-      "custom_domain": true,
+      "custom_domain": true
     },
     {
       "pattern": "initiate.global",
-      "custom_domain": true,
-    },
-  ],
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_id": "0981b552-4d0d-47da-8759-61b61ac8b927",
-      "database_name": "initiate",
-      "migrations_dir": "migrations",
-      "migrations_pattern": "migrations/*/migration.sql",
-    },
-  ],
-  "send_email": [
-    {
-      "name": "EMAIL",
-    },
+      "custom_domain": true
+    }
   ],
   "queues": {
     "producers": [
       {
         "binding": "NOTIFICATIONS",
-        "queue": "initiate-notifications",
-      },
+        "queue": "initiate-notifications"
+      }
     ],
     "consumers": [
       {
@@ -55,41 +30,56 @@
         "max_batch_size": 10,
         "max_batch_timeout": 5,
         "max_retries": 3,
-        "dead_letter_queue": "initiate-notifications-dead-letter",
-      },
-    ],
+        "dead_letter_queue": "initiate-notifications-dead-letter"
+      }
+    ]
   },
-  "r2_buckets": [
+  "workflows": [
     {
-      "binding": "BUCKET",
-      "bucket_name": "initiate",
-    },
+      "binding": "SYNCHRONIZE",
+      "name": "initiate-synchronizer",
+      "class_name": "SynchronizeWorkflow"
+    }
   ],
   "vectorize": [
     {
       "binding": "VECTORIZE",
-      "index_name": "initiate-search",
-    },
+      "index_name": "initiate-search"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "0981b552-4d0d-47da-8759-61b61ac8b927",
+      "database_name": "initiate",
+      "migrations_dir": "migrations",
+      "migrations_pattern": "migrations/*/migration.sql"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "initiate"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "remote": true
+    }
   ],
   "durable_objects": {
     "bindings": [
       {
         "name": "MESSAGING",
-        "class_name": "Messaging",
-      },
-    ],
+        "class_name": "Messaging"
+      }
+    ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["Messaging"],
-    },
-  ],
-  "workflows": [
-    {
-      "name": "initiate-synchronizer",
-      "binding": "SYNCHRONIZE",
-      "class_name": "SynchronizeWorkflow",
-    },
-  ],
+      "new_sqlite_classes": ["Messaging"]
+    }
+  ]
 }

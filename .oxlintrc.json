@@ -2,6 +2,10 @@
   "$schema": "node_modules/oxlint/configuration_schema.json",
   "plugins": ["eslint", "import", "promise", "react", "typescript"],
   "rules": {
+    "react/exhaustive-deps": "allow",
+    "react/immutability": "allow",
+    "react/incompatible-library": "allow",
+    "react/set-state-in-effect": "allow",
     "sort-keys": "allow"
   },
   "ignorePatterns": ["docs/prisma/**", "src/components/ui/**", "src/routeTree.gen.ts"]

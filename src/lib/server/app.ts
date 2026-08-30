@@ -1,4 +1,3 @@
-import { sentry } from "@hono/sentry";
 import { Hono } from "hono";
 import { getRuntimeKey } from "hono/adapter";
 import { cors } from "hono/cors";
@@ -38,7 +37,6 @@ import servicePlans from "#/lib/server/routes/service-plans.js";
 import serviceReviews from "#/lib/server/routes/service-reviews.js";
 import services from "#/lib/server/routes/services.js";
 import users from "#/lib/server/routes/users.js";
-import mcp from "#/lib/server/routes/webhooks/mcp.js";
 
 // Initialize Hono Application
 const app = new Hono<{ Bindings: Env }>();
@@ -62,35 +60,12 @@ if (getRuntimeKey() !== "workerd") {
   app.use(logger());
 }
 
-// Setup Sentry for Error Monitoring
-app.use(
-  sentry({
-    dsn: "https://f0696624c7847459e428a939f8946d1c@o4509434539999232.ingest.us.sentry.io/4509434838908928",
-    enabled: ENVIRONMENT !== "development",
-    environment: ENVIRONMENT,
-    sendDefaultPii: true,
-  }),
-);
-
 // Resolve the Better Auth session once for every embedded API request.
 app.use(createSessionMiddleware());
 
-// Setup User Context
-app.use(async (c, next) => {
-  const { auth, sentry } = c.var;
-  if (auth.userId) {
-    sentry.setUser({
-      id: auth.userId,
-    });
-  }
-  await next();
-});
-
 // Setup Error Handling
 app.onError((error, c) => {
-  const { sentry } = c.var;
   console.error(error);
-  sentry.captureException(error);
   return c.json({ message: error.message }, 500);
 });
 
@@ -139,9 +114,6 @@ app.route("/service", servicePlans);
 app.route("/service", serviceReviews);
 app.route("/service", services);
 app.route("/user", users);
-
-// Setup Webhooks
-app.route("/webhooks/mcp", mcp);
 
 // Tests Routes
 if (ENVIRONMENT === "development") {
