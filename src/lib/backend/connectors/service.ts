@@ -1,4 +1,6 @@
-import { Order, orderSchema } from "#/lib/backend/connectors/orders";
+import { z } from "zod";
+
+import { Order, OrderInvoice, orderInvoiceSchema, orderSchema } from "#/lib/backend/connectors/orders";
 import { BackendPrimitives } from "#/lib/backend/primitives";
 import {
   OrderStatus,
@@ -135,9 +137,15 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       await primitives.delete(`/service/${serviceId}/plans/${planId}`);
     },
 
-    orderServicePlan: async (serviceId: string, planId: string, data: any): Promise<any> => {
+    orderServicePlan: async (
+      serviceId: string,
+      planId: string,
+      data: any,
+    ): Promise<{ message: string; order: Record<string, unknown>; invoice: OrderInvoice }> => {
       const response = await primitives.post(`/service/${serviceId}/plans/${planId}/order`, data);
-      return response;
+      return z
+        .object({ message: z.string(), order: z.record(z.unknown()), invoice: orderInvoiceSchema })
+        .parse(response);
     },
 
     getServicePlans: async (serviceId: string): Promise<ServicePlan[]> => {

@@ -45,9 +45,9 @@ export default function Page() {
       if (!planId) return;
       await backend.service
         .orderServicePlan(id, planId, values)
-        .then(() => {
-          toast.success("Order created successfully!");
-          router.push("/manage/orders");
+        .then((result) => {
+          toast.success("Order created. Continue with the demo payment.");
+          router.push(`/manage/invoices/${result.invoice.id}`);
         })
         .catch((error: Error) => {
           console.error(error);
@@ -162,15 +162,13 @@ export default function Page() {
           <CardContent>
             <div className={"flex justify-between"}>
               <span className={"text-muted-foreground text-sm"}>{plan.name}</span>
-              <span className={"text-sm font-bold"}>
-                {plan.stripePriceData ? formatPrice(plan.stripePriceData) : "Unknown"}
-              </span>
+              <span className={"text-sm font-bold"}>{plan.priceData ? formatPrice(plan.priceData) : "Unknown"}</span>
             </div>
           </CardContent>
           <CardFooter className={"flex-col gap-2"}>
             <Button className={"w-full"} type={"submit"} variant={"default"} disabled={form.formState.isSubmitting}>
               <ShoppingCartIcon />
-              <span>Order Now</span>
+              <span>Continue to demo payment</span>
             </Button>
             <Button
               className={"w-full"}

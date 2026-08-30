@@ -1,8 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loadConnectAndInitialize, StripeConnectInstance } from "@stripe/connect-js";
-import { BanknoteIcon, EyeIcon, InfoIcon, SaveIcon, UsersIcon } from "lucide-react";
+import { BanknoteIcon, EyeIcon, InfoIcon, SaveIcon, UsersIcon, WalletCardsIcon } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,11 +15,12 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "#/comp
 import { Input } from "#/components/ui/input";
 import FormWrapper from "#/components/ui/wrappers/form";
 import ImageWrapper from "#/components/ui/wrappers/image";
-import { STRIPE_PUBLISHABLE_KEY } from "#/environment";
 import useBackend from "#/lib/backend/client";
+import { PaymentAccount } from "#/lib/backend/schema/payments";
 import { useSession } from "#/lib/providers/session";
 import Link from "#/lib/router";
 import industries from "#/lib/store/industries";
+import { formatAmount } from "#/lib/utils";
 import Loading from "#/routes/-pages/loading";
 
 const schema = z.object({
@@ -51,8 +51,7 @@ export default function Page() {
   });
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [connect, setConnect] = useState<StripeConnectInstance>();
-  const [connectStatus, setConnectStatus] = useState<"loading" | "setup" | "ready">();
+  const [paymentAccount, setPaymentAccount] = useState<PaymentAccount>();
 
   function createSaveHandler() {
     return form.handleSubmit(async (values) => {
@@ -85,14 +84,14 @@ export default function Page() {
       });
   }
 
-  async function handleSetupPayouts() {
-    const link = await backend.payments.onboardConnectAccount();
-    window.open(link.url, "_blank");
-  }
-
-  async function handleManagePayouts() {
-    const link = await backend.payments.accessConnectAccount();
-    window.open(link.url, "_blank");
+  async function handleActivatePayments() {
+    await backend.payments
+      .activateAccount()
+      .then((account) => {
+        setPaymentAccount(account);
+        toast.success("Demo payments activated. No external account was created.");
+      })
+      .catch((error: Error) => toast.error(error.message));
   }
 
   useEffect(() => {
@@ -110,24 +109,9 @@ export default function Page() {
       });
     });
 
-    const loadConnect = STRIPE_PUBLISHABLE_KEY
-      ? backend.payments
-          .getConnectAccount()
-          .then((account) => {
-            // setConnectStatus(account.details_submitted && account.charges_enabled && account.payouts_enabled ? "ready" : "setup");
-            setConnectStatus(account.details_submitted ? "ready" : "setup");
-            return backend.payments.createConnectSession();
-          })
-          .then((session) => {
-            const instance = loadConnectAndInitialize({
-              publishableKey: STRIPE_PUBLISHABLE_KEY,
-              fetchClientSecret: async () => session.client_secret,
-            });
-            setConnect(instance);
-          })
-      : Promise.resolve();
+    const loadPayments = backend.payments.getAccount().then(setPaymentAccount);
 
-    Promise.all([loadOrganization, loadConnect])
+    Promise.all([loadOrganization, loadPayments])
       .catch((error: Error) => {
         console.error(error);
         toast.error(error.message);
@@ -144,23 +128,59 @@ export default function Page() {
   return (
     <FormWrapper form={form} onSubmit={createSaveHandler()}>
       <div className={"container mx-auto max-w-4xl space-y-4 p-4"}>
-        {!STRIPE_PUBLISHABLE_KEY && (
-          <Alert>
-            <InfoIcon />
-            <AlertTitle>Payouts are not configured</AlertTitle>
-            <AlertDescription>Add the Stripe keys to enable payout setup and management.</AlertDescription>
-          </Alert>
-        )}
-        {connectStatus === "setup" && (
-          <Alert className={"cursor-pointer"} onClick={handleSetupPayouts}>
-            <InfoIcon />
-            <AlertTitle>Tip</AlertTitle>
-            <AlertDescription>
-              To receive payouts, you need to set up your Stripe account. Click here or the button below to start the
-              setup.
-            </AlertDescription>
-          </Alert>
-        )}
+        <Alert className="border-primary/30 bg-primary/5">
+          <InfoIcon />
+          <AlertTitle>Demo payment environment</AlertTitle>
+          <AlertDescription>
+            Balances, payments, declines, and refunds are simulated locally. No financial account or real transfer is
+            created.
+          </AlertDescription>
+        </Alert>
+
+        <div className="rounded-xl border p-4">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <WalletCardsIcon className="size-5" />
+                <h2 className="font-semibold">Payment account</h2>
+              </div>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {paymentAccount?.status === "ready"
+                  ? `Active · ${paymentAccount.id}`
+                  : "Activate once to start accepting demo payments."}
+              </p>
+            </div>
+            {paymentAccount?.status !== "ready" && (
+              <Button type="button" onClick={handleActivatePayments}>
+                <BanknoteIcon />
+                Activate demo payments
+              </Button>
+            )}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="bg-muted/50 rounded-lg p-3">
+              <p className="text-muted-foreground text-xs">Available</p>
+              <p className="text-xl font-semibold">
+                {formatAmount(paymentAccount?.availableBalance ?? 0, paymentAccount?.currency ?? "sgd")}
+              </p>
+              <p className="text-muted-foreground text-xs">{paymentAccount?.paidInvoices ?? 0} paid invoices</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3">
+              <p className="text-muted-foreground text-xs">Awaiting payment</p>
+              <p className="text-xl font-semibold">
+                {formatAmount(paymentAccount?.pendingBalance ?? 0, paymentAccount?.currency ?? "sgd")}
+              </p>
+              <p className="text-muted-foreground text-xs">{paymentAccount?.openInvoices ?? 0} open invoices</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3">
+              <p className="text-muted-foreground text-xs">Refunded</p>
+              <p className="text-xl font-semibold">
+                {formatAmount(paymentAccount?.refundedAmount ?? 0, paymentAccount?.currency ?? "sgd")}
+              </p>
+              <p className="text-muted-foreground text-xs">Simulated lifecycle total</p>
+            </div>
+          </div>
+        </div>
 
         <div className={"flex gap-4 max-sm:flex-col"}>
           {/* Avatar */}
@@ -285,18 +305,6 @@ export default function Page() {
         />
 
         <div className={"flex flex-wrap gap-2"}>
-          {connectStatus === "setup" && (
-            <Button className={"mr-auto"} type={"button"} variant={"outline"} onClick={handleSetupPayouts}>
-              <BanknoteIcon />
-              <span>Setup Payouts</span>
-            </Button>
-          )}
-          {connectStatus === "ready" && (
-            <Button className={"mr-auto"} type={"button"} variant={"outline"} onClick={handleManagePayouts}>
-              <BanknoteIcon />
-              <span>Manage Payouts</span>
-            </Button>
-          )}
           <div className="bg-muted/40 rounded-lg border px-3 py-2 text-sm font-medium">{organization?.name}</div>
           <Button type={"button"} variant={"outline"} asChild>
             <Link href={`/organizations/${organization!.id}`}>

@@ -59,7 +59,7 @@ export default function PlansTab(props: { data: Service }) {
               {plan.default && <Badge variant={"default"}>Default</Badge>}
             </div>
             <p className={"flex flex-col items-end text-sm"}>
-              {plan.stripePriceData ? formatPrice(plan.stripePriceData) : "Unknown"}
+              {plan.priceData ? formatPrice(plan.priceData) : "Unknown"}
             </p>
           </div>
 

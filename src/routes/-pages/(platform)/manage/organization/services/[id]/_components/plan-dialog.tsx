@@ -113,12 +113,12 @@ export default function PlanDialog(props: {
       description: props.plan?.description ?? undefined,
       status: props.plan?.status ?? "active",
       default: props.plan?.default ?? false,
-      type: props.plan?.stripePriceData?.type ?? "one_time",
-      currency: props.plan?.stripePriceData?.currency ?? "sgd",
+      type: props.plan?.priceData?.type ?? "one_time",
+      currency: props.plan?.priceData?.currency ?? "sgd",
       ...(() => {
-        switch (props.plan?.stripePriceData?.type) {
+        switch (props.plan?.priceData?.type) {
           case "one_time": {
-            return { amount: props.plan.stripePriceData.unit_amount / 100 };
+            return { amount: props.plan.priceData.unit_amount / 100 };
           }
           default: {
             return { amount: 5 };

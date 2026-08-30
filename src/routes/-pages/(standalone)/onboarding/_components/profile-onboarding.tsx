@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRightIcon, Loader2Icon, MapPinIcon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -7,7 +7,9 @@ import { z } from "zod";
 
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "#/components/ui/card";
+import { Checkbox } from "#/components/ui/checkbox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "#/components/ui/form";
+import { Input } from "#/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select";
 import FormWrapper from "#/components/ui/wrappers/form";
 import useBackend from "#/lib/backend/client";
@@ -16,21 +18,20 @@ import countries from "#/lib/store/countries";
 
 const schema = z.object({
   location: z.string().min(1, "Select your location."),
+  terms: z.boolean().refine(Boolean, "Accept the terms and privacy policy to continue."),
 });
 
 export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
   const backend = useBackend();
   const session = useSession();
   const form = useForm({
-    defaultValues: {
-      location: "",
-    },
+    defaultValues: { location: "", terms: false },
     resolver: zodResolver(schema),
   });
 
-  const save = form.handleSubmit(async (values) => {
+  const save = form.handleSubmit(async ({ location }) => {
     try {
-      await backend.user.updateUser("current", values);
+      await backend.user.updateUser("current", { location });
       await session.refreshUser();
       onNext();
     } catch (saveError) {
@@ -41,24 +42,39 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
 
   useEffect(() => {
     if (!session.user) return;
-    form.reset({
-      location: session.user.location ?? "",
-    });
+    form.reset({ location: session.user.location ?? "", terms: false });
   }, [form, session.user]);
 
   return (
-    <FormWrapper className="w-full max-w-md" form={form} onSubmit={save}>
+    <FormWrapper className="w-100 max-w-full" form={form} onSubmit={save}>
       <Card>
         <CardHeader>
-          <div className="bg-primary/10 text-primary mb-2 flex size-10 items-center justify-center rounded-xl">
-            <MapPinIcon className="size-5" />
-          </div>
-          <CardTitle>One last detail</CardTitle>
-          <CardDescription>
-            Add your location so Initiate can show services, people, and resources that are relevant to you.
-          </CardDescription>
+          <CardTitle>Welcome onboard!</CardTitle>
+          <CardDescription>Complete your profile to start using Initiate.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="flex gap-4 max-sm:flex-col [&>*]:flex-1">
+            <FormItem>
+              <FormLabel>First Name</FormLabel>
+              <FormControl>
+                <Input value={session.user?.firstName ?? ""} readOnly />
+              </FormControl>
+            </FormItem>
+            <FormItem>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input value={session.user?.lastName ?? ""} readOnly />
+              </FormControl>
+            </FormItem>
+          </div>
+
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+              <Input value={session.user?.emails[0] ?? ""} readOnly />
+            </FormControl>
+          </FormItem>
+
           <FormField
             control={form.control}
             name="location"
@@ -68,7 +84,7 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
                 <FormControl>
                   <Select value={field.value} disabled={form.formState.isSubmitting} onValueChange={field.onChange}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select your location" />
+                      <SelectValue placeholder="Select location..." />
                     </SelectTrigger>
                     <SelectContent>
                       {countries.map((country) => (
@@ -83,10 +99,46 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="terms"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-start gap-2">
+                  <FormControl>
+                    <Checkbox className="mt-0.5" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <FormLabel className="text-muted-foreground text-sm leading-5">
+                    I accept the{" "}
+                    <a
+                      className="text-primary hover:underline"
+                      href="https://dennise.me/terms"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a
+                      className="text-primary hover:underline"
+                      href="https://dennise.me/privacy"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </FormLabel>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </CardContent>
-        <CardFooter className="mt-6 justify-end border-t">
+        <CardFooter>
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? <Loader2Icon className="animate-spin" /> : <ArrowRightIcon />}
+            {form.formState.isSubmitting && <Loader2Icon className="animate-spin" />}
             {form.formState.isSubmitting ? "Saving..." : "Finish setup"}
           </Button>
         </CardFooter>

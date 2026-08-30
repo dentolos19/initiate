@@ -3,269 +3,137 @@ import { Hono } from "hono";
 import z from "zod";
 
 import { orderInvoice } from "#/lib/database/schema.js";
-import { stripe } from "#/lib/server/integrations.js";
 import { database } from "#/lib/server/integrations/database.js";
-import { getCustomer } from "#/lib/server/lib/utils.js";
+import { createPaymentReference, ensurePaymentAccount } from "#/lib/server/lib/payments.js";
+import { checkMembership, getUser } from "#/lib/server/lib/utils.js";
 
 const orderInvoices = new Hono();
 
-// Update invoice
-orderInvoices.put("/invoices/:invoiceId", async (c) => {
-  const invoiceId = c.req.param("invoiceId");
-
-  const invoice = await database.query.orderInvoice.findFirst({
-    where: {
-      id: invoiceId,
-    },
+async function getInvoice(invoiceId: string) {
+  return database.query.orderInvoice.findFirst({
+    where: { id: invoiceId },
+    with: { order: { columns: { organizationId: true, userId: true } } },
   });
+}
 
-  if (!invoice) {
-    throw new Error("Invoice not found.");
+async function canManage(userId: string, organizationId?: string | null) {
+  return organizationId ? checkMembership(userId, organizationId) : false;
+}
+
+orderInvoices.put("/invoices/:invoiceId", async (c) => {
+  const user = await getUser(c);
+  const invoice = await getInvoice(c.req.param("invoiceId"));
+  if (!user || !invoice || !(await canManage(user.id, invoice.order?.organizationId))) {
+    return c.json({ message: "Invoice not found." }, 404);
   }
+  if (invoice.status !== "draft") return c.json({ message: "Only draft invoices can be edited." }, 400);
 
-  if (invoice.status !== "draft") {
-    throw new Error("Only draft invoices can be edited.");
-  }
-
-  const body = await c.req.json();
-
-  const { success, data } = z
+  const parsed = z
     .object({
       milestoneId: z.string().nullable().optional(),
-      currency: z.string().optional(),
+      currency: z.string().length(3).optional(),
       amount: z.number().int().positive().optional(),
       description: z.string().optional(),
     })
-    .safeParse(body);
+    .safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ message: "Invalid request body." }, 400);
 
-  if (!success) {
-    throw new Error("Invalid request body.");
-  }
-
-  // Get invoice items from Stripe
-  const stripeInvoice = await stripe.invoices.update(
-    invoice.stripeInvoiceId,
-    {
-      description: data.description,
-      expand: ["lines"],
-      metadata: {
-        ...(data.milestoneId ? { milestoneId: data.milestoneId } : {}),
-        ...(data.description ? { description: data.description } : {}),
-      },
-    },
-    { stripeAccount: invoice.stripeAccountId },
-  );
-
-  // Delete existing invoice items
-  await Promise.all(
-    stripeInvoice.lines.data.map((item) =>
-      stripe.invoiceItems.del(item.id, {}, { stripeAccount: invoice.stripeAccountId }),
-    ),
-  );
-
-  // Create new invoice item
-  const stripeInvoiceItem = await stripe.invoiceItems.create(
-    {
-      customer: invoice.stripeCustomerId,
-      invoice: invoice.stripeInvoiceId,
-      currency: data.currency || invoice.currency,
-      amount: data.amount || invoice.amount,
-      description: data.description,
-    },
-    { stripeAccount: invoice.stripeAccountId },
-  );
-
-  // Update the invoice in the database
   const [updatedInvoice] = await database
     .update(orderInvoice)
-    .set({
-      currency: stripeInvoiceItem.currency,
-      amount: stripeInvoiceItem.amount,
-      description: data.description,
-      milestoneId: data.milestoneId,
-    })
-    .where(eq(orderInvoice.id, invoiceId))
+    .set(parsed.data)
+    .where(eq(orderInvoice.id, invoice.id))
     .returning();
-
   return c.json(updatedInvoice);
 });
 
-// Delete/void invoice
 orderInvoices.delete("/invoices/:invoiceId", async (c) => {
-  const invoiceId = c.req.param("invoiceId");
-
-  const invoice = await database.query.orderInvoice.findFirst({
-    where: {
-      id: invoiceId,
-    },
-  });
-
-  if (!invoice) {
-    throw new Error("Invoice not found.");
+  const user = await getUser(c);
+  const invoice = await getInvoice(c.req.param("invoiceId"));
+  if (!user || !invoice || !(await canManage(user.id, invoice.order?.organizationId))) {
+    return c.json({ message: "Invoice not found." }, 404);
   }
 
   if (invoice.status === "draft") {
-    await stripe.invoices.del(invoice.stripeInvoiceId, {}, { stripeAccount: invoice.stripeAccountId });
-    await database.delete(orderInvoice).where(eq(orderInvoice.id, invoiceId));
+    await database.delete(orderInvoice).where(eq(orderInvoice.id, invoice.id));
   } else if (invoice.status === "open") {
-    await stripe.invoices.voidInvoice(invoice.stripeInvoiceId, {}, { stripeAccount: invoice.stripeAccountId });
-    await database.update(orderInvoice).set({ status: "void" }).where(eq(orderInvoice.id, invoiceId));
+    await database.update(orderInvoice).set({ status: "void" }).where(eq(orderInvoice.id, invoice.id));
   } else {
-    throw new Error("Invoice cannot be deleted or voided.");
+    return c.json({ message: "Only draft or open invoices can be removed." }, 400);
   }
-
-  return c.json({ message: "Invoice deleted successfully." });
+  return c.json({ message: invoice.status === "draft" ? "Invoice deleted." : "Invoice voided." });
 });
 
-// Finalize invoice
 orderInvoices.post("/invoices/:invoiceId/finalize", async (c) => {
-  const invoiceId = c.req.param("invoiceId");
-
-  const invoice = await database.query.orderInvoice.findFirst({
-    where: {
-      id: invoiceId,
-    },
-  });
-
-  if (!invoice) {
-    throw new Error("Invoice not found.");
+  const user = await getUser(c);
+  const invoice = await getInvoice(c.req.param("invoiceId"));
+  if (!user || !invoice || !(await canManage(user.id, invoice.order?.organizationId))) {
+    return c.json({ message: "Invoice not found." }, 404);
   }
+  if (invoice.status !== "draft") return c.json({ message: "Only draft invoices can be finalized." }, 400);
 
-  if (invoice.status !== "draft") {
-    throw new Error("Only draft invoices can be finalized.");
-  }
-
-  // Finalize the invoice in Stripe
-  const stripeInvoice = await stripe.invoices.finalizeInvoice(
-    invoice.stripeInvoiceId,
-    {},
-    { stripeAccount: invoice.stripeAccountId },
-  );
-
-  // Update the invoice in the database
   const [updatedInvoice] = await database
     .update(orderInvoice)
-    .set({
-      status: stripeInvoice.status || "open",
-      url: stripeInvoice.hosted_invoice_url,
-    })
-    .where(eq(orderInvoice.id, invoiceId))
+    .set({ status: "open" })
+    .where(eq(orderInvoice.id, invoice.id))
     .returning();
-
   return c.json(updatedInvoice);
 });
 
-// Create new invoice
 orderInvoices.post("/:orderId/invoices", async (c) => {
-  const orderId = c.req.param("orderId");
-
+  const user = await getUser(c);
   const order = await database.query.order.findFirst({
-    where: {
-      id: orderId,
-    },
-    columns: {
-      id: true,
-      userId: true,
-    },
-    with: {
-      organization: {
-        columns: {
-          stripeAccountId: true,
-        },
-      },
-    },
+    where: { id: c.req.param("orderId") },
+    columns: { id: true, userId: true, organizationId: true },
+    with: { organization: true },
   });
-
-  console.log(order);
-
-  if (!order) {
-    throw new Error("Order not found.");
+  if (!user || !order?.userId || !order.organizationId || !order.organization) {
+    return c.json({ message: "Order not found." }, 404);
   }
+  if (!(await canManage(user.id, order.organizationId))) return c.json({ message: "Unauthorized." }, 401);
 
-  const body = await c.req.json();
-
-  const { success, data } = z
+  const parsed = z
     .object({
       milestoneId: z.string().nullable().optional(),
-      currency: z.string().optional(),
+      currency: z.string().length(3).default("sgd"),
       amount: z.number().int().positive(),
       description: z.string().optional(),
     })
-    .safeParse(body);
+    .safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ message: "Invalid request body." }, 400);
 
-  if (!success) {
-    return c.json({ message: "Invalid request body." }, 400);
-  }
-
-  if (!order.organization || !order.organization.stripeAccountId) {
-    return c.json({ message: "Order does not have a valid organization." }, 400);
-  }
-
-  if (!order.userId) {
-    return c.json({ message: "Order does not have a valid user." }, 400);
-  }
-
-  const customer = await getCustomer(order.userId, order.organization.stripeAccountId);
-
-  const stripeInvoice = await stripe.invoices.create(
-    {
-      customer: customer.id,
-      currency: data.currency,
-      description: data.description,
-      auto_advance: false, // Keep as draft
-      metadata: {
-        userId: order.userId,
-        orderId: order.id,
-        accountId: order.organization.stripeAccountId,
-        customerId: customer.id,
-        ...(data.milestoneId ? { milestoneId: data.milestoneId } : {}),
-        ...(data.description ? { description: data.description } : {}),
-      },
-    },
-    { stripeAccount: order.organization.stripeAccountId },
-  );
-
-  const stripeInvoiceItem = await stripe.invoiceItems.create(
-    {
-      customer: customer.id,
-      invoice: stripeInvoice.id!,
-      currency: data.currency,
-      amount: data.amount,
-    },
-    { stripeAccount: order.organization.stripeAccountId },
-  );
-
+  const paymentAccountId = await ensurePaymentAccount(order.organizationId, order.organization.paymentAccountId);
   const [invoice] = await database
     .insert(orderInvoice)
     .values({
       userId: order.userId,
-      orderId: orderId,
-      milestoneId: data.milestoneId,
-      stripeInvoiceId: stripeInvoice.id!,
-      stripeAccountId: order.organization.stripeAccountId,
-      stripeCustomerId: customer.id,
+      orderId: order.id,
+      milestoneId: parsed.data.milestoneId,
+      paymentAccountId,
+      customerReference: createPaymentReference("customer"),
+      reference: createPaymentReference("invoice"),
       status: "draft",
-      currency: stripeInvoiceItem.currency,
-      amount: stripeInvoiceItem.amount,
-      description: data.description,
-      url: stripeInvoice.hosted_invoice_url,
+      currency: parsed.data.currency,
+      amount: parsed.data.amount,
+      description: parsed.data.description,
     })
     .returning();
-
   return c.json(invoice);
 });
 
-// Get order's invoices
 orderInvoices.get("/:orderId/invoices", async (c) => {
-  const id = c.req.param("orderId");
-
-  const invoices = await database.query.orderInvoice.findMany({
-    where: {
-      orderId: id,
-    },
+  const user = await getUser(c);
+  const order = await database.query.order.findFirst({
+    where: { id: c.req.param("orderId") },
+    columns: { id: true, userId: true, organizationId: true },
   });
+  if (!user || !order) return c.json({ message: "Order not found." }, 404);
 
-  return c.json(invoices);
+  const authorized = order.userId === user.id || (await canManage(user.id, order.organizationId));
+  if (!authorized) return c.json({ message: "Order not found." }, 404);
+
+  return c.json(
+    await database.query.orderInvoice.findMany({ where: { orderId: order.id }, orderBy: { createdAt: "desc" } }),
+  );
 });
 
 export default orderInvoices;

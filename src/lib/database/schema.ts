@@ -1,14 +1,5 @@
 import { sql } from "drizzle-orm";
-import {
-  foreignKey,
-  index,
-  integer,
-  primaryKey,
-  real,
-  sqliteTable,
-  text,
-  uniqueIndex,
-} from "drizzle-orm/sqlite-core";
+import { foreignKey, index, integer, primaryKey, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 const id = () =>
   text()
@@ -47,9 +38,7 @@ export const callParticipant = sqliteTable(
       .default(sql`(unixepoch() * 1000)`)
       .notNull(),
   },
-  (table) => [
-    uniqueIndex("call_participants_callId_userId_key").on(table.callId, table.userId),
-  ],
+  (table) => [uniqueIndex("call_participants_callId_userId_key").on(table.callId, table.userId)],
 );
 
 export const call = sqliteTable("communication_calls", {
@@ -139,9 +128,7 @@ export const communityFollow = sqliteTable(
       .default(sql`(unixepoch() * 1000)`)
       .notNull(),
   },
-  (table) => [
-    uniqueIndex("community_follows_userId_tag_key").on(table.userId, table.tag),
-  ],
+  (table) => [uniqueIndex("community_follows_userId_tag_key").on(table.userId, table.tag)],
 );
 
 export const communityLike = sqliteTable(
@@ -325,7 +312,7 @@ export const organization = sqliteTable("organizations", {
     .default(sql`(unixepoch() * 1000)`)
     .notNull(),
   verified: integer({ mode: "boolean" }).default(false).notNull(),
-  stripeAccountId: text(),
+  paymentAccountId: text(),
   location: text(),
 });
 
@@ -371,9 +358,9 @@ export const orderInvoice = sqliteTable("service_invoices", {
   amount: integer().default(0).notNull(),
   status: text().default("draft").notNull(),
   url: text(),
-  stripeAccountId: text().notNull(),
-  stripeCustomerId: text().notNull(),
-  stripeInvoiceId: text().notNull(),
+  paymentAccountId: text().notNull(),
+  customerReference: text().notNull(),
+  reference: text().notNull(),
   dueAt: integer({ mode: "timestamp_ms" }),
   paidAt: integer({ mode: "timestamp_ms" }),
   updatedAt: integer({ mode: "timestamp_ms" })
@@ -428,15 +415,15 @@ export const servicePlan = sqliteTable("service_plans", {
     .references(() => service.id, { onDelete: "cascade", onUpdate: "cascade" }),
   name: text().notNull(),
   description: text(),
-  stripePriceData: text({ mode: "json" }).$type<Record<string, any>>(),
-  stripePriceId: text(),
+  priceData: text({ mode: "json" }).$type<Record<string, any>>(),
+  priceReference: text(),
   default: integer({ mode: "boolean" }).default(false).notNull(),
   deployment: text({ mode: "json" }).$type<Record<string, any>>(),
   features: text({ mode: "json" }).$type<any[]>(),
   status: text().default("active").notNull(),
   amount: integer().default(0).notNull(),
   currency: text().default("sgd").notNull(),
-  type: text().default("stripe").notNull(),
+  type: text().default("one_time").notNull(),
 });
 
 export const serviceReview = sqliteTable("service_reviews", {
@@ -477,7 +464,7 @@ export const service = sqliteTable("services", {
     .default(sql`(unixepoch() * 1000)`)
     .notNull(),
   type: text().default("other").notNull(),
-  stripeProductId: text(),
+  productReference: text(),
   features: text({ mode: "json" }).$type<any[]>(),
 });
 

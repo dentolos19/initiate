@@ -7,7 +7,7 @@ import { Button } from "#/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#/components/ui/table";
 import { OrderInvoice } from "#/lib/backend/connectors/orders";
 import Link from "#/lib/router";
-import stripeInvoiceStatus from "#/lib/store/stripe-invoice-status";
+import invoiceStatus from "#/lib/store/invoice-status";
 import { formatAmount, formatDate, getLabel } from "#/lib/utils";
 
 interface InvoiceTableProps {
@@ -47,7 +47,7 @@ export default function InvoiceTable({ invoices, loading, emptyMessage }: Invoic
         ) : (
           invoices.map((invoice) => (
             <TableRow key={invoice.id}>
-              <TableCell className={"font-mono text-sm"}>{invoice.stripeInvoiceId}</TableCell>
+              <TableCell className={"font-mono text-sm"}>{invoice.reference}</TableCell>
               <TableCell>
                 <div className={"space-y-1"}>
                   <div className={"font-medium"}>{(invoice as any).order?.service?.name || "Unknown Service"}</div>
@@ -58,35 +58,35 @@ export default function InvoiceTable({ invoices, loading, emptyMessage }: Invoic
               </TableCell>
               <TableCell>{formatAmount(invoice.amount, invoice.currency)}</TableCell>
               <TableCell>
-                <Badge variant={"outline"}>{getLabel(stripeInvoiceStatus, invoice.status, "Unknown")}</Badge>
+                <Badge variant={"outline"}>{getLabel(invoiceStatus, invoice.status, "Unknown")}</Badge>
               </TableCell>
               <TableCell>{formatDate((invoice as any).createdAt || new Date())}</TableCell>
               <TableCell>
                 <div className={"flex gap-2"}>
                   {/* Pay Invoice */}
-                  {invoice.url && invoice.status === "open" && (
+                  {invoice.status === "open" && (
                     <Button variant={"default"} size={"sm"} asChild>
-                      <Link href={invoice.url} target={"_blank"}>
+                      <Link href={`/manage/invoices/${invoice.id}`}>
                         <BanknoteIcon className={"h-4 w-4"} />
-                        <span>Pay Invoice</span>
+                        <span>Demo payment</span>
                       </Link>
                     </Button>
                   )}
 
                   {/* View Invoice */}
-                  {invoice.url && invoice.status === "paid" && (
+                  {(invoice.status === "paid" || invoice.status === "refunded") && (
                     <Button variant={"default"} size={"sm"} asChild>
-                      <Link href={invoice.url} target={"_blank"}>
+                      <Link href={`/manage/invoices/${invoice.id}`}>
                         <ReceiptIcon className={"h-4 w-4"} />
-                        <span>View Invoice</span>
+                        <span>View receipt</span>
                       </Link>
                     </Button>
                   )}
 
                   {/* View Invoice for draft/void */}
-                  {invoice.url && (invoice.status === "draft" || invoice.status === "void") && (
+                  {(invoice.status === "draft" || invoice.status === "void") && (
                     <Button variant={"outline"} size={"sm"} asChild>
-                      <Link href={invoice.url} target={"_blank"}>
+                      <Link href={`/manage/invoices/${invoice.id}`}>
                         <ReceiptIcon className={"h-4 w-4"} />
                         <span>View</span>
                       </Link>

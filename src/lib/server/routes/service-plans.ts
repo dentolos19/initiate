@@ -1,145 +1,76 @@
 import { and, eq, ne } from "drizzle-orm";
 import { Hono } from "hono";
-import type Stripe from "stripe";
 import z from "zod";
 
-import { order as orderTable, servicePlan } from "#/lib/database/schema.js";
+import { order as orderTable, orderInvoice, servicePlan } from "#/lib/database/schema.js";
 import ServiceOrderedUserMail from "#/lib/server/components/service-ordered-user-mail.js";
-import { stripe } from "#/lib/server/integrations.js";
 import { database } from "#/lib/server/integrations/database.js";
+import { createPaymentReference, ensurePaymentAccount } from "#/lib/server/lib/payments.js";
 import { priceSchema } from "#/lib/server/lib/schema.js";
-import { getCustomer, getOrganization, getUser } from "#/lib/server/lib/utils.js";
-import { attachInvoice } from "#/lib/server/lib/utils/finances.js";
+import { getOrganization, getUser } from "#/lib/server/lib/utils.js";
 
 const servicePlans = new Hono();
 
-// Create a service plan of a service
+function toPriceData(name: string, data: z.infer<typeof priceSchema>) {
+  if (data.type === "one_time") return { ...data, nickname: name };
+  if (data.type === "recurring" || data.type === "metered") {
+    return {
+      type: "recurring" as const,
+      currency: data.currency,
+      nickname: name,
+      unit_amount: data.unit_amount,
+      recurring: {
+        interval: data.interval,
+        interval_count: 1,
+        usage_type: data.type === "metered" ? "metered" : "licensed",
+      },
+    };
+  }
+  return {
+    type: "tiered" as const,
+    currency: data.currency,
+    nickname: name,
+    tiers_mode: "volume" as const,
+    tiers: data.tiers,
+    recurring: { interval: "month" as const, interval_count: 1, usage_type: "licensed" as const },
+  };
+}
+
 servicePlans.post("/:serviceId/plans", async (c) => {
   const user = await getUser(c);
   const organization = await getOrganization(c);
+  if (!user || !organization) return c.json({ message: "Unauthorized." }, 401);
 
-  if (!user || !organization) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
+  const service = await database.query.service.findFirst({ where: { id: c.req.param("serviceId") } });
+  if (!service) return c.json({ message: "Service not found." }, 404);
+  if (service.organizationId !== organization.id) return c.json({ message: "Unauthorized." }, 401);
 
-  if (!organization?.stripeAccountId) {
-    return c.json({ message: "Organization does not have a Stripe account." }, 400);
-  }
-
-  const serviceId = c.req.param("serviceId");
-  const requestBody = await c.req.json();
-
-  const service = await database.query.service.findFirst({
-    where: {
-      id: serviceId,
-    },
-    columns: {
-      id: true,
-      organizationId: true,
-      stripeProductId: true,
-    },
-  });
-
-  if (!service) {
-    return c.json({ message: "Service not found." }, 404);
-  }
-
-  if (service.organizationId !== organization.id) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
-
-  const { success, data } = z
+  const parsed = z
     .object({
-      name: z.string(),
-      type: z.string().optional(),
+      name: z.string().min(1),
       status: z.string().optional(),
       description: z.string().optional(),
       default: z.boolean().optional(),
-      data: priceSchema.optional(),
+      data: priceSchema,
     })
-    .safeParse(requestBody);
+    .safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ message: "Invalid request body." }, 400);
 
-  if (!success) {
-    return c.json({ message: "Invalid request body." }, 400);
-  }
-
-  const body = data.data;
-
-  let price: Stripe.Price | undefined;
-
-  if (body && service.stripeProductId) {
-    switch (body.type) {
-      case "one_time":
-        price = await stripe.prices.create(
-          {
-            product: service.stripeProductId,
-            nickname: data.name,
-            currency: body.currency,
-            unit_amount: body.unit_amount,
-          },
-          { stripeAccount: organization.stripeAccountId },
-        );
-        break;
-      // case "recurring":
-      //   price = await stripe.prices.create(
-      //     {
-      //       product: service.stripeProductId,
-      //       nickname: data.name,
-      //       currency: body.currency,
-      //       unit_amount: body.unit_amount,
-      //       recurring: {
-      //         interval: body.interval,
-      //       },
-      //     },
-      //     { stripeAccount: organization.stripeAccountId },
-      //   );
-      //   break;
-      // case "tiered":
-      //   price = await stripe.prices.create(
-      //     {
-      //       product: service.stripeProductId,
-      //       nickname: data.name,
-      //       currency: body.currency,
-      //       tiers_mode: "volume",
-      //       billing_scheme: "tiered",
-      //       tiers: body.tiers.map((tier) => ({
-      //         up_to: tier.up_to,
-      //         unit_amount: tier.unit_amount,
-      //       })),
-      //     },
-      //     { stripeAccount: organization.stripeAccountId },
-      //   );
-      //   break;
-      // case "metered":
-      //   price = await stripe.prices.create(
-      //     {
-      //       product: service.stripeProductId,
-      //       nickname: data.name,
-      //       currency: body.currency,
-      //       unit_amount: body.unit_amount,
-      //       recurring: {
-      //         interval: body.interval,
-      //         usage_type: "metered",
-      //       },
-      //     },
-      //     { stripeAccount: organization.stripeAccountId },
-      //   );
-      //   break;
-    }
-  }
-
+  const priceData = toPriceData(parsed.data.name, parsed.data.data);
+  const amount = "unit_amount" in priceData ? priceData.unit_amount : (priceData.tiers[0]?.unit_amount ?? 0);
   const [plan] = await database
     .insert(servicePlan)
     .values({
       serviceId: service.id,
-      name: data.name,
-      description: data.description,
-      status: data.status || "active",
-      default: data.default || false,
-      currency: price?.currency,
-      amount: price?.unit_amount || 0,
-      stripePriceId: price?.id,
-      stripePriceData: price,
+      name: parsed.data.name,
+      description: parsed.data.description,
+      status: parsed.data.status ?? "active",
+      default: parsed.data.default ?? false,
+      type: priceData.type,
+      currency: priceData.currency,
+      amount,
+      priceReference: createPaymentReference("price"),
+      priceData,
     })
     .returning();
 
@@ -147,120 +78,65 @@ servicePlans.post("/:serviceId/plans", async (c) => {
     await database
       .update(servicePlan)
       .set({ default: false })
-      .where(and(eq(servicePlan.serviceId, serviceId), ne(servicePlan.id, plan.id)));
+      .where(and(eq(servicePlan.serviceId, service.id), ne(servicePlan.id, plan.id)));
   }
-
   return c.json(plan);
 });
 
-// Get a service plan of a service
 servicePlans.get("/:serviceId/plans/:planId", async (c) => {
-  const serviceId = c.req.param("serviceId");
-  const planId = c.req.param("planId");
-
   const plan = await database.query.servicePlan.findFirst({
-    where: {
-      id: planId,
-      serviceId: serviceId,
-    },
+    where: { id: c.req.param("planId"), serviceId: c.req.param("serviceId") },
   });
-
-  if (!plan) {
-    return c.json({ message: "Service plan not found." }, 404);
-  }
-
-  return c.json(plan);
+  return plan ? c.json(plan) : c.json({ message: "Service plan not found." }, 404);
 });
 
-// Update a service plan of a service
 servicePlans.put("/:serviceId/plans/:planId", async (c) => {
   const user = await getUser(c);
   const organization = await getOrganization(c);
+  if (!user || !organization) return c.json({ message: "Unauthorized." }, 401);
 
-  if (!user || !organization) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
+  const { serviceId, planId } = c.req.param();
+  const service = await database.query.service.findFirst({ where: { id: serviceId } });
+  const existingPlan = await database.query.servicePlan.findFirst({ where: { id: planId, serviceId } });
+  if (!service || !existingPlan) return c.json({ message: "Service plan not found." }, 404);
+  if (service.organizationId !== organization.id) return c.json({ message: "Unauthorized." }, 401);
 
-  if (!organization.stripeAccountId) {
-    return c.json({ message: "Organization does not have a Stripe account." }, 400);
-  }
-
-  const serviceId = c.req.param("serviceId");
-  const planId = c.req.param("planId");
-  const requestBody = await c.req.json();
-
-  const service = await database.query.service.findFirst({
-    where: {
-      id: serviceId,
-    },
-    columns: {
-      id: true,
-      organizationId: true,
-      stripeProductId: true,
-    },
-  });
-
-  if (!service) {
-    return c.json({ message: "Service not found." }, 404);
-  }
-
-  if (service.organizationId !== organization.id) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
-
-  const existingPlan = await database.query.servicePlan.findFirst({
-    where: {
-      id: planId,
-      serviceId: serviceId,
-    },
-    columns: {
-      id: true,
-      stripePriceId: true,
-    },
-  });
-
-  if (!existingPlan) {
-    return c.json({ message: "Service plan not found." }, 404);
-  }
-
-  const { success, data } = z
+  const parsed = z
     .object({
-      name: z.string().optional(),
+      name: z.string().min(1).optional(),
       description: z.string().optional(),
       status: z.string().optional(),
       default: z.boolean().optional(),
+      type: z.literal("one_time").optional(),
+      currency: z.string().length(3).optional(),
+      amount: z.number().positive().optional(),
     })
-    .safeParse(requestBody);
+    .safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ message: "Invalid request body." }, 400);
 
-  if (!success) {
-    return c.json({ message: "Invalid request body." }, 400);
-  }
-
-  let price: Stripe.Price | undefined;
-
-  if (existingPlan.stripePriceId) {
-    price = await stripe.prices.update(
-      existingPlan.stripePriceId,
-      {
-        nickname: data.name,
-      },
-      {
-        stripeAccount: organization.stripeAccountId,
-      },
-    );
-  }
+  const currentPrice = existingPlan.priceData as Record<string, unknown> | null;
+  const priceData = {
+    type: "one_time" as const,
+    currency: parsed.data.currency ?? existingPlan.currency,
+    nickname: parsed.data.name ?? existingPlan.name,
+    unit_amount: parsed.data.amount ? Math.round(parsed.data.amount * 100) : existingPlan.amount,
+    ...(currentPrice?.type === "one_time" ? currentPrice : {}),
+  };
+  priceData.currency = parsed.data.currency ?? existingPlan.currency;
+  priceData.nickname = parsed.data.name ?? existingPlan.name;
+  priceData.unit_amount = parsed.data.amount ? Math.round(parsed.data.amount * 100) : existingPlan.amount;
 
   const [plan] = await database
     .update(servicePlan)
     .set({
-      name: data.name,
-      description: data.description,
-      status: data.status,
-      default: data.default,
-      currency: price?.currency,
-      amount: price?.unit_amount || 0,
-      stripePriceId: price?.id,
-      stripePriceData: price,
+      name: parsed.data.name,
+      description: parsed.data.description,
+      status: parsed.data.status,
+      default: parsed.data.default,
+      type: priceData.type,
+      currency: priceData.currency,
+      amount: priceData.unit_amount,
+      priceData,
     })
     .where(eq(servicePlan.id, planId))
     .returning();
@@ -271,208 +147,100 @@ servicePlans.put("/:serviceId/plans/:planId", async (c) => {
       .set({ default: false })
       .where(and(eq(servicePlan.serviceId, serviceId), ne(servicePlan.id, planId)));
   }
-
   return c.json(plan);
 });
 
-// Delete service plan of a service
 servicePlans.delete("/:serviceId/plans/:planId", async (c) => {
   const user = await getUser(c);
   const organization = await getOrganization(c);
+  if (!user || !organization) return c.json({ message: "Unauthorized." }, 401);
 
-  if (!user || !organization) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
+  const { serviceId, planId } = c.req.param();
+  const service = await database.query.service.findFirst({ where: { id: serviceId } });
+  if (!service) return c.json({ message: "Service not found." }, 404);
+  if (service.organizationId !== organization.id) return c.json({ message: "Unauthorized." }, 401);
 
-  if (!organization.stripeAccountId) {
-    return c.json({ message: "Organization does not have a Stripe account." }, 400);
-  }
-
-  const serviceId = c.req.param("serviceId");
-  const planId = c.req.param("planId");
-
-  const service = await database.query.service.findFirst({
-    where: {
-      id: serviceId,
-    },
-  });
-
-  if (!service) {
-    return c.json({ message: "Service not found." }, 404);
-  }
-
-  if (service.organizationId !== organization.id) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
-
-  const existingPlan = await database.query.servicePlan.findFirst({
-    where: {
-      id: planId,
-      serviceId: serviceId,
-    },
-    columns: {
-      id: true,
-      stripePriceId: true,
-    },
-  });
-
-  if (!existingPlan) {
-    return c.json({ message: "Service plan not found." }, 404);
-  }
-
-  if (existingPlan.stripePriceId) {
-    await stripe.prices.update(
-      existingPlan.stripePriceId,
-      {
-        active: false,
-      },
-      {
-        stripeAccount: organization.stripeAccountId,
-      },
-    );
-  }
-
-  await database.delete(servicePlan).where(eq(servicePlan.id, planId));
-
+  await database.delete(servicePlan).where(and(eq(servicePlan.id, planId), eq(servicePlan.serviceId, serviceId)));
   return c.json({ message: "Service plan deleted." });
 });
 
-// Order a service plan of a service
 servicePlans.post("/:serviceId/plans/:planId/order", async (c) => {
   const { notification } = c.var.integrations;
-
   const user = await getUser(c);
+  if (!user) return c.json({ message: "Unauthorized." }, 401);
 
-  if (!user) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
-
-  const body = await c.req.json();
-
-  const { success, data } = z
-    .object({
-      instructions: z.string().optional(),
-    })
-    .safeParse(body);
-
-  if (!success) {
-    return c.json({ message: "Invalid request body." }, 400);
-  }
+  const parsed = z.object({ instructions: z.string().optional() }).safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ message: "Invalid request body." }, 400);
 
   const { serviceId, planId } = c.req.param();
-
   const service = await database.query.service.findFirst({
-    where: {
-      id: serviceId,
-    },
-    with: {
-      organization: {
-        columns: {
-          id: true,
-          name: true,
-          stripeAccountId: true,
-        },
-      },
-    },
+    where: { id: serviceId },
+    with: { organization: true },
   });
+  if (!service?.organization) return c.json({ message: "Service not found." }, 404);
 
-  if (!service) {
-    return c.json({ message: "Service not found." }, 404);
-  }
+  const plan = await database.query.servicePlan.findFirst({ where: { id: planId, serviceId } });
+  if (!plan?.priceData || plan.amount <= 0)
+    return c.json({ message: "Service plan does not have a valid price." }, 400);
 
-  if (!service.organization) {
-    return c.json({ message: "Service organization not found." }, 404);
-  }
-
-  const plan = await database.query.servicePlan.findFirst({
-    where: {
-      id: planId,
-      serviceId: service.id,
-    },
-  });
-
-  if (!plan) {
-    return c.json({ message: "Service plan not found." }, 404);
-  }
-
-  if (!plan.stripePriceId) {
-    return c.json({ message: "Service plan does not have a Stripe price." }, 400);
-  }
-
-  const price = await stripe.prices.retrieve(plan.stripePriceId, {
-    stripeAccount: service.organization.stripeAccountId!,
-  });
-
-  const customer = await getCustomer(user.id, service.organization.stripeAccountId!);
-
+  const paymentAccountId = await ensurePaymentAccount(service.organization.id, service.organization.paymentAccountId);
   const [order] = await database
     .insert(orderTable)
     .values({
       userId: user.id,
       serviceId: service.id,
       planId: plan.id,
-      organizationId: service.organization.id, // Assign the organization from the service
+      organizationId: service.organization.id,
+      name: `${service.name} — ${plan.name}`,
       description: plan.description,
-      instructions: data.instructions,
+      instructions: parsed.data.instructions,
       status: "pending",
     })
     .returning();
 
-  await attachInvoice(
-    {
-      orderId: order.id,
+  const [invoice] = await database
+    .insert(orderInvoice)
+    .values({
       userId: user.id,
-      accountId: service.organization.stripeAccountId!,
-      customerId: customer.id,
-      serviceName: service.name,
-      servicePlan: plan.name,
-    },
-    {
-      currency: price.currency,
-      amount: price.unit_amount || 0,
-    },
-  );
+      orderId: order.id,
+      paymentAccountId,
+      customerReference: createPaymentReference("customer"),
+      reference: createPaymentReference("invoice"),
+      status: "open",
+      currency: plan.currency,
+      amount: plan.amount,
+      description: `${service.name} — ${plan.name}`,
+      dueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    })
+    .returning();
 
-  // TODO: Improve notification system
-
-  // Send notification to user
   await notification.queueNotification([user.id], {
     title: "Service Order Created",
-    description: `Your order for the service "${service.name}" has been created successfully.`,
+    description: `Your order for "${service.name}" is ready for demo payment.`,
     content: ServiceOrderedUserMail({
-      userName: `${user.firstName} ${user.lastName}`,
+      userName: `${user.firstName} ${user.lastName ?? ""}`.trim(),
       serviceName: service.name,
       serviceProvider: service.organization.name,
       orderDate: new Date().toLocaleDateString(),
       orderNumber: order.id,
-      amount: ((price.unit_amount || 0) / 100).toFixed(2),
-      estimatedCompletion: undefined, // Can be added if available
+      amount: (plan.amount / 100).toFixed(2),
+      estimatedCompletion: undefined,
     }),
   });
-
-  // Send notification to organization
   await notification.queueNotification([service.organization.id], {
     title: "New Service Order",
-    description: `A new service order has been created for the service "${service.name}".`,
-    content: `A new service order has been created by ${user.firstName} ${user.lastName} for the service "${service.name}". The order ID is ${order.id}.`,
+    description: `A demo order was created for "${service.name}".`,
+    content: `A new demo order was created by ${user.firstName} ${user.lastName ?? ""}. The order ID is ${order.id}.`,
   });
 
-  return c.json({ message: "Service order created successfully.", order });
+  return c.json({ message: "Order created. Complete the simulated payment to continue.", order, invoice });
 });
 
-// Get all service plans of service
 servicePlans.get("/:serviceId/plans", async (c) => {
-  const serviceId = c.req.param("serviceId");
-
   const plans = await database.query.servicePlan.findMany({
-    where: {
-      serviceId: serviceId,
-    },
-    orderBy: {
-      default: "desc",
-    },
+    where: { serviceId: c.req.param("serviceId") },
+    orderBy: { default: "desc" },
   });
-
   return c.json(plans);
 });
 

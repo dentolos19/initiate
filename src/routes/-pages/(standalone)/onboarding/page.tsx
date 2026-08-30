@@ -20,7 +20,7 @@ export default function Page() {
   }
 
   return (
-    <div className="relative grid size-full place-content-center overflow-hidden px-4 py-12">
+    <div className="grid size-full place-content-center p-4">
       <ThemeParticles className="absolute inset-0" />
       <div className="relative z-10">
         <ProfileOnboarding onNext={() => router.replace(destination)} />

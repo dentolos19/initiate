@@ -2,11 +2,10 @@ import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
 
-import { order as orderTable } from "#/lib/database/schema.js";
+import { order as orderTable, orderInvoice } from "#/lib/database/schema.js";
 import ServiceCancelledMail from "#/lib/server/components/service-cancelled-mail.js";
 import ServiceCompletedMail from "#/lib/server/components/service-completed-mail.js";
 import ServiceConfirmedMail from "#/lib/server/components/service-confirmed-mail.js";
-import { stripe } from "#/lib/server/integrations.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database } from "#/lib/server/integrations/database.js";
 
@@ -136,17 +135,13 @@ orders.patch("/:id/status", async (c) => {
       where: {
         orderId: order.id,
       },
-      columns: {
-        stripeInvoiceId: true,
-        stripeAccountId: true,
-      },
+      columns: { id: true, status: true },
     });
 
-    // Finalize all invoices for the order
     await Promise.all(
-      invoices.map((invoice) =>
-        stripe.invoices.finalizeInvoice(invoice.stripeInvoiceId, {}, { stripeAccount: invoice.stripeAccountId }),
-      ),
+      invoices
+        .filter((invoice) => invoice.status === "draft")
+        .map((invoice) => database.update(orderInvoice).set({ status: "open" }).where(eq(orderInvoice.id, invoice.id))),
     );
 
     if (order.user) {
@@ -210,20 +205,14 @@ orders.patch("/:id/status", async (c) => {
       where: {
         orderId: order.id,
       },
-      columns: {
-        status: true,
-        stripeInvoiceId: true,
-        stripeAccountId: true,
-      },
+      columns: { id: true, status: true },
     });
 
-    // Delete or void all invoices for the order
     await Promise.all(
-      invoices.map((invoice) =>
-        invoice.status === "draft"
-          ? stripe.invoices.del(invoice.stripeInvoiceId, {}, { stripeAccount: invoice.stripeAccountId })
-          : stripe.invoices.voidInvoice(invoice.stripeInvoiceId, {}, { stripeAccount: invoice.stripeAccountId }),
-      ),
+      invoices.map((invoice) => {
+        const status = invoice.status === "paid" ? "refunded" : invoice.status === "refunded" ? "refunded" : "void";
+        return database.update(orderInvoice).set({ status }).where(eq(orderInvoice.id, invoice.id));
+      }),
     );
 
     if (order.user) {

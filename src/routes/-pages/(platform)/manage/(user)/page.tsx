@@ -1,14 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeIcon, ImagePlusIcon, Loader2Icon, SaveIcon } from "lucide-react";
+import { EyeIcon, Loader2Icon, SaveIcon } from "lucide-react";
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "#/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "#/components/ui/card";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "#/components/ui/form";
 import { Input } from "#/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select";
@@ -150,220 +149,184 @@ export default function Page() {
   const submitting = form.formState.isSubmitting;
 
   return (
-    <main className="container mx-auto w-full max-w-5xl space-y-8 p-4 py-8">
-      <div>
-        <p className="text-primary text-sm font-medium">Settings</p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight">Profile and account</h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-6">
-          Update how people see you on Initiate and manage the password you use to sign in.
-        </p>
-      </div>
-
+    <main className="space-y-8">
       <FormWrapper form={form} onSubmit={save}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Public profile</CardTitle>
-            <CardDescription>Your name, photo, and profile details appear across the community.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-[10rem_1fr]">
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Avatar</FormLabel>
-                    <FormControl>
-                      <label className="group bg-muted relative block aspect-square cursor-pointer overflow-hidden rounded-xl border">
-                        <input
-                          className="sr-only"
-                          type="file"
-                          accept="image/*"
-                          disabled={submitting || uploading !== undefined}
-                          onChange={(event) => void uploadImage(event, "avatar")}
-                        />
-                        <ImageWrapper className="size-full object-cover" src={field.value} alt="Profile avatar" />
-                        <span className="bg-background/90 absolute inset-x-2 bottom-2 flex items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium shadow-sm">
-                          {uploading === "avatar" ? (
-                            <Loader2Icon className="size-3.5 animate-spin" />
-                          ) : (
-                            <ImagePlusIcon className="size-3.5" />
-                          )}
-                          {uploading === "avatar" ? "Uploading..." : "Change photo"}
+        <div className="container mx-auto max-w-4xl space-y-4 p-4">
+          <div className="flex gap-4 max-sm:flex-col">
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar</FormLabel>
+                  <FormControl>
+                    <label className="relative block size-40 cursor-pointer overflow-hidden rounded-lg">
+                      <input
+                        className="hidden"
+                        type="file"
+                        accept="image/*"
+                        disabled={submitting || uploading !== undefined}
+                        onChange={(event) => void uploadImage(event, "avatar")}
+                      />
+                      <ImageWrapper className="size-full object-cover" src={field.value} alt="Avatar" />
+                      {uploading === "avatar" && (
+                        <span className="bg-background/80 absolute inset-0 grid place-content-center">
+                          <Loader2Icon className="animate-spin" />
                         </span>
-                      </label>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      )}
+                    </label>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="bannerUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Profile banner</FormLabel>
-                    <FormControl>
-                      <label className="group bg-muted relative block h-40 cursor-pointer overflow-hidden rounded-xl border">
-                        <input
-                          className="sr-only"
-                          type="file"
-                          accept="image/*"
-                          disabled={submitting || uploading !== undefined}
-                          onChange={(event) => void uploadImage(event, "banner")}
-                        />
-                        <ImageWrapper className="size-full object-cover" src={field.value} alt="Profile banner" />
-                        <span className="bg-background/90 absolute right-2 bottom-2 flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium shadow-sm">
-                          {uploading === "banner" ? (
-                            <Loader2Icon className="size-3.5 animate-spin" />
-                          ) : (
-                            <ImagePlusIcon className="size-3.5" />
-                          )}
-                          {uploading === "banner" ? "Uploading..." : "Change banner"}
+            <FormField
+              control={form.control}
+              name="bannerUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Banner</FormLabel>
+                  <FormControl>
+                    <label className="relative block w-max max-w-full cursor-pointer overflow-hidden rounded-lg">
+                      <input
+                        className="hidden"
+                        type="file"
+                        accept="image/*"
+                        disabled={submitting || uploading !== undefined}
+                        onChange={(event) => void uploadImage(event, "banner")}
+                      />
+                      <ImageWrapper className="h-40 w-auto max-w-full object-cover" src={field.value} alt="Banner" />
+                      {uploading === "banner" && (
+                        <span className="bg-background/80 absolute inset-0 grid place-content-center">
+                          <Loader2Icon className="animate-spin" />
                         </span>
-                      </label>
-                    </FormControl>
-                    <FormDescription>JPG, PNG, or WebP. Up to 5 MB.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      )}
+                    </label>
+                  </FormControl>
+                  <FormDescription>Choose an image up to 5 MB.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First name</FormLabel>
-                    <FormControl>
-                      <Input autoComplete="given-name" disabled={submitting} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last name</FormLabel>
-                    <FormControl>
-                      <Input autoComplete="family-name" disabled={submitting} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="account-email">
-                Email
-              </label>
-              <Input id="account-email" value={user.emails[0] ?? ""} disabled readOnly />
-              <p className="text-muted-foreground text-sm">This is the email you use to sign in.</p>
-            </div>
-
+          <div className="flex gap-4 max-sm:flex-col [&>*]:flex-1">
             <FormField
               control={form.control}
-              name="location"
+              name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location</FormLabel>
+                  <FormLabel>First Name</FormLabel>
                   <FormControl>
-                    <Select value={field.value} disabled={submitting} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select your location" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {countries.map((country) => (
-                          <SelectItem key={country.value} value={country.label}>
-                            {country.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input autoComplete="given-name" disabled={submitting} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
-              name="tagline"
+              name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tagline</FormLabel>
+                  <FormLabel>Last Name</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Software engineer building tools for small teams."
-                      disabled={submitting}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>A short introduction shown near your name.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>About you</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-28"
-                      placeholder="Share what you work on, what you know, and who you want to meet."
-                      disabled={submitting}
-                      {...field}
-                    />
+                    <Input autoComplete="family-name" disabled={submitting} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
 
-            <FormField
-              control={form.control}
-              name="prompt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>What are you looking for?</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-24"
-                      placeholder="I want to meet collaborators who can help launch my product."
-                      disabled={submitting}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>Initiate uses this to tailor suggestions to your goals.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-          <CardFooter className="mt-6 justify-end gap-2 border-t">
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Location</FormLabel>
+                <FormControl>
+                  <Select value={field.value} disabled={submitting} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select location..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem key={country.value} value={country.label}>
+                          {country.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tagline"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tagline</FormLabel>
+                <FormControl>
+                  <Input placeholder="I am a software engineer." disabled={submitting} {...field} />
+                </FormControl>
+                <FormDescription>Just met you, who are you?</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="I am a software engineer with a passion for building scalable applications."
+                    disabled={submitting}
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>What do you want to tell the world?</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="prompt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prompt</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="I want something that boosts my business." disabled={submitting} {...field} />
+                </FormControl>
+                <FormDescription>What do you expect from this platform?</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" asChild>
               <Link href={`/users/${user.id}`}>
                 <EyeIcon />
-                Preview profile
+                <span>Preview</span>
               </Link>
             </Button>
             <Button type="submit" disabled={submitting || uploading !== undefined || !form.formState.isDirty}>
               {submitting ? <Loader2Icon className="animate-spin" /> : <SaveIcon />}
-              {submitting ? "Saving..." : "Save changes"}
+              <span>{submitting ? "Saving..." : "Save"}</span>
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       </FormWrapper>
 
       <PasswordForm />

@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#
 import useBackend from "#/lib/backend/client";
 import { Order, OrderInvoice } from "#/lib/backend/connectors/orders";
 import Link from "#/lib/router";
-import stripeInvoiceStatus from "#/lib/store/stripe-invoice-status";
+import invoiceStatus from "#/lib/store/invoice-status";
 import { formatAmount, getLabel } from "#/lib/utils";
 
 export default function InvoicesTab(props: { order: Order }) {
@@ -73,28 +73,28 @@ export default function InvoicesTab(props: { order: Order }) {
             <TableBody>
               {invoices.map((invoice) => (
                 <TableRow key={invoice.id}>
-                  <TableCell className={"font-mono text-sm"}>{invoice.stripeInvoiceId}</TableCell>
+                  <TableCell className={"font-mono text-sm"}>{invoice.reference}</TableCell>
                   <TableCell className={"font-medium"}>{formatAmount(invoice.amount, invoice.currency)}</TableCell>
                   <TableCell>
-                    <Badge variant={"outline"}>{getLabel(stripeInvoiceStatus, invoice.status, "Unknown")}</Badge>
+                    <Badge variant={"outline"}>{getLabel(invoiceStatus, invoice.status, "Unknown")}</Badge>
                   </TableCell>
                   <TableCell>
                     {/* Pay Invoice */}
-                    {invoice.url && invoice.status === "open" && (
+                    {invoice.status === "open" && (
                       <Button variant={"default"} size={"sm"} asChild>
-                        <Link href={invoice.url} target={"_blank"}>
+                        <Link href={`/manage/invoices/${invoice.id}`}>
                           <BanknoteIcon />
-                          <span>Pay Invoice</span>
+                          <span>Demo payment</span>
                         </Link>
                       </Button>
                     )}
 
                     {/* View Invoice */}
-                    {invoice.url && invoice.status === "paid" && (
+                    {(invoice.status === "paid" || invoice.status === "refunded") && (
                       <Button variant={"default"} size={"sm"} asChild>
-                        <Link href={invoice.url} target={"_blank"}>
+                        <Link href={`/manage/invoices/${invoice.id}`}>
                           <ReceiptIcon />
-                          <span>View Invoice</span>
+                          <span>View receipt</span>
                         </Link>
                       </Button>
                     )}

@@ -7,7 +7,6 @@ import {
   userCountExtras,
 } from "#/lib/database/query-fragments.js";
 import { communityPost } from "#/lib/database/schema.js";
-import { stripe } from "#/lib/server/integrations.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database, insertEmbedding, searchEmbeddings } from "#/lib/server/integrations/database.js";
 import { generateEmbedding, indexEmbeddings } from "#/lib/server/lib/embeddings.js";
@@ -59,55 +58,6 @@ export async function getOrganization(context: Context) {
 
 export function getOrganizationId(context: Context) {
   return context.req.header("X-Organization-Id") ?? getAuth(context).orgId;
-}
-
-export async function getCustomer(userId: string, accountId: string) {
-  const customers = await stripe.customers.search(
-    {
-      query: `metadata['id']:'${userId}'`,
-      limit: 1,
-    },
-    {
-      stripeAccount: accountId,
-    },
-  );
-
-  const user = await database.query.user.findFirst({ where: { id: userId } });
-  if (!user?.email) throw new Error("The user does not have a billing email address.");
-  const userName = `${user.firstName} ${user.lastName ?? ""}`.trim();
-  const userEmail = user.email;
-
-  if (customers.data.length === 0) {
-    return await stripe.customers.create(
-      {
-        name: userName,
-        email: userEmail,
-        metadata: {
-          id: userId,
-        },
-      },
-      {
-        stripeAccount: accountId,
-      },
-    );
-  } else {
-    let customer = customers.data[0];
-
-    if (customer.name !== userName || customer.email !== userEmail) {
-      customer = await stripe.customers.update(
-        customer.id,
-        {
-          name: userName,
-          email: userEmail,
-        },
-        {
-          stripeAccount: accountId,
-        },
-      );
-    }
-
-    return customer;
-  }
 }
 
 export async function checkMembership(userId: string, organizationId: string) {

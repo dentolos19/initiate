@@ -4,10 +4,10 @@ import { z } from "zod";
 
 import { serviceCountExtras } from "#/lib/database/query-fragments.js";
 import { service as serviceTable, serviceLike } from "#/lib/database/schema.js";
-import { stripe } from "#/lib/server/integrations.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database, insertEmbedding, searchEmbeddings, searchRecords } from "#/lib/server/integrations/database.js";
 import { aggregateEmbeddings, generateEmbeddings, indexEmbeddings } from "#/lib/server/lib/embeddings.js";
+import { createPaymentReference } from "#/lib/server/lib/payments.js";
 import { getOrganization, getUser, safeParseInt, searchServices } from "#/lib/server/lib/utils.js";
 
 const services = new Hono();
@@ -267,27 +267,9 @@ services.post("/", async (c) => {
     .values({
       ...data,
       organizationId: organization.id,
+      productReference: createPaymentReference("product"),
     })
     .returning();
-
-  if (organization.stripeAccountId) {
-    const product = await stripe.products.create(
-      {
-        name: service.name,
-        description: service.tagline ?? undefined,
-        metadata: {
-          id: service.id,
-          organizationId: organization.id,
-        },
-      },
-      {
-        stripeAccount: organization.stripeAccountId,
-      },
-    );
-
-    await database.update(serviceTable).set({ stripeProductId: product.id }).where(eq(serviceTable.id, service.id));
-    service.stripeProductId = product.id;
-  }
 
   await indexEmbeddings(
     (vector) => insertEmbedding("service", service.id, vector),
@@ -339,7 +321,7 @@ services.put("/:id", async (c) => {
     columns: {
       id: true,
       organizationId: true,
-      stripeProductId: true,
+      productReference: true,
     },
   });
 
@@ -376,39 +358,6 @@ services.put("/:id", async (c) => {
 
   if (!service) {
     return c.json({ message: "Service not found after update." }, 404);
-  }
-
-  if (organization.stripeAccountId && service.stripeProductId) {
-    await stripe.products.update(
-      service.stripeProductId,
-      {
-        name: service.name,
-        description: service.tagline,
-      },
-      {
-        stripeAccount: organization.stripeAccountId!,
-      },
-    );
-  } else if (organization.stripeAccountId && !existingService.stripeProductId) {
-    const product = await stripe.products.create(
-      {
-        name: service.name,
-        description: service.tagline ?? undefined,
-        metadata: {
-          id: existingService.id,
-          organizationId: organization.id,
-        },
-      },
-      {
-        stripeAccount: organization.stripeAccountId,
-      },
-    );
-
-    await database
-      .update(serviceTable)
-      .set({ stripeProductId: product.id })
-      .where(eq(serviceTable.id, existingService.id));
-    service.stripeProductId = product.id;
   }
 
   await indexEmbeddings(
@@ -485,7 +434,7 @@ services.delete("/:id", async (c) => {
     },
     columns: {
       organizationId: true,
-      stripeProductId: true,
+      productReference: true,
     },
   });
 
@@ -495,10 +444,6 @@ services.delete("/:id", async (c) => {
 
   if (existingService.organizationId !== organization.id) {
     return c.json({ message: "Unauthorized." }, 401);
-  }
-
-  if (organization.stripeAccountId && existingService.stripeProductId) {
-    await stripe.products.del(existingService.stripeProductId, { stripeAccount: organization.stripeAccountId });
   }
 
   await database.delete(serviceTable).where(eq(serviceTable.id, id));

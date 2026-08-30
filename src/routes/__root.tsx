@@ -12,7 +12,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Initiate — Build What Matters" },
+      { title: "Initiate" },
       {
         name: "description",
         content: "Discover collaborators, services, and practical resources for your next venture.",

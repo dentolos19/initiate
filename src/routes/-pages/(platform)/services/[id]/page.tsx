@@ -203,7 +203,7 @@ export default function Page() {
                     <SelectItem key={plan.id} value={plan.id}>
                       <span>{plan.name}</span>
                       <span className={"text-muted-foreground text-xs"}>
-                        {plan.stripePriceData ? formatPrice(plan.stripePriceData) : "Unknown Price"}
+                        {plan.priceData ? formatPrice(plan.priceData) : "Unknown Price"}
                       </span>
                     </SelectItem>
                   ))}
@@ -211,10 +211,8 @@ export default function Page() {
               </Select>
 
               {/* Current Plan */}
-              <CardTitle>{plan?.stripePriceData ? formatPrice(plan.stripePriceData) : "Unknown Price"}</CardTitle>
-              <CardDescription>
-                {plan?.stripePriceData ? formatPriceModel(plan.stripePriceData) : "Unknown Model"}
-              </CardDescription>
+              <CardTitle>{plan?.priceData ? formatPrice(plan.priceData) : "Unknown Price"}</CardTitle>
+              <CardDescription>{plan?.priceData ? formatPriceModel(plan.priceData) : "Unknown Model"}</CardDescription>
             </CardHeader>
             <CardFooter className={"flex-col gap-2"}>
               <Button className={"w-full"} variant={"default"} onClick={handleOrder}>

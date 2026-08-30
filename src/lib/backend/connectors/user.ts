@@ -122,8 +122,10 @@ export default function mapConnectors(primitives: BackendPrimitives) {
           draftInvoices: z.number(),
           openInvoices: z.number(),
           paidInvoices: z.number(),
+          refundedInvoices: z.number(),
           totalAmount: z.number(),
           paidAmount: z.number(),
+          refundedAmount: z.number(),
         })
         .parse(response);
     },

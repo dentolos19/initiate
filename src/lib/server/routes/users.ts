@@ -384,9 +384,11 @@ users.get("/:id/proposals", async (c) => {
 // Get user's invoices
 users.get("/:id/invoices", async (c) => {
   const auth = getAuth(c);
+  if (!auth?.userId) return c.json({ message: "Sign in to view invoices." }, 401);
 
   let id = c.req.param("id");
-  if (auth?.userId && id === "current") id = auth.userId;
+  if (id === "current") id = auth.userId;
+  if (id !== auth.userId) return c.json({ message: "You can only view your own invoices." }, 403);
 
   const page = safeParseInt(c.req.query("page"), 1);
   const limit = safeParseInt(c.req.query("limit"), 10);
@@ -421,9 +423,11 @@ users.get("/:id/invoices", async (c) => {
 // Get user's invoice statistics
 users.get("/:id/invoices/statistics", async (c) => {
   const auth = getAuth(c);
+  if (!auth?.userId) return c.json({ message: "Sign in to view invoices." }, 401);
 
   let id = c.req.param("id");
-  if (auth?.userId && id === "current") id = auth.userId;
+  if (id === "current") id = auth.userId;
+  if (id !== auth.userId) return c.json({ message: "You can only view your own invoices." }, 403);
 
   const invoiceRows = await database.query.orderInvoice.findMany({
     where: { userId: id },
@@ -433,16 +437,23 @@ users.get("/:id/invoices/statistics", async (c) => {
   const draftInvoices = invoiceRows.filter((invoice) => invoice.status === "draft").length;
   const openInvoices = invoiceRows.filter((invoice) => invoice.status === "open").length;
   const paidInvoices = invoiceRows.filter((invoice) => invoice.status === "paid").length;
+  const refundedInvoices = invoiceRows.filter((invoice) => invoice.status === "refunded").length;
   const totalAmount = invoiceRows.reduce((sum, invoice) => sum + invoice.amount, 0);
   const paidAmount = invoiceRows.reduce((sum, invoice) => sum + (invoice.status === "paid" ? invoice.amount : 0), 0);
+  const refundedAmount = invoiceRows.reduce(
+    (sum, invoice) => sum + (invoice.status === "refunded" ? invoice.amount : 0),
+    0,
+  );
 
   return c.json({
     totalInvoices,
     draftInvoices,
     openInvoices,
     paidInvoices,
+    refundedInvoices,
     totalAmount,
     paidAmount,
+    refundedAmount,
   });
 });
 

@@ -39,7 +39,7 @@ export default function ServiceStack(props: ComponentProps<"a"> & { data: Servic
         <div className={"flex items-center gap-2 text-xs"}>
           <div className={"flex items-center gap-1"}>
             <CoinsIcon className={"size-3"} />
-            <span>{service.plan?.stripePriceData ? formatPrice(service.plan.stripePriceData) : "Unknown"}</span>
+            <span>{service.plan?.priceData ? formatPrice(service.plan.priceData) : "Unknown"}</span>
           </div>
           <div className={"flex items-center gap-1"}>
             <StoreIcon className={"size-3"} />

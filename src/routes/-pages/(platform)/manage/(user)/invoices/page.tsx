@@ -21,8 +21,10 @@ export default function InvoicesPage() {
     draftInvoices: number;
     openInvoices: number;
     paidInvoices: number;
+    refundedInvoices: number;
     totalAmount: number;
     paidAmount: number;
+    refundedAmount: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
@@ -75,8 +77,10 @@ export default function InvoicesPage() {
   return (
     <div className={"space-y-6 p-6"}>
       <div>
-        <h1 className={"text-2xl font-bold"}>Invoices</h1>
-        <p className={"text-muted-foreground"}>View and manage all your invoices from service orders.</p>
+        <h1 className={"text-2xl font-bold"}>Demo invoices</h1>
+        <p className={"text-muted-foreground"}>
+          Run approved and declined payment scenarios without moving real money.
+        </p>
       </div>
 
       {/* Statistics Cards */}
@@ -121,12 +125,14 @@ export default function InvoicesPage() {
 
           <Card>
             <CardHeader className={"flex flex-row items-center justify-between space-y-0 pb-2"}>
-              <CardTitle className={"text-sm font-medium"}>Draft Invoices</CardTitle>
+              <CardTitle className={"text-sm font-medium"}>Refunded</CardTitle>
               <ReceiptIcon className={"text-muted-foreground h-4 w-4"} />
             </CardHeader>
             <CardContent>
-              <div className={"text-2xl font-bold"}>{statistics.draftInvoices}</div>
-              <p className={"text-muted-foreground text-xs"}>Not yet finalized</p>
+              <div className={"text-2xl font-bold"}>{statistics.refundedInvoices}</div>
+              <p className={"text-muted-foreground text-xs"}>
+                {formatAmount(statistics.refundedAmount, "usd")} simulated
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -144,7 +150,7 @@ export default function InvoicesPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className={"grid w-full grid-cols-5"}>
               <TabsTrigger value={"all"}>All</TabsTrigger>
-              <TabsTrigger value={"draft"}>Draft</TabsTrigger>
+              <TabsTrigger value={"refunded"}>Refunded</TabsTrigger>
               <TabsTrigger value={"open"}>Open</TabsTrigger>
               <TabsTrigger value={"paid"}>Paid</TabsTrigger>
               <TabsTrigger value={"void"}>Void</TabsTrigger>

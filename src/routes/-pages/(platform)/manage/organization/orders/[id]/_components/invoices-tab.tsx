@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, EditIcon, PlusIcon, ReceiptIcon, TrashIcon } from "lucide-react";
+import { CheckIcon, EditIcon, PlusIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,8 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#
 import useBackend from "#/lib/backend/client";
 import { Order, OrderInvoice, OrderMilestone } from "#/lib/backend/connectors/orders";
 import { usePrompt } from "#/lib/providers/prompt";
-import Link from "#/lib/router";
-import stripeInvoiceStatus from "#/lib/store/stripe-invoice-status";
+import invoiceStatus from "#/lib/store/invoice-status";
 import { formatAmount, getLabel } from "#/lib/utils";
 
 import InvoiceDialog from "./invoice-dialog";
@@ -107,6 +106,17 @@ export default function InvoicesTab(props: { order: Order }) {
       });
   }
 
+  async function handleRefundInvoice(invoice: OrderInvoice) {
+    if (!(await confirm("Run a demo refund for this invoice? No real money will move."))) return;
+    await backend.payments
+      .refundInvoice(invoice.id)
+      .then((result) => {
+        toast.success(result.message);
+        loadInvoices();
+      })
+      .catch((error: Error) => toast.error(error.message));
+  }
+
   function getMilestoneName(milestoneId: string | null | undefined): string {
     if (!milestoneId) return "No milestone";
     const milestone = milestones.find((m) => m.id === milestoneId);
@@ -156,12 +166,12 @@ export default function InvoicesTab(props: { order: Order }) {
           ) : (
             invoices.map((invoice) => (
               <TableRow key={invoice.id}>
-                <TableCell>{invoice.stripeInvoiceId}</TableCell>
+                <TableCell>{invoice.reference}</TableCell>
                 <TableCell>{invoice.description || "No description provided"}</TableCell>
                 <TableCell>{getMilestoneName(invoice.milestoneId)}</TableCell>
                 <TableCell>{formatAmount(invoice.amount, invoice.currency)}</TableCell>
                 <TableCell>
-                  <Badge variant={"outline"}>{getLabel(stripeInvoiceStatus, invoice.status, "Unknown")}</Badge>
+                  <Badge variant={"outline"}>{getLabel(invoiceStatus, invoice.status, "Unknown")}</Badge>
                 </TableCell>
                 <TableCell>
                   <div className={"flex gap-2"}>
@@ -197,13 +207,10 @@ export default function InvoicesTab(props: { order: Order }) {
                       </Button>
                     )}
 
-                    {/* View Invoice */}
-                    {invoice.url && (invoice.status === "paid" || invoice.status === "open") && (
-                      <Button variant={"default"} size={"sm"} asChild>
-                        <Link href={invoice.url} target={"_blank"}>
-                          <ReceiptIcon />
-                          <span>View</span>
-                        </Link>
+                    {invoice.status === "paid" && (
+                      <Button variant={"outline"} size={"sm"} onClick={() => handleRefundInvoice(invoice)}>
+                        <RotateCcwIcon />
+                        <span>Demo refund</span>
                       </Button>
                     )}
                   </div>

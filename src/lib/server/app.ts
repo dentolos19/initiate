@@ -38,7 +38,6 @@ import serviceReviews from "#/lib/server/routes/service-reviews.js";
 import services from "#/lib/server/routes/services.js";
 import users from "#/lib/server/routes/users.js";
 import mcp from "#/lib/server/routes/webhooks/mcp.js";
-import stripeWebhook from "#/lib/server/routes/webhooks/stripe.js";
 
 // Initialize Hono Application
 const app = new Hono<{ Bindings: Env }>();
@@ -140,7 +139,6 @@ app.route("/service", services);
 app.route("/user", users);
 
 // Setup Webhooks
-app.route("/webhooks/stripe", stripeWebhook);
 app.route("/webhooks/mcp", mcp);
 
 // Tests Routes

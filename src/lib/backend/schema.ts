@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { stripePriceSchema } from "#/lib/backend/schema/stripe-prices";
+import { priceSchema } from "#/lib/backend/schema/prices";
 
 export const currencySchema = z.enum(["sgd", "myr", "usd", "eur", "krw", "cny", "vnd"]);
 
@@ -94,9 +94,8 @@ export const servicePlanSchema = z.object({
   status: z.string().default("active"),
   default: z.boolean().default(false),
 
-  // Stripe
-  stripePriceId: z.string().nullish(),
-  stripePriceData: stripePriceSchema.nullish(),
+  priceReference: z.string().nullish(),
+  priceData: priceSchema.nullish(),
 });
 
 export const serviceSchema = z.object({

@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
-import { StripePrice } from "#/lib/backend/schema/stripe-prices";
+import { Price } from "#/lib/backend/schema/prices";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -52,7 +52,7 @@ export function formatAmount(amount: number, currency: string) {
   }).format(amount / 100);
 }
 
-export function formatPrice(price: StripePrice) {
+export function formatPrice(price: Price) {
   const { currency, type } = price;
 
   switch (type) {
@@ -76,7 +76,7 @@ export function formatPrice(price: StripePrice) {
   }
 }
 
-export function formatPriceModel(price: StripePrice) {
+export function formatPriceModel(price: Price) {
   const { type } = price;
 
   switch (type) {
