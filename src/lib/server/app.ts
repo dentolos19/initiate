@@ -96,7 +96,7 @@ app.onError((error, c) => {
 
 // Setup App Integrations
 app.use(async (c, next) => {
-  const database = createDatabase(c.env.HYPERDRIVE);
+  const database = createDatabase(c.env.DB);
   const bucket = createBucketClient(c);
   const notification = createNotificationClient(c, database);
 

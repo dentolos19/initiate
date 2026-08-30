@@ -13,7 +13,7 @@ const communityTopics = new Hono();
 communityTopics.get("/topics", async (c) => {
   const postsWithTagsForNames = await database.query.communityPost.findMany({
     where: {
-      RAW: (post) => sql`cardinality(${post.tags}) > 0`,
+      RAW: (post) => sql`json_array_length(${post.tags}) > 0`,
     },
     columns: {
       tags: true,
@@ -46,7 +46,7 @@ communityTopics.get("/topic/:topic", async (c) => {
   const posts = (
     await database.query.communityPost.findMany({
       where: {
-        tags: { arrayContains: [topic] },
+        RAW: (post) => sql`exists (select 1 from json_each(${post.tags}) where value = ${topic})`,
       },
       offset: (page - 1) * limit,
       limit: limit,
@@ -158,7 +158,11 @@ communityTopics.get("/feed/following", async (c) => {
   const posts = (
     await database.query.communityPost.findMany({
       where: {
-        tags: { arrayOverlaps: tagsList },
+        RAW: (post) =>
+          sql`exists (select 1 from json_each(${post.tags}) where value in (${sql.join(
+            tagsList.map((tag) => sql`${tag}`),
+            sql`, `,
+          )}))`,
       },
       offset: (page - 1) * limit,
       limit: limit,

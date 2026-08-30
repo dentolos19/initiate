@@ -1,11 +1,10 @@
-.PHONY: setup start check build deploy migrate
-.PHONY: start-app start-database stop generate studio
+.PHONY: build check deploy generate migrate migrate-remote setup start
 
 setup:
 	bun install
 
-start: start-database
-	$(MAKE) start-app
+start:
+	bun run dev
 
 check:
 	bun run check
@@ -19,17 +18,8 @@ deploy:
 migrate:
 	bun run db:migrate
 
-start-app:
-	bun run dev
-
-start-database:
-	docker compose up -d database
-
-stop:
-	docker compose down
+migrate-remote:
+	bun run db:migrate:remote
 
 generate:
 	bun run db:generate
-
-studio:
-	bun run db:studio

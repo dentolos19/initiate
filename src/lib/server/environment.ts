@@ -3,9 +3,6 @@ import "dotenv/config";
 export const ENVIRONMENT = (process.env.ENVIRONMENT || "development") as "production" | "development";
 export const PLATFORM_URL = process.env.PLATFORM_URL || "http://localhost:3000";
 
-// Neon (Postgres Database)
-export const DATABASE_URL = process.env.DATABASE_URL as string;
-
 // Better Auth
 export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET as string;
 export const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || PLATFORM_URL;

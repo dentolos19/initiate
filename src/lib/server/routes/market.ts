@@ -1,4 +1,5 @@
 import { generateObject, generateText } from "ai";
+import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
 
@@ -205,7 +206,7 @@ market.get("/tag/:tag", async (c) => {
       limit: limit,
       where: {
         status: "published",
-        tags: { arrayContains: [tag] },
+        RAW: (service) => sql`exists (select 1 from json_each(${service.tags}) where value = ${tag})`,
       },
       orderBy: {
         createdAt: "desc",

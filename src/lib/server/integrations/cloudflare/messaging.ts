@@ -12,7 +12,7 @@ const messageSchema = z.object({
   id: z.string().optional(),
   action: z.enum(["send", "edit", "delete"]).default("send"),
   content: z.string().optional(),
-  attachments: z.unknown(),
+  attachments: z.array(z.unknown()).default([]),
 });
 
 export class MessagingObject extends DurableObject<Env> {
@@ -20,7 +20,7 @@ export class MessagingObject extends DurableObject<Env> {
 
   constructor(state: DurableObjectState, environment: Env) {
     super(state, environment);
-    this.database = createDatabase(environment.HYPERDRIVE);
+    this.database = createDatabase(environment.DB);
 
     this.ctx.blockConcurrencyWhile(async () => {
       // TODO

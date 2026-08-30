@@ -73,7 +73,7 @@ export function createNotificationClient(context: AppContext, database: AppDatab
   };
 
   const queueNotification = async (audience: string[], data: NotificationInput) => {
-    await context.env.NOTIFICATION_QUEUE.send({
+    await context.env.NOTIFICATIONS.send({
       audience,
       data: {
         ...data,
@@ -84,7 +84,7 @@ export function createNotificationClient(context: AppContext, database: AppDatab
 
   return {
     email: context.env.EMAIL,
-    queue: context.env.NOTIFICATION_QUEUE,
+    queue: context.env.NOTIFICATIONS,
     sendNotification,
     queueNotification,
   };

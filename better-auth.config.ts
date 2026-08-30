@@ -1,6 +1,7 @@
-import "dotenv/config";
+import { getPlatformProxy } from "wrangler";
+
 import { createAuth } from "#/lib/auth/auth.server";
 
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required to inspect the Better Auth schema.");
+const { env } = await getPlatformProxy<Env>();
 
-export const auth = createAuth(process.env.DATABASE_URL);
+export const auth = createAuth(env.DB);

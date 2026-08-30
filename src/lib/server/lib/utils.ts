@@ -154,9 +154,9 @@ export async function searchServices(context: Context, query: string, page: numb
       where: {
         status: "published",
         OR: [
-          { name: { ilike: `%${query}%` } },
-          { description: { ilike: `%${query}%` } },
-          { tagline: { ilike: `%${query}%` } },
+          { name: { like: `%${query}%` } },
+          { description: { like: `%${query}%` } },
+          { tagline: { like: `%${query}%` } },
         ],
       },
       extras: serviceCountExtras,
@@ -195,7 +195,7 @@ export async function searchOrganizations(context: Context, query: string, page:
 
     const organizations = await database.query.organization.findMany({
       where: {
-        OR: [{ name: { ilike: `%${query}%` } }, { description: { ilike: `%${query}%` } }],
+        OR: [{ name: { like: `%${query}%` } }, { description: { like: `%${query}%` } }],
       },
       limit: limit,
       offset,
@@ -249,11 +249,11 @@ export async function searchUsers(context: Context, query: string, page: number 
       limit: limit,
       where: {
         OR: [
-          { firstName: { ilike: `%${query}%` } },
-          { lastName: { ilike: `%${query}%` } },
-          { email: { ilike: `%${query}%` } },
-          { description: { ilike: `%${query}%` } },
-          { tagline: { ilike: `%${query}%` } },
+          { firstName: { like: `%${query}%` } },
+          { lastName: { like: `%${query}%` } },
+          { email: { like: `%${query}%` } },
+          { description: { like: `%${query}%` } },
+          { tagline: { like: `%${query}%` } },
         ],
       },
       extras: userCountExtras,
@@ -279,9 +279,9 @@ export async function searchGrants(context: Context, query: string, page: number
   const grants = await database.query.resourceGrant.findMany({
     where: {
       OR: [
-        { name: { ilike: `%${query}%` } },
-        { description: { ilike: `%${query}%` } },
-        { provider: { ilike: `%${query}%` } },
+        { name: { like: `%${query}%` } },
+        { description: { like: `%${query}%` } },
+        { provider: { like: `%${query}%` } },
       ],
     },
     orderBy: { createdAt: "desc" },
@@ -313,7 +313,7 @@ export async function searchGrantsWithEmbeddings(
     where: {
       id: { in: similarities.map((item) => item.id) },
       ...(org.location && {
-        OR: [{ location: { ilike: `%${org.location}%` } }, { location: { isNull: true } }],
+        OR: [{ location: { like: `%${org.location}%` } }, { location: { isNull: true } }],
       }),
     },
     orderBy: { createdAt: "desc" },

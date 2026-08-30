@@ -7,7 +7,7 @@ import * as schema from "#/lib/database/schema";
 import { BETTER_AUTH_SECRET, BETTER_AUTH_URL } from "#/lib/server/environment";
 import { createDrizzleDatabase } from "#/lib/server/integrations/database";
 
-export function createAuth(connection: string | Hyperdrive) {
+export function createAuth(connection: D1Database) {
   const database = createDrizzleDatabase(connection);
 
   return betterAuth({
@@ -15,7 +15,7 @@ export function createAuth(connection: string | Hyperdrive) {
     baseURL: BETTER_AUTH_URL,
     secret: BETTER_AUTH_SECRET,
     database: drizzleAdapter(database, {
-      provider: "pg",
+      provider: "sqlite",
       schema,
     }),
     emailAndPassword: {

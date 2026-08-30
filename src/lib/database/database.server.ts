@@ -1,7 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/d1";
 
 import { relations } from "#/lib/database/relations";
 import { generateEmbedding } from "#/lib/server/lib/embeddings";
@@ -13,13 +12,9 @@ type DatabaseContext = {
 
 const databaseStorage = new AsyncLocalStorage<DatabaseContext>();
 
-export function createDatabase(connection?: string | Hyperdrive) {
-  const connectionString = typeof connection === "string" ? connection : connection?.connectionString;
-  const url = connectionString ?? process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL or a Hyperdrive binding is required.");
-
-  const client = postgres(url, { max: 5, prepare: false });
-  return drizzle({ client, relations });
+export function createDatabase(connection: D1Database) {
+  if (!connection) throw new Error("The DB binding is required.");
+  return drizzle(connection, { relations });
 }
 
 export const createDrizzleDatabase = createDatabase;
@@ -32,8 +27,7 @@ export function runWithDatabase<T>(database: AppDatabase, vectorIndex: Vectorize
 function currentContext() {
   const context = databaseStorage.getStore();
   if (context) return context;
-
-  return { database: createDatabase(), vectorIndex: undefined };
+  throw new Error("A database context is required.");
 }
 
 export const database = new Proxy({} as AppDatabase, {

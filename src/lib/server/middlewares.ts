@@ -4,7 +4,7 @@ import { createAuth, getAuth } from "#/lib/server/integrations/auth.js";
 
 export function createSessionMiddleware() {
   return createMiddleware<{ Bindings: Env }>(async (c, next) => {
-    const session = await createAuth(c.env.HYPERDRIVE).api.getSession({
+    const session = await createAuth(c.env.DB).api.getSession({
       headers: c.req.raw.headers,
     });
     const requestedOrganizationId = c.req.header("X-Organization-ID");

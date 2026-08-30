@@ -24,11 +24,13 @@
       "custom_domain": true,
     },
   ],
-  "hyperdrive": [
+  "d1_databases": [
     {
-      "binding": "HYPERDRIVE",
-      "id": "8e4d525848d441b6ac3570d793e522ac",
-      "localConnectionString": "postgresql://initiate:initiate@localhost:5432/initiate",
+      "binding": "DB",
+      "database_id": "0981b552-4d0d-47da-8759-61b61ac8b927",
+      "database_name": "initiate",
+      "migrations_dir": "migrations",
+      "migrations_pattern": "migrations/*/migration.sql",
     },
   ],
   "send_email": [
@@ -39,7 +41,7 @@
   "queues": {
     "producers": [
       {
-        "binding": "NOTIFICATION_QUEUE",
+        "binding": "NOTIFICATIONS",
         "queue": "initiate-notifications",
       },
     ],
@@ -81,7 +83,7 @@
   ],
   "workflows": [
     {
-      "name": "synchronize",
+      "name": "initiate-synchronize",
       "binding": "SYNCHRONIZE",
       "class_name": "SynchronizeWorkflow",
     },

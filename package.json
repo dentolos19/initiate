@@ -14,8 +14,8 @@
     "types": "wrangler types && tsr generate",
     "check": "oxfmt --write && oxlint --fix",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:migrate": "wrangler d1 migrations apply initiate --local",
+    "db:migrate:remote": "wrangler d1 migrations apply initiate --remote"
   },
   "dependencies": {
     "@ai-sdk/react": "^1.2.12",
@@ -116,7 +116,6 @@
     "lucide-react": "^0.484.0",
     "motion": "^12.23.12",
     "next-themes": "^0.4.6",
-    "postgres": "^3.4.9",
     "react": "^19.2.8",
     "react-day-picker": "^9.9.0",
     "react-dom": "^19.2.8",

@@ -5,5 +5,5 @@ import { env } from "cloudflare:workers";
 import { createAuth } from "#/lib/auth/auth.server";
 
 export const getSession = createServerFn({ method: "GET" }).handler(async () => {
-  return createAuth(env.HYPERDRIVE).api.getSession({ headers: getRequestHeaders() });
+  return createAuth(env.DB).api.getSession({ headers: getRequestHeaders() });
 });

@@ -15,7 +15,7 @@ const start = createServerEntry({
 export default {
   ...start,
   async queue(batch: MessageBatch<NotificationMessage>, env: Env) {
-    const database = createDatabase(env.HYPERDRIVE);
+    const database = createDatabase(env.DB);
 
     for (const message of batch.messages) {
       try {

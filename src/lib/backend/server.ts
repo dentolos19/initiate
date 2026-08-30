@@ -7,7 +7,7 @@ import { createAuth } from "#/lib/auth/auth.server";
 import { generateMappings, generatePrimitives } from "#/lib/backend/primitives";
 
 export default async function createBackend() {
-  const session = await createAuth(env.HYPERDRIVE).api.getSession({ headers: getRequestHeaders() });
+  const session = await createAuth(env.DB).api.getSession({ headers: getRequestHeaders() });
 
   const primitives = generatePrimitives({
     userId: session?.user.id,

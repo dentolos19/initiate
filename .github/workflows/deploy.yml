@@ -37,9 +37,7 @@ jobs:
           VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
 
       - name: Migrate Database
-        run: bun run db:migrate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: bun run db:migrate:remote
 
       - name: Deploy Worker
         uses: dentolos19/dentolos19/actions/deploy-cloudflare-worker@main

@@ -6,7 +6,7 @@ import { forceSerializable } from "#/lib/server/lib/utils.js";
 
 export class SynchronizeWorkflow extends WorkflowEntrypoint<Env, unknown> {
   async run(event: Readonly<WorkflowEvent<unknown>>, step: WorkflowStep) {
-    const database = createDatabase(this.env.HYPERDRIVE);
+    const database = createDatabase(this.env.DB);
 
     const services = await step.do("Get Services", async () => {
       const result = await database.query.service.findMany({
