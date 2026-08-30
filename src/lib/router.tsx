@@ -6,14 +6,11 @@ import {
   useRouter as useTanStackRouter,
 } from "@tanstack/react-router";
 import type { AnchorHTMLAttributes } from "react";
-import { createContext, useContext } from "react";
 
 type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
   href: string;
   passHref?: boolean;
 };
-
-export const LegacyRouteContext = createContext<Record<string, string>>({});
 
 export default function Link({ href, passHref: _passHref, ...props }: LinkProps) {
   return <TanStackLink {...props} to={href as never} />;
@@ -45,9 +42,8 @@ export function useRouter() {
 }
 
 export function useParams<T extends Record<string, string | undefined> = Record<string, string>>() {
-  const compatibilityParams = useContext(LegacyRouteContext);
   const routerParams = useTanStackParams({ strict: false });
-  return { ...routerParams, ...compatibilityParams } as T;
+  return routerParams as T;
 }
 
 export function usePathname() {

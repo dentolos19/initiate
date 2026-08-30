@@ -1,5 +1,3 @@
-"use client";
-
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
 import { authClient } from "#/lib/auth/auth";

@@ -287,7 +287,7 @@ export const MultiSelect = React.forwardRef<
         >
           <Command>
             <CommandInput
-              placeholder="Search..."
+              placeholder="Search…"
               onKeyDown={handleInputKeyDown}
             />
             <CommandList>

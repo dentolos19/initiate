@@ -33,12 +33,12 @@ export default function mapConnectors(primitives: BackendPrimitives) {
     },
 
     // FIXED: Delete documentation (admin only)
-    deleteDocumentation: async (id: string, confirmation: string) => {
+    deleteDocumentation: async (id: string, _confirmation: string) => {
       return await primitives.delete(`/resources/documentation/${id}`);
     },
 
     // FIXED: Delete grant (admin only)
-    deleteGrant: async (id: string, confirmation: string) => {
+    deleteGrant: async (id: string, _confirmation: string) => {
       return await primitives.delete(`/resources/grants/${id}`);
     },
   };

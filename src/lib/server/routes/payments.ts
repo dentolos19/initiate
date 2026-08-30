@@ -9,7 +9,7 @@ import { checkMembership, getOrganization, getUser } from "#/lib/server/lib/util
 
 const payments = new Hono();
 
-async function getAccountSummary(organizationId: string, paymentAccountId: string | null) {
+async function getAccountSummary(organizationId: string, paymentAccountId: string) {
   const orders = await database.query.order.findMany({
     where: { organizationId },
     columns: { id: true },
@@ -25,7 +25,7 @@ async function getAccountSummary(organizationId: string, paymentAccountId: strin
   return {
     id: paymentAccountId,
     mode: "demo" as const,
-    status: paymentAccountId ? ("ready" as const) : ("setup" as const),
+    status: "ready" as const,
     currency: invoices[0]?.currency ?? "sgd",
     availableBalance: invoices.reduce((sum, invoice) => sum + (invoice.status === "paid" ? invoice.amount : 0), 0),
     pendingBalance: invoices.reduce((sum, invoice) => sum + (invoice.status === "open" ? invoice.amount : 0), 0),
@@ -36,16 +36,6 @@ async function getAccountSummary(organizationId: string, paymentAccountId: strin
 }
 
 payments.get("/account", async (c) => {
-  const user = await getUser(c);
-  const organization = await getOrganization(c);
-  if (!user || !organization || !(await checkMembership(user.id, organization.id))) {
-    return c.json({ message: "Unauthorized." }, 401);
-  }
-
-  return c.json(await getAccountSummary(organization.id, organization.paymentAccountId));
-});
-
-payments.post("/account", async (c) => {
   const user = await getUser(c);
   const organization = await getOrganization(c);
   if (!user || !organization || !(await checkMembership(user.id, organization.id))) {

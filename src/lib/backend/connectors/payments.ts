@@ -23,11 +23,6 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return paymentAccountSchema.parse(response);
     },
 
-    activateAccount: async (): Promise<PaymentAccount> => {
-      const response = await primitives.post("/payments/account");
-      return paymentAccountSchema.parse(response);
-    },
-
     payInvoice: async (invoiceId: string, outcome: "approved" | "declined"): Promise<InvoicePaymentResult> => {
       const response = await primitives.post(`/payments/invoices/${invoiceId}/pay`, { outcome });
       return resultSchema.parse(response);

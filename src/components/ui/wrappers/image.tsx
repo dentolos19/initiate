@@ -1,4 +1,3 @@
-"use client";
 
 import { AvatarImage } from "#/components/ui/avatar";
 import clsx from "clsx";

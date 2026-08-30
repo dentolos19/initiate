@@ -1,5 +1,3 @@
-"use client";
-
 import { BotMessageSquareIcon } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { toast } from "sonner";

@@ -1,17 +1,37 @@
-import { HeadContent, Link, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import { HeadContent, Link, Outlet, ScriptOnce, Scripts, createRootRoute } from "@tanstack/react-router";
 
 import AppProvider from "#/components/app-provider";
 import LogoTitle from "#/components/logo-title";
 import { buttonVariants } from "#/components/ui/button";
 import { Toaster } from "#/components/ui/sonner";
+import ErrorPage from "#/routes/-components/error";
 
 import styles from "../styles.css?url";
+
+const themeScript = `(() => {
+  try {
+    const storedTheme = window.localStorage.getItem("theme");
+    const theme = ["dark", "light", "system"].includes(storedTheme) ? storedTheme : "system";
+    const resolvedTheme = theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+      : theme;
+    const root = document.documentElement;
+    root.classList.remove("dark", "light");
+    root.classList.add(resolvedTheme);
+    root.style.colorScheme = resolvedTheme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      "content",
+      resolvedTheme === "dark" ? "#252525" : "#ffffff",
+    );
+  } catch {}
+})()`;
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#ffffff" },
       { title: "Initiate" },
       {
         name: "description",
@@ -24,6 +44,7 @@ export const Route = createRootRoute({
     ],
   }),
   component: Root,
+  errorComponent: ErrorPage,
   shellComponent: Document,
   notFoundComponent: NotFound,
 });
@@ -42,6 +63,7 @@ function Document({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <ScriptOnce>{themeScript}</ScriptOnce>
       </head>
       <body>
         {children}

@@ -28,7 +28,7 @@ export function validateMetadata(metadata: string): { isValid: boolean; message?
   try {
     JSON.parse(metadata);
     return { isValid: true };
-  } catch (e) {
+  } catch {
     // If not valid JSON, check if it's a simple string
     if (metadata.includes(":") || metadata.includes("{") || metadata.includes("}")) {
       return { isValid: false, message: "Please enter valid JSON metadata or simple text." };
@@ -44,7 +44,7 @@ export function parseMetadata(metadata: string): Record<string, string> | undefi
 
   try {
     return JSON.parse(metadata);
-  } catch (e) {
+  } catch {
     // If JSON parsing fails, treat as simple key-value pair
     return { note: metadata.trim() };
   }

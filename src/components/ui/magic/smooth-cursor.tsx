@@ -1,4 +1,3 @@
-"use client";
 
 import { motion, useSpring } from "motion/react";
 import { FC, JSX, useEffect, useRef, useState } from "react";

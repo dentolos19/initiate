@@ -1,5 +1,4 @@
 import { BellIcon, MenuIcon, MessageCircleIcon, SearchIcon, ShoppingCartIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import { ComponentProps, useEffect, useState } from "react";
 
 import AppProfile from "#/components/app-profile";
@@ -17,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/ui/tooltip
 import ImageWrapper from "#/components/ui/wrappers/image";
 import { useIsMobile } from "#/lib/hooks/use-mobile";
 import { useSession } from "#/lib/providers/session";
+import { useTheme } from "#/lib/providers/theme";
 import Link from "#/lib/router";
 import { usePathname, useRouter, useSearchParams } from "#/lib/router";
 import { cn } from "#/lib/utils";

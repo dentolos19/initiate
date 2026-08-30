@@ -1,4 +1,3 @@
-"use client";
 
 import "#/components/ui/custom/rich/rich.styles.css";
 
@@ -172,6 +171,7 @@ export function RichEditor(props: RichEditorProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                aria-label="Undo"
                 type={"button"}
                 variant={"ghost"}
                 size={"icon"}
@@ -187,6 +187,7 @@ export function RichEditor(props: RichEditorProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                aria-label="Redo"
                 type={"button"}
                 variant={"ghost"}
                 size={"icon"}
@@ -347,7 +348,7 @@ export function RichEditor(props: RichEditorProps) {
           {/* Embed Frame */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type={"button"} variant={"ghost"} size={"icon"} onClick={embedFrame}>
+              <Button aria-label="Embed Frame" type={"button"} variant={"ghost"} size={"icon"} onClick={embedFrame}>
                 <FrameIcon />
               </Button>
             </TooltipTrigger>
@@ -357,7 +358,7 @@ export function RichEditor(props: RichEditorProps) {
           {/* Embed Video */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type={"button"} variant={"ghost"} size={"icon"} onClick={embedVideo}>
+              <Button aria-label="Embed Video" type={"button"} variant={"ghost"} size={"icon"} onClick={embedVideo}>
                 <VideoIcon />
               </Button>
             </TooltipTrigger>
@@ -368,7 +369,7 @@ export function RichEditor(props: RichEditorProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button type={"button"} variant={"ghost"} size={"icon"} asChild>
-                <label>
+                <label aria-label="Upload Image">
                   <input
                     className={"hidden"}
                     type={"file"}

@@ -10,7 +10,6 @@ import {
   UserIcon,
   UsersIcon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -28,6 +27,7 @@ import ImageWrapper from "#/components/ui/wrappers/image";
 import useBackend from "#/lib/backend/client";
 import { Organization } from "#/lib/backend/schema";
 import { useSession } from "#/lib/providers/session";
+import { useTheme } from "#/lib/providers/theme";
 import Link from "#/lib/router";
 import userTypes from "#/lib/store/user-types";
 import { cn, getLabel } from "#/lib/utils";

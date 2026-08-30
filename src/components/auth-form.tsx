@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
@@ -125,7 +123,7 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
           )}
           <Button className="w-full" disabled={pending} type="submit">
             {pending ? (
-              <Loader2 className="animate-spin" />
+              <Loader2 className="animate-spin motion-reduce:animate-none" />
             ) : (
               <>
                 {isSignUp ? "Create account" : "Sign in"}

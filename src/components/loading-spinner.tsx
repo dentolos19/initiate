@@ -23,8 +23,8 @@ export default function LoadingSpinner(
   }
 
   return (
-    <div {...props} className={cn("mx-auto size-min animate-spin", props.className)}>
-      <Loader2Icon className={size} />
+    <div {...props} className={cn("mx-auto size-min animate-spin motion-reduce:animate-none", props.className)}>
+      <Loader2Icon className={size} aria-hidden="true" />
     </div>
   );
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import { BotMessageSquareIcon, MicIcon, SendIcon, SquareArrowOutUpRightIcon } from "lucide-react";
 import { ComponentProps } from "react";
 
@@ -25,7 +23,7 @@ export default function AdvisorPopover(
             <h1 className={"text-lg font-bold"}>Advisor</h1>
           </div>
           <div>
-            <Button variant={"outline"} size={"icon"} onClick={showAdvisorDialog}>
+            <Button aria-label="Open Advisor" variant={"outline"} size={"icon"} onClick={showAdvisorDialog}>
               <SquareArrowOutUpRightIcon />
             </Button>
           </div>
@@ -42,12 +40,13 @@ export default function AdvisorPopover(
         <form className={"bg-secondary flex gap-2 border-t p-4"} onSubmit={props.data.handleSubmit}>
           <Input
             type={"text"}
-            placeholder={"I need help with..."}
+            placeholder={"I need help with…"}
             value={props.data.input}
             disabled={props.data.status !== "ready"}
             onChange={props.data.handleInputChange}
           />
           <Button
+            aria-label="Start Voice Conversation"
             type={"button"}
             variant={"outline"}
             size={"icon"}
@@ -56,7 +55,13 @@ export default function AdvisorPopover(
           >
             <MicIcon />
           </Button>
-          <Button type={"submit"} variant={"default"} size={"icon"} disabled={props.data.status !== "ready"}>
+          <Button
+            aria-label="Send Message"
+            type={"submit"}
+            variant={"default"}
+            size={"icon"}
+            disabled={props.data.status !== "ready"}
+          >
             <SendIcon />
           </Button>
         </form>

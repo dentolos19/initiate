@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const paymentAccountSchema = z.object({
-  id: z.string().nullish(),
+  id: z.string(),
   mode: z.literal("demo"),
-  status: z.enum(["setup", "ready"]),
+  status: z.literal("ready"),
   currency: z.string(),
   availableBalance: z.number().int(),
   pendingBalance: z.number().int(),

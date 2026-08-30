@@ -1,5 +1,3 @@
-"use client";
-
 import { ReactNode } from "react";
 
 import { TooltipProvider } from "#/components/ui/tooltip";
@@ -12,7 +10,7 @@ import TourProvider from "#/lib/providers/tour";
 
 export default function AppProvider(props: { children?: ReactNode }) {
   return (
-    <ThemeProvider attribute={"class"} defaultTheme={"system"} enableSystem>
+    <ThemeProvider>
       <AuthProvider>
         <SessionProvider>
           <TooltipProvider>

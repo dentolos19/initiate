@@ -1,5 +1,3 @@
-"use server";
-
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
 

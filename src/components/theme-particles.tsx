@@ -1,9 +1,7 @@
-"use client";
-
-import { useTheme } from "next-themes";
 import { ComponentProps } from "react";
 
 import { Particles } from "#/components/ui/magic/particles";
+import { useTheme } from "#/lib/providers/theme";
 
 export default function ThemeParticles(props: ComponentProps<typeof Particles>) {
   const { resolvedTheme } = useTheme();

@@ -6,7 +6,7 @@ export default function ShinyBadge(props: { className?: string; children?: React
   return (
     <div
       className={cn(
-        "group w-max rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800",
+        "group w-max rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-colors ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800",
       )}
     >
       <AnimatedShinyText

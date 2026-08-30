@@ -1,9 +1,7 @@
-"use client";
-
-import { useTheme } from "next-themes";
 import { ComponentProps } from "react";
 
 import { MagicCard } from "#/components/ui/magic/magic-card";
+import { useTheme } from "#/lib/providers/theme";
 
 export default function ThemeGradient(props: ComponentProps<typeof MagicCard>) {
   const { resolvedTheme } = useTheme();

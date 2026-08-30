@@ -1,9 +1,7 @@
-"use client";
-
-import { useTheme } from "next-themes";
 import { ComponentProps } from "react";
 
 import Image from "#/components/ui/wrappers/image";
+import { useTheme } from "#/lib/providers/theme";
 
 export default function Logo(props: Omit<ComponentProps<typeof Image>, "src" | "alt">) {
   const { resolvedTheme } = useTheme();

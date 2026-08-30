@@ -1,5 +1,3 @@
-"use client";
-
 import { useConversation } from "@elevenlabs/react";
 import {
   BotMessageSquareIcon,
@@ -41,7 +39,7 @@ function VoiceTranscriptIndicator({ transcript }: { transcript: string }) {
       >
         <div className={"mb-2 flex items-center gap-2"}>
           <Mic className={"size-3 animate-pulse text-blue-500"} />
-          <span className={"text-xs font-medium text-blue-600 dark:text-blue-400"}>You're speaking...</span>
+          <span className={"text-xs font-medium text-blue-600 dark:text-blue-400"}>You're speaking…</span>
         </div>
         <p className={"min-h-[1rem] text-sm text-blue-800 dark:text-blue-200"}>{transcript}</p>
       </div>
@@ -65,7 +63,7 @@ function AISpeakingIndicator() {
       >
         <div className={"flex items-center gap-2"}>
           <Volume2 className={"size-3 animate-pulse text-green-500"} />
-          <span className={"text-xs font-medium text-green-600 dark:text-green-400"}>AI is speaking...</span>
+          <span className={"text-xs font-medium text-green-600 dark:text-green-400"}>AI is speaking…</span>
           <div className={"ml-2 flex gap-1"}>
             <div className={"h-1.5 w-1.5 animate-bounce rounded-full bg-green-500"}></div>
             <div
@@ -106,7 +104,6 @@ export default function AdvisorDialog(
   // Voice
   const [voiceLoading, setVoiceLoading] = useState<boolean>(false);
   const [voiceConnected, setVoiceConnected] = useState<boolean>(false);
-  const [agentId, setAgentId] = useState<string>("");
   const [voiceError, setVoiceError] = useState<string>("");
   const [isListening, setIsListening] = useState<boolean>(false);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState<boolean>(false);
@@ -206,7 +203,7 @@ export default function AdvisorDialog(
         setCurrentTranscript("");
       }
     },
-    onAudio: (audio: any) => {
+    onAudio: (_audio: any) => {
       // console.log("Audio:", audio);
     },
     onDebug: (debug: any) => {
@@ -268,7 +265,6 @@ export default function AdvisorDialog(
       // }
 
       const agentId = await backend.ai.getAgent();
-      setAgentId(agentId);
 
       await conversation.startSession({
         agentId,
@@ -373,9 +369,11 @@ export default function AdvisorDialog(
                 {voiceLoading ? (
                   <div className={"flex items-center gap-1 text-sm text-blue-500"}>
                     <div
-                      className={"h-4 w-4 animate-spin rounded-full border-2 border-blue-400 border-t-blue-500"}
+                      className={
+                        "h-4 w-4 animate-spin rounded-full border-2 border-blue-400 border-t-blue-500 motion-reduce:animate-none"
+                      }
                     ></div>
-                    <span>Connecting voice...</span>
+                    <span>Connecting voice…</span>
                   </div>
                 ) : voiceError ? (
                   <div className={"text-sm text-red-500"}>Voice Error</div>
@@ -387,7 +385,7 @@ export default function AdvisorDialog(
                 ) : isListening ? (
                   <div className={"flex items-center gap-1 text-sm text-blue-500"}>
                     <Mic className={"size-4 animate-pulse"} />
-                    <span>Listening{currentTranscript && "..."}</span>
+                    <span>Listening{currentTranscript && "…"}</span>
                   </div>
                 ) : voiceConnected ? (
                   <div className={"flex items-center gap-1 text-sm text-green-500"}>
@@ -453,12 +451,13 @@ export default function AdvisorDialog(
         <form className={"bg-secondary z-20 flex gap-2 border-t p-4"} onSubmit={props.data.handleSubmit}>
           <Input
             type={"text"}
-            placeholder={isVoiceEnabled && voiceConnected ? "Type or speak your message..." : "Say something..."}
+            placeholder={isVoiceEnabled && voiceConnected ? "Type or speak your message…" : "Say something…"}
             value={props.data.input}
             disabled={props.data.status !== "ready" || voiceLoading}
             onChange={props.data.handleInputChange}
           />
           <Button
+            aria-label={hideSuggestions ? "Show Suggestions" : "Hide Suggestions"}
             type={"button"}
             variant={"outline"}
             size={"icon"}
@@ -469,6 +468,7 @@ export default function AdvisorDialog(
           </Button>
           {/* {isVoiceEnabled && isVoiceConnected && (
             <Button
+              aria-label="Voice Status"
               type={"button"}
               variant={(conversation.isSpeaking || isAISpeaking) ? "default" : isListening ? "secondary" : "outline"}
               size={"icon"}
@@ -477,7 +477,7 @@ export default function AdvisorDialog(
                 isListening && "bg-blue-600 hover:bg-blue-700 animate-pulse"
               )}
               disabled={!isVoiceConnected || isVoiceLoading}
-              title={(conversation.isSpeaking || isAISpeaking) ? "AI is speaking..." : isListening ? "Listening..." : "Ready for voice"}
+              title={(conversation.isSpeaking || isAISpeaking) ? "AI is speaking…" : isListening ? "Listening…" : "Ready for voice"}
             >
               {(conversation.isSpeaking || isAISpeaking) ? (
                 <Volume2 className={"size-4"} />
@@ -487,6 +487,7 @@ export default function AdvisorDialog(
             </Button>
           )} */}
           <Button
+            aria-label={isVoiceEnabled ? "Disable Voice" : "Enable Voice"}
             className={cn(
               "flex items-center gap-2",
               isVoiceEnabled &&
@@ -505,7 +506,11 @@ export default function AdvisorDialog(
             onClick={toggleVoice}
           >
             {voiceLoading ? (
-              <div className={"h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"}></div>
+              <div
+                className={
+                  "h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent motion-reduce:animate-none"
+                }
+              />
             ) : isVoiceEnabled ? (
               <MicOffIcon className={"size-4"} />
             ) : (
@@ -513,6 +518,7 @@ export default function AdvisorDialog(
             )}
           </Button>
           <Button
+            aria-label="Send Message"
             type={"submit"}
             variant={"default"}
             size={"icon"}
