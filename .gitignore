@@ -1,0 +1,30 @@
+# Editor configurations
+.vs/
+.idea/
+
+# Build files
+.tanstack/
+.wrangler/
+node_modules/
+dist/
+build/
+out/
+coverage/
+*.tsbuildinfo
+*.d.ts
+
+# User files
+.env*
+!.env*.template
+.dev.vars*
+!.dev.vars*.template
+
+# Project files
+/.postgres/
+/src/routeTree.gen.ts
+
+# Miscellaneous files
+.DS_Store
+Desktop.ini
+Thumbs.db
+!.gitkeep

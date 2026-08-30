@@ -1,0 +1,32 @@
+{
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": [
+    "src/routes/-pages/(routes)/**",
+    "src/routes/-pages/error.tsx",
+    "src/routes/-pages/global-error.tsx",
+    "src/routes/-pages/layout.tsx",
+    "src/instrumentation.ts",
+    "src/instrumentation-client.ts",
+    "src/middleware.ts"
+  ],
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["dom", "dom.iterable", "es2023"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "#/*": ["./src/*"]
+    },
+    "types": ["vite/client"],
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true
+  }
+}

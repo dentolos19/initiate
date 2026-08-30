@@ -1,0 +1,48 @@
+{
+  "name": "initiate-mcp",
+  "version": "2.0",
+  "description": "MCP server for Initiate platform with voice AI integration",
+  "dynamic_variables": {
+    "user_id": {
+      "type": "string",
+      "description": "The authenticated user's ID from ElevenLabs or external system"
+    }
+  },
+  "tools": [
+    {
+      "name": "searchServices",
+      "description": "Search for AI services and solutions on the Initiate platform"
+    },
+    {
+      "name": "searchOrganizations",
+      "description": "Search for organizations and companies on the Initiate platform"
+    },
+    {
+      "name": "getMyOrders",
+      "description": "Get the user's orders from the platform with optional status filtering",
+      "requires_auth": true
+    },
+    {
+      "name": "getMyAnalytics",
+      "description": "Get business analytics and performance metrics for the user's organization",
+      "requires_auth": true
+    },
+    {
+      "name": "getNotifications",
+      "description": "Get the user's notifications from the platform",
+      "requires_auth": true
+    },
+    {
+      "name": "checkMessages",
+      "description": "Check recent messages and conversations",
+      "requires_auth": true
+    },
+    {
+      "name": "findServicesByNeed",
+      "description": "Find AI services that match specific business problems or needs using intelligent matching"
+    }
+  ],
+  "endpoints": {
+    "mcp": "/webhooks/mcp"
+  }
+}

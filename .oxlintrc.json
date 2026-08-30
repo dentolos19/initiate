@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "import", "promise", "react", "typescript"],
+  "rules": {
+    "sort-keys": "allow"
+  },
+  "ignorePatterns": ["docs/prisma/**", "src/components/ui/**", "src/routeTree.gen.ts"]
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "account_id": "3e25dc098d36fb6dbeb697225bd94d86",
+  "name": "initiate",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-08-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "dev": {
+    "port": 3000,
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 },
+  },
+  "routes": [{ "pattern": "initiate.global", "custom_domain": true }],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "500a328941f24935a1fb44b04600cfde",
+      "localConnectionString": "postgresql://initiate:initiate@localhost:5432/initiate",
+    },
+  ],
+  "send_email": [{ "name": "EMAIL" }],
+  "queues": {
+    "producers": [{ "binding": "NOTIFICATION_QUEUE", "queue": "initiate-notifications" }],
+    "consumers": [
+      {
+        "queue": "initiate-notifications",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 3,
+        "dead_letter_queue": "initiate-notifications-dead-letter",
+      },
+    ],
+  },
+  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "initiate" }],
+  "vectorize": [{ "binding": "VECTORIZE", "index_name": "initiate-search" }],
+  "durable_objects": {
+    "bindings": [{ "name": "MESSAGING", "class_name": "Messaging" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Messaging"] }],
+  "workflows": [
+    {
+      "name": "synchronize",
+      "binding": "SYNCHRONIZE",
+      "class_name": "SynchronizeWorkflow",
+    },
+  ],
+}
