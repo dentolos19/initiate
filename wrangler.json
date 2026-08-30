@@ -23,6 +23,10 @@
       "pattern": "initiate.dennise.me",
       "custom_domain": true,
     },
+    {
+      "pattern": "initiate.global",
+      "custom_domain": true,
+    },
   ],
   "d1_databases": [
     {
@@ -83,7 +87,7 @@
   ],
   "workflows": [
     {
-      "name": "initiate-synchronize",
+      "name": "initiate-synchronizer",
       "binding": "SYNCHRONIZE",
       "class_name": "SynchronizeWorkflow",
     },

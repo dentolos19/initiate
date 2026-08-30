@@ -97,20 +97,26 @@ users.get("/:id", async (c) => {
 // Update user
 users.put("/:id", async (c) => {
   const auth = getAuth(c);
+  if (!auth.userId) {
+    return c.json({ message: "Sign in to update your profile." }, 401);
+  }
 
-  let id = c.req.param("id");
-  if (auth?.userId && id === "current") id = auth.userId;
+  const requestedId = c.req.param("id");
+  if (requestedId !== "current" && requestedId !== auth.userId) {
+    return c.json({ message: "You can only update your own profile." }, 403);
+  }
+  const id = auth.userId;
 
   const body = await c.req.json();
 
   const { success, data } = z
     .object({
       bannerUrl: z.string().optional(),
-      location: z.string().optional(),
-      tagline: z.string().optional(),
       description: z.string().optional(),
+      location: z.string().optional(),
       prompt: z.string().optional(),
       settings: z.any().optional(),
+      tagline: z.string().optional(),
     })
     .safeParse(body);
 
@@ -126,18 +132,21 @@ users.put("/:id", async (c) => {
       followers: auth?.userId ? { where: { userId: auth.userId } } : false,
     },
   });
+  if (!user) {
+    return c.json({ message: "User not found." }, 404);
+  }
 
   await indexEmbeddings(
-    (vector) => insertEmbedding("user", user!.id, vector),
-    `${user!.firstName} ${user!.lastName ?? ""}`.trim(),
-    user!.description,
+    (vector) => insertEmbedding("user", user.id, vector),
+    `${user.firstName} ${user.lastName ?? ""}`.trim(),
+    user.description,
   );
 
   return c.json({
-    ...user!,
-    followers: user!.followersCount,
-    following: user!.followingsCount,
-    isFollowing: user!.followers.length > 0,
+    ...user,
+    followers: user.followersCount,
+    following: user.followingsCount,
+    isFollowing: user.followers.length > 0,
   });
 });
 

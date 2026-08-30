@@ -1,39 +1,30 @@
 "use client";
 
-import { useState } from "react";
-
 import ThemeParticles from "#/components/theme-particles";
+import { getAuthDestination } from "#/lib/auth/redirect";
 import { useSession } from "#/lib/providers/session";
-import { useRouter } from "#/lib/router";
-import EndOnboarding from "#/routes/-pages/(standalone)/onboarding/_components/end-onboarding";
+import { useRouter, useSearchParams } from "#/lib/router";
 import ProfileOnboarding from "#/routes/-pages/(standalone)/onboarding/_components/profile-onboarding";
+import Loading from "#/routes/-pages/loading";
 
 export default function Page() {
   const session = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const destination = getAuthDestination(searchParams.get("redirect"));
 
-  const [stage, setStage] = useState<"profile" | "end">("profile");
-
-  function nextStage() {
-    switch (stage) {
-      case "profile":
-        setStage("end");
-        break;
-      case "end":
-        router.push("/");
-        break;
-    }
-  }
+  if (session.loading) return <Loading />;
 
   if (!session.user) {
-    return <div className={"my-20 text-center"}>Please login.</div>;
+    return <div className="my-20 text-center">We couldn't load your account. Sign in again and retry.</div>;
   }
 
   return (
-    <div className={"grid size-full place-content-center"}>
-      <ThemeParticles className={"absolute inset-0"} />
-      {stage === "profile" && <ProfileOnboarding user={session.user} onNext={nextStage} />}
-      {stage === "end" && <EndOnboarding />}
+    <div className="relative grid size-full place-content-center overflow-hidden px-4 py-12">
+      <ThemeParticles className="absolute inset-0" />
+      <div className="relative z-10">
+        <ProfileOnboarding onNext={() => router.replace(destination)} />
+      </div>
     </div>
   );
 }

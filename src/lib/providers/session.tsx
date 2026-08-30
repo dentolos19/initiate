@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
 import { authClient } from "#/lib/auth/auth";
 import useBackend from "#/lib/backend/client";
@@ -12,7 +12,6 @@ const SessionContext = createContext<{
   organization: Organization | null;
   refreshUser: () => Promise<void>;
   refreshOrganization: () => Promise<void>;
-  showUserProfile: () => Promise<void>;
   showOrganizationProfile: () => Promise<void>;
   switchOrganization: (id: string) => void;
   signOut: () => Promise<void>;
@@ -22,7 +21,6 @@ const SessionContext = createContext<{
   organization: null,
   refreshUser: async () => {},
   refreshOrganization: async () => {},
-  showUserProfile: async () => {},
   showOrganizationProfile: async () => {},
   switchOrganization: async (_id: string) => {},
   signOut: async () => {},
@@ -38,33 +36,32 @@ export default function SessionProvider(props: { children?: ReactNode }) {
   const { data: authSession, isPending: sessionPending } = authClient.useSession();
   const { data: activeOrganization, isPending: organizationPending } = authClient.useActiveOrganization();
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const activeOrganizationId = activeOrganization?.id;
+  const userId = authSession?.user.id;
+
+  const [loadedKey, setLoadedKey] = useState<string>();
   const [user, setUser] = useState<User | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
+  const sessionKey = `${userId ?? ""}:${activeOrganizationId ?? ""}`;
+  const loading = sessionPending || organizationPending || loadedKey !== sessionKey;
 
-  async function refreshUser() {
-    if (authSession?.user) {
-      await backend.user.getUser().then((user) => {
-        setUser(user);
-      });
-    } else {
-      setUser(null);
-    }
-  }
+  const loadUser = useCallback(async () => {
+    if (!userId) return null;
+    return backend.user.getUser();
+  }, [backend.user, userId]);
 
-  async function refreshOrganization() {
-    if (activeOrganization) {
-      await backend.organization.getOrganization(activeOrganization.id).then((organization) => {
-        setOrganization(organization);
-      });
-    } else {
-      setOrganization(null);
-    }
-  }
+  const loadOrganization = useCallback(async () => {
+    if (!activeOrganizationId) return null;
+    return backend.organization.getOrganization(activeOrganizationId);
+  }, [activeOrganizationId, backend.organization]);
 
-  async function showUserProfile() {
-    window.location.assign("/manage");
-  }
+  const refreshUser = useCallback(async () => {
+    setUser(await loadUser());
+  }, [loadUser]);
+
+  const refreshOrganization = useCallback(async () => {
+    setOrganization(await loadOrganization());
+  }, [loadOrganization]);
 
   async function showOrganizationProfile() {
     if (!activeOrganization) return;
@@ -83,15 +80,26 @@ export default function SessionProvider(props: { children?: ReactNode }) {
 
   useEffect(() => {
     if (sessionPending || organizationPending) return;
-    setLoading(true);
-    void Promise.all([refreshUser(), refreshOrganization()])
-      .catch((error: unknown) => {
-        console.error("Failed to refresh the application session.", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [authSession?.user.id, activeOrganization?.id, sessionPending, organizationPending]);
+    let active = true;
+
+    void Promise.allSettled([loadUser(), loadOrganization()]).then(([userResult, organizationResult]) => {
+      if (!active) return;
+      if (userResult.status === "rejected") {
+        console.error("Failed to refresh the user session.", userResult.reason);
+      }
+      if (organizationResult.status === "rejected") {
+        console.error("Failed to refresh the organization session.", organizationResult.reason);
+      }
+
+      setUser(userResult.status === "fulfilled" ? userResult.value : null);
+      setOrganization(organizationResult.status === "fulfilled" ? organizationResult.value : null);
+      setLoadedKey(sessionKey);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [loadOrganization, loadUser, organizationPending, sessionKey, sessionPending]);
 
   return (
     <SessionContext.Provider
@@ -101,7 +109,6 @@ export default function SessionProvider(props: { children?: ReactNode }) {
         organization,
         refreshUser,
         refreshOrganization,
-        showUserProfile,
         showOrganizationProfile,
         switchOrganization,
         signOut,

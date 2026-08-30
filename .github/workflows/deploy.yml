@@ -33,7 +33,6 @@ jobs:
       - name: Build Project
         run: bun run build
         env:
-          VITE_ENVIRONMENT: ${{ vars.ENVIRONMENT }}
           VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
 
       - name: Migrate Database
@@ -43,39 +42,17 @@ jobs:
         uses: dentolos19/dentolos19/actions/deploy-cloudflare-worker@main
         with:
           secrets: |
-            ENVIRONMENT
-            PLATFORM_URL
             BETTER_AUTH_SECRET
-            BETTER_AUTH_URL
-            EMAIL_FROM_ADDRESS
-            EMAIL_FROM_NAME
-            ELEVENLABS_API_KEY
             ELEVENLABS_AGENT_ID
+            ELEVENLABS_API_KEY
             OPENROUTER_API_KEY
-            OPENROUTER_TITLE
-            OPENROUTER_REFERER
-            OPENROUTER_MODEL
-            OPENROUTER_EMBEDDING_MODEL
-            OPENROUTER_EMBEDDING_DIMENSIONS
             REALTIMEKIT_APP_ID
-            REALTIMEKIT_PRESET_NAME
         env:
-          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-          PLATFORM_URL: ${{ vars.PLATFORM_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
-          EMAIL_FROM_ADDRESS: ${{ vars.EMAIL_FROM_ADDRESS }}
-          EMAIL_FROM_NAME: ${{ vars.EMAIL_FROM_NAME }}
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_AGENT_ID: ${{ vars.ELEVENLABS_AGENT_ID }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_TITLE: ${{ vars.OPENROUTER_TITLE }}
-          OPENROUTER_REFERER: ${{ vars.OPENROUTER_REFERER }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-          OPENROUTER_EMBEDDING_MODEL: ${{ vars.OPENROUTER_EMBEDDING_MODEL }}
-          OPENROUTER_EMBEDDING_DIMENSIONS: ${{ vars.OPENROUTER_EMBEDDING_DIMENSIONS }}
           REALTIMEKIT_APP_ID: ${{ vars.REALTIMEKIT_APP_ID }}
-          REALTIMEKIT_PRESET_NAME: ${{ vars.REALTIMEKIT_PRESET_NAME }}
           # STRIPE_PUBLISHABLE_KEY: ${{ vars.STRIPE_PUBLISHABLE_KEY }}
           # STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           # STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
