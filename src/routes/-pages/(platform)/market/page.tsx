@@ -93,9 +93,9 @@ export default function Page() {
             <div>
               <h2 className={"mb-1 flex items-center gap-2"}>
                 <PencilRulerIcon className={"size-6"} />
-                <span className={"text-2xl font-bold"}>Editor's Pick</span>
+                <span className={"text-2xl font-bold"}>Recommended Services</span>
               </h2>
-              <p className={"text-muted-foreground text-sm"}>Handpicked services to kickstart your journey.</p>
+              <p className={"text-muted-foreground text-sm"}>Services matched to your profile and interests.</p>
             </div>
             <Button variant={"ghost"} asChild>
               <Link href={"/market/featured"}>
@@ -108,16 +108,16 @@ export default function Page() {
         </div>
 
         {/* No Items */}
-        {popularServices.length === 0 && (
+        {relevantServices.length === 0 && (
           <div className={"text-muted-foreground col-span-full my-10 text-center"}>
-            No featured services available at the moment.
+            No recommendations available at the moment.
           </div>
         )}
 
         {/* With Items */}
         <Carousel opts={{ align: "start" }}>
           <CarouselContent>
-            {popularServices.map((service) => (
+            {relevantServices.map((service) => (
               <CarouselItem
                 key={service.id}
                 className={"basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"}

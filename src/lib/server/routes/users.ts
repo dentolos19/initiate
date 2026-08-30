@@ -62,7 +62,7 @@ users.get("/", async (c) => {
       ...user,
       followers: user.followersCount,
       following: user.followingsCount,
-      isFollowing: user.followers.length > 0,
+      isFollowing: (user.followers?.length ?? 0) > 0,
     })),
   );
 });
@@ -90,7 +90,7 @@ users.get("/:id", async (c) => {
     ...user,
     followers: user.followersCount,
     following: user.followingsCount,
-    isFollowing: user.followers.length > 0,
+    isFollowing: (user.followers?.length ?? 0) > 0,
   });
 });
 
@@ -146,7 +146,7 @@ users.put("/:id", async (c) => {
     ...user,
     followers: user.followersCount,
     following: user.followingsCount,
-    isFollowing: user.followers.length > 0,
+    isFollowing: (user.followers?.length ?? 0) > 0,
   });
 });
 
@@ -183,7 +183,7 @@ users.get("/:id/organizations", async (c) => {
   ).map((organization) => ({
     ...organization,
     likes: organization.likesCount,
-    isLiked: organization.likes.length > 0,
+    isLiked: (organization.likes?.length ?? 0) > 0,
   }));
 
   return c.json(organizations);
@@ -341,7 +341,7 @@ users.get("/:id/posts", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   }));
 
   return c.json(posts);

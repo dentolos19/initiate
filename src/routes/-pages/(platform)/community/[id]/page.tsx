@@ -70,26 +70,26 @@ export default function Page() {
     const shareText = `${post.title} – Check out this post`;
 
     if (navigator.share) {
-      navigator
-        .share({
+      try {
+        await navigator.share({
           title: post.title,
           text: shareText,
           url: shareUrl,
-        })
-        .catch((error: Error) => {
-          console.error(error);
-          toast.error(error.message);
         });
+        toast.success("Post shared successfully.");
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        console.error(error);
+        toast.error(error instanceof Error ? error.message : "Could not share the post.");
+      }
     } else {
-      navigator.clipboard
-        .writeText(shareUrl)
-        .then(() => {
-          toast.success("Link copied to clipboard!");
-        })
-        .catch((error: Error) => {
-          console.error(error);
-          toast.error(error.message);
-        });
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard.");
+      } catch (error) {
+        console.error(error);
+        toast.error(error instanceof Error ? error.message : "Could not copy the post link.");
+      }
     }
   }
 

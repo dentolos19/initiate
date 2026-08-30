@@ -112,7 +112,7 @@ market.get("/compare", async (c) => {
       categories: z.array(
         z.object({
           name: z.string().describe("The category name."),
-          description: z.string().optional().describe("A brief description of the category."),
+          description: z.string().default("").describe("A brief description of the category."),
           features: z
             .array(
               z.object({
@@ -233,7 +233,7 @@ market.get("/tag/:tag", async (c) => {
     plan: service.plans[0] ?? null,
     orders: service.ordersCount,
     likes: service.likesCount,
-    isLiked: service.likes.length > 0,
+    isLiked: (service.likes?.length ?? 0) > 0,
   }));
 
   return c.json(services);

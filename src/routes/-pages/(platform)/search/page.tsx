@@ -87,7 +87,7 @@ export default function Page() {
                 <div className={"mb-2 flex flex-wrap gap-1"}>
                   {service.tags.map((tag) => (
                     <Badge key={tag} variant={"outline"}>
-                      {getLabel(domains, tag, "Unknown")}
+                      {getLabel(domains, tag, tag || "Uncategorized")}
                     </Badge>
                   ))}
                 </div>

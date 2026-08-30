@@ -1,7 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BanknoteIcon, EyeIcon, InfoIcon, SaveIcon, UsersIcon, WalletCardsIcon } from "lucide-react";
+import {
+  BanknoteIcon,
+  EyeIcon,
+  InfoIcon,
+  SaveIcon,
+  UsersIcon,
+  WalletCardsIcon,
+} from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -11,7 +18,13 @@ import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Button } from "#/components/ui/button";
 import { MultiSelect } from "#/components/ui/custom/multi-select";
 import { RichEditor } from "#/components/ui/custom/rich";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "#/components/ui/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "#/components/ui/form";
 import { Input } from "#/components/ui/input";
 import FormWrapper from "#/components/ui/wrappers/form";
 import ImageWrapper from "#/components/ui/wrappers/image";
@@ -27,7 +40,11 @@ const schema = z.object({
   id: z.string(),
   imageUrl: z.string().optional(),
   bannerUrl: z.string().optional(),
-  name: z.string(),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Enter an organization name.")
+    .max(100, "Keep the organization name under 100 characters."),
   tagline: z.string().optional(),
   tags: z.string().array(),
   description: z.string().optional(),
@@ -35,7 +52,7 @@ const schema = z.object({
 
 export default function Page() {
   const backend = useBackend();
-  const { organization, showOrganizationProfile } = useSession();
+  const { organization, refreshOrganization } = useSession();
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -53,20 +70,29 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
   const [paymentAccount, setPaymentAccount] = useState<PaymentAccount>();
 
-  function createSaveHandler() {
-    return form.handleSubmit(async (values) => {
-      if (!organization) return;
-      await backend.organization
-        .updateOrganization(organization.id, values)
-        .then(() => {
-          toast.success("Organization updated successfully!");
-        })
-        .catch((error: Error) => {
-          console.error(error);
-          toast.error(error.message);
-        });
-    });
-  }
+  const saveOrganization = form.handleSubmit(async (values) => {
+    if (!organization) return;
+
+    try {
+      const updatedOrganization = await backend.organization.updateOrganization(
+        organization.id,
+        values,
+      );
+      await refreshOrganization();
+      form.reset({
+        ...values,
+        name: updatedOrganization.name,
+      });
+      toast.success("Organization updated successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to update the organization.",
+      );
+    }
+  });
 
   function handleBannerUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -84,12 +110,30 @@ export default function Page() {
       });
   }
 
+  function handleLogoUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    backend.assets
+      .uploadFile(file)
+      .then((data) => {
+        form.setValue("imageUrl", "/assets/" + data.id, { shouldDirty: true });
+        toast.success("Logo uploaded. Save the organization to apply it.");
+      })
+      .catch((error: Error) => {
+        console.error(error);
+        toast.error(error.message);
+      });
+  }
+
   async function handleActivatePayments() {
     await backend.payments
       .activateAccount()
       .then((account) => {
         setPaymentAccount(account);
-        toast.success("Demo payments activated. No external account was created.");
+        toast.success(
+          "Demo payments activated. No external account was created.",
+        );
       })
       .catch((error: Error) => toast.error(error.message));
   }
@@ -97,17 +141,19 @@ export default function Page() {
   useEffect(() => {
     if (!organization) return;
     setLoading(true);
-    const loadOrganization = backend.organization.getOrganization(organization.id).then((org) => {
-      form.reset({
-        id: org.id,
-        imageUrl: org.imageUrl ?? "",
-        bannerUrl: org.bannerUrl ?? "",
-        name: org.name,
-        tagline: org.tagline ?? "",
-        description: org.description ?? "",
-        tags: org.tags ?? [],
+    const loadOrganization = backend.organization
+      .getOrganization(organization.id)
+      .then((org) => {
+        form.reset({
+          id: org.id,
+          imageUrl: org.imageUrl ?? "",
+          bannerUrl: org.bannerUrl ?? "",
+          name: org.name,
+          tagline: org.tagline ?? "",
+          description: org.description ?? "",
+          tags: org.tags ?? [],
+        });
       });
-    });
 
     const loadPayments = backend.payments.getAccount().then(setPaymentAccount);
 
@@ -126,14 +172,14 @@ export default function Page() {
   }
 
   return (
-    <FormWrapper form={form} onSubmit={createSaveHandler()}>
+    <FormWrapper form={form} onSubmit={saveOrganization}>
       <div className={"container mx-auto max-w-4xl space-y-4 p-4"}>
         <Alert className="border-primary/30 bg-primary/5">
           <InfoIcon />
           <AlertTitle>Demo payment environment</AlertTitle>
           <AlertDescription>
-            Balances, payments, declines, and refunds are simulated locally. No financial account or real transfer is
-            created.
+            Balances, payments, declines, and refunds are simulated locally. No
+            financial account or real transfer is created.
           </AlertDescription>
         </Alert>
 
@@ -161,23 +207,38 @@ export default function Page() {
             <div className="bg-muted/50 rounded-lg p-3">
               <p className="text-muted-foreground text-xs">Available</p>
               <p className="text-xl font-semibold">
-                {formatAmount(paymentAccount?.availableBalance ?? 0, paymentAccount?.currency ?? "sgd")}
+                {formatAmount(
+                  paymentAccount?.availableBalance ?? 0,
+                  paymentAccount?.currency ?? "sgd",
+                )}
               </p>
-              <p className="text-muted-foreground text-xs">{paymentAccount?.paidInvoices ?? 0} paid invoices</p>
+              <p className="text-muted-foreground text-xs">
+                {paymentAccount?.paidInvoices ?? 0} paid invoices
+              </p>
             </div>
             <div className="bg-muted/50 rounded-lg p-3">
               <p className="text-muted-foreground text-xs">Awaiting payment</p>
               <p className="text-xl font-semibold">
-                {formatAmount(paymentAccount?.pendingBalance ?? 0, paymentAccount?.currency ?? "sgd")}
+                {formatAmount(
+                  paymentAccount?.pendingBalance ?? 0,
+                  paymentAccount?.currency ?? "sgd",
+                )}
               </p>
-              <p className="text-muted-foreground text-xs">{paymentAccount?.openInvoices ?? 0} open invoices</p>
+              <p className="text-muted-foreground text-xs">
+                {paymentAccount?.openInvoices ?? 0} open invoices
+              </p>
             </div>
             <div className="bg-muted/50 rounded-lg p-3">
               <p className="text-muted-foreground text-xs">Refunded</p>
               <p className="text-xl font-semibold">
-                {formatAmount(paymentAccount?.refundedAmount ?? 0, paymentAccount?.currency ?? "sgd")}
+                {formatAmount(
+                  paymentAccount?.refundedAmount ?? 0,
+                  paymentAccount?.currency ?? "sgd",
+                )}
               </p>
-              <p className="text-muted-foreground text-xs">Simulated lifecycle total</p>
+              <p className="text-muted-foreground text-xs">
+                Simulated lifecycle total
+              </p>
             </div>
           </div>
         </div>
@@ -191,14 +252,24 @@ export default function Page() {
               <FormItem>
                 <FormLabel>Logo</FormLabel>
                 <FormControl>
-                  <button
-                    className={"size-40 cursor-pointer overflow-hidden rounded-lg"}
-                    type={"button"}
-                    disabled={formState.isSubmitting}
-                    onClick={showOrganizationProfile}
+                  <label
+                    className={
+                      "block size-40 cursor-pointer overflow-hidden rounded-lg"
+                    }
                   >
-                    <ImageWrapper className={"size-full object-cover"} src={field.value} alt={"Logo"} />
-                  </button>
+                    <input
+                      className={"hidden"}
+                      type={"file"}
+                      accept={"image/*"}
+                      disabled={formState.isSubmitting}
+                      onChange={handleLogoUpload}
+                    />
+                    <ImageWrapper
+                      className={"size-full object-cover"}
+                      src={field.value}
+                      alt={"Logo"}
+                    />
+                  </label>
                 </FormControl>
               </FormItem>
             )}
@@ -222,7 +293,11 @@ export default function Page() {
                     />
 
                     {/* Visual Representation */}
-                    <ImageWrapper className={"h-40 w-auto rounded-lg"} src={field.value} alt={"Banner"} />
+                    <ImageWrapper
+                      className={"h-40 w-auto rounded-lg"}
+                      src={field.value}
+                      alt={"Banner"}
+                    />
                   </label>
                 </FormControl>
               </FormItem>
@@ -239,12 +314,12 @@ export default function Page() {
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
-                  value={field.value}
+                  {...field}
+                  autoComplete={"organization"}
                   disabled={formState.isSubmitting}
-                  onClick={showOrganizationProfile}
-                  readOnly
                 />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -297,7 +372,11 @@ export default function Page() {
           render={({ field, formState }) => (
             <FormItem>
               <FormControl>
-                <RichEditor value={field.value} disabled={formState.isSubmitting} onValueChange={field.onChange} />
+                <RichEditor
+                  value={field.value}
+                  disabled={formState.isSubmitting}
+                  onValueChange={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -305,20 +384,28 @@ export default function Page() {
         />
 
         <div className={"flex flex-wrap gap-2"}>
-          <div className="bg-muted/40 rounded-lg border px-3 py-2 text-sm font-medium">{organization?.name}</div>
+          <div className="bg-muted/40 rounded-lg border px-3 py-2 text-sm font-medium">
+            {organization?.name}
+          </div>
           <Button type={"button"} variant={"outline"} asChild>
             <Link href={`/organizations/${organization!.id}`}>
               <EyeIcon />
               <span>Preview</span>
             </Link>
           </Button>
-          <Button type={"button"} variant={"outline"} onClick={showOrganizationProfile}>
-            <UsersIcon />
-            <span>Members</span>
+          <Button type={"button"} variant={"outline"} asChild>
+            <Link href={"/manage/organization/members"}>
+              <UsersIcon />
+              <span>Members</span>
+            </Link>
           </Button>
-          <Button type={"submit"} variant={"default"}>
+          <Button
+            type={"submit"}
+            variant={"default"}
+            disabled={form.formState.isSubmitting}
+          >
             <SaveIcon />
-            <span>Save</span>
+            <span>{form.formState.isSubmitting ? "Saving..." : "Save"}</span>
           </Button>
         </div>
       </div>

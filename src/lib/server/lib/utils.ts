@@ -67,9 +67,51 @@ export async function checkMembership(userId: string, organizationId: string) {
 
 export async function searchServices(context: Context, query: string, page: number = 1, limit: number = 10) {
   const auth = getAuth(context);
+  const offset = Math.max(0, page - 1) * limit;
+  const candidateLimit = Math.min(offset + limit, 100);
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const textServices = await database.query.service.findMany({
+    limit: candidateLimit,
+    where: {
+      status: "published",
+      OR: [
+        { name: { like: `%${query}%` } },
+        { description: { like: `%${query}%` } },
+        { tagline: { like: `%${query}%` } },
+      ],
+    },
+    extras: serviceCountExtras,
+    with: {
+      organization: { columns: { verified: true } },
+      likes: auth?.userId ? { where: { userId: auth.userId } } : false,
+      plans: { where: { default: true }, limit: 1 },
+    },
+  });
+
+  const mapService = (service: (typeof textServices)[number], similarity = 1) => ({
+    ...service,
+    verified: service.organization?.verified ?? false,
+    plan: service.plans[0] ?? null,
+    orders: service.ordersCount,
+    likes: service.likesCount,
+    isLiked: (service.likes?.length ?? 0) > 0,
+    similarity,
+  });
+
+  const textResults = textServices
+    .toSorted((left, right) => {
+      const leftExact = left.name.trim().toLowerCase() === normalizedQuery;
+      const rightExact = right.name.trim().toLowerCase() === normalizedQuery;
+      return Number(rightExact) - Number(leftExact);
+    })
+    .map((service) => mapService(service));
+
   try {
     const embedding = await generateEmbedding(query);
-    const similarities = await searchEmbeddings("service", embedding.vector, page, limit);
+    const similarities = (await searchEmbeddings("service", embedding.vector, 1, 100)).filter(
+      (item) => item.similarity >= 0.55,
+    );
     const services = await database.query.service.findMany({
       where: { id: { in: similarities.map((item) => item.id) }, status: "published" },
       extras: serviceCountExtras,
@@ -80,61 +122,17 @@ export async function searchServices(context: Context, query: string, page: numb
       },
     });
 
-    return similarities
-      .map((item) => {
-        const service = services.find((service) => service.id === item.id);
-        if (!service) return null;
-
-        return {
-          ...service,
-          verified: service.organization?.verified ?? false,
-          plan: service.plans[0] ?? null,
-          orders: service.ordersCount,
-          likes: service.likesCount,
-          isLiked: (service.likes?.length ?? 0) > 0,
-          similarity: item.similarity,
-        };
-      })
-      .filter((item) => !!item);
-  } catch (error) {
-    console.warn("Semantic service search is unavailable; using text search.", error);
-    const services = await database.query.service.findMany({
-      offset: (page - 1) * limit,
-      limit: limit,
-      where: {
-        status: "published",
-        OR: [
-          { name: { like: `%${query}%` } },
-          { description: { like: `%${query}%` } },
-          { tagline: { like: `%${query}%` } },
-        ],
-      },
-      extras: serviceCountExtras,
-      with: {
-        organization: {
-          columns: {
-            verified: true,
-          },
-        },
-        likes: auth?.userId ? { where: { userId: auth.userId } } : false,
-        plans: {
-          where: {
-            default: true,
-          },
-          limit: 1,
-        },
-      },
+    const textIds = new Set(textResults.map((service) => service.id));
+    const semanticResults = similarities.flatMap((item) => {
+      const service = services.find((service) => service.id === item.id);
+      if (!service || textIds.has(service.id)) return [];
+      return [mapService(service, item.similarity)];
     });
 
-    return services.map((service) => ({
-      ...service,
-      verified: service.organization?.verified ?? false,
-      plan: service.plans[0] ?? null,
-      orders: service.ordersCount,
-      likes: service.likesCount,
-      isLiked: (service.likes?.length ?? 0) > 0,
-      similarity: 0,
-    }));
+    return [...textResults, ...semanticResults].slice(offset, offset + limit);
+  } catch (error) {
+    console.warn("Semantic service search is unavailable; using text search.", error);
+    return textResults.slice(offset, offset + limit);
   }
 }
 
@@ -167,9 +165,48 @@ export async function searchOrganizations(context: Context, query: string, page:
 
 export async function searchUsers(context: Context, query: string, page: number = 1, limit: number = 10) {
   const auth = getAuth(context);
+  const offset = Math.max(0, page - 1) * limit;
+  const candidateLimit = Math.min(offset + limit, 100);
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const textUsers = await database.query.user.findMany({
+    limit: candidateLimit,
+    where: {
+      OR: [
+        { firstName: { like: `%${query}%` } },
+        { lastName: { like: `%${query}%` } },
+        { email: { like: `%${query}%` } },
+        { description: { like: `%${query}%` } },
+        { tagline: { like: `%${query}%` } },
+      ],
+    },
+    extras: userCountExtras,
+    with: {
+      followers: auth?.userId ? { where: { userId: auth.userId } } : false,
+    },
+  });
+
+  const mapUser = (user: (typeof textUsers)[number], similarity = 1) => ({
+    ...user,
+    followers: user.followersCount,
+    following: user.followingsCount,
+    isFollowing: (user.followers?.length ?? 0) > 0,
+    similarity,
+  });
+
+  const textResults = textUsers
+    .toSorted((left, right) => {
+      const leftName = `${left.firstName} ${left.lastName ?? ""}`.trim().toLowerCase();
+      const rightName = `${right.firstName} ${right.lastName ?? ""}`.trim().toLowerCase();
+      return Number(rightName === normalizedQuery) - Number(leftName === normalizedQuery);
+    })
+    .map((user) => mapUser(user));
+
   try {
     const embedding = await generateEmbedding(query);
-    const similarities = await searchEmbeddings("user", embedding.vector, page, limit);
+    const similarities = (await searchEmbeddings("user", embedding.vector, 1, 100)).filter(
+      (item) => item.similarity >= 0.55,
+    );
     const users = await database.query.user.findMany({
       where: { id: { in: similarities.map((item) => item.id) } },
       extras: userCountExtras,
@@ -178,47 +215,17 @@ export async function searchUsers(context: Context, query: string, page: number 
       },
     });
 
-    return similarities
-      .map((item) => {
-        const user = users.find((user) => user.id === item.id);
-        if (!user) return null;
-
-        return {
-          ...user,
-          followers: user.followersCount,
-          following: user.followingsCount,
-          isFollowing: (user.followers?.length ?? 0) > 0,
-          similarity: item.similarity,
-        };
-      })
-      .filter((item) => item !== null);
-  } catch (error) {
-    console.warn("Semantic user search is unavailable; using text search.", error);
-    const users = await database.query.user.findMany({
-      offset: (page - 1) * limit,
-      limit: limit,
-      where: {
-        OR: [
-          { firstName: { like: `%${query}%` } },
-          { lastName: { like: `%${query}%` } },
-          { email: { like: `%${query}%` } },
-          { description: { like: `%${query}%` } },
-          { tagline: { like: `%${query}%` } },
-        ],
-      },
-      extras: userCountExtras,
-      with: {
-        followers: auth?.userId ? { where: { userId: auth.userId } } : false,
-      },
+    const textIds = new Set(textResults.map((user) => user.id));
+    const semanticResults = similarities.flatMap((item) => {
+      const user = users.find((user) => user.id === item.id);
+      if (!user || textIds.has(user.id)) return [];
+      return [mapUser(user, item.similarity)];
     });
 
-    return users.map((user) => ({
-      ...user,
-      followers: user.followersCount,
-      following: user.followingsCount,
-      isFollowing: (user.followers?.length ?? 0) > 0,
-      similarity: 0,
-    }));
+    return [...textResults, ...semanticResults].slice(offset, offset + limit);
+  } catch (error) {
+    console.warn("Semantic user search is unavailable; using text search.", error);
+    return textResults.slice(offset, offset + limit);
   }
 }
 

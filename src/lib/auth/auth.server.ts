@@ -14,7 +14,7 @@ export function createAuth(connection: D1Database) {
     appName: "Initiate",
     baseURL: BETTER_AUTH_URL,
     secret: BETTER_AUTH_SECRET,
-    trustedOrigins: ["https://initiate.global"],
+    trustedOrigins: ["https://initiate.dennise.me", "https://initiate.global"],
     database: drizzleAdapter(database, {
       provider: "sqlite",
       schema,

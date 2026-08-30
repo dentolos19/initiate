@@ -10,11 +10,7 @@ import { useAdvisor } from "#/lib/providers/advisor";
 import { cn } from "#/lib/utils";
 
 export default function AmplifyBanner(props: ComponentProps<"div">) {
-  const { askAdvisor } = useAdvisor();
-
-  function handleStart() {
-    askAdvisor("I want to grow my business with AI tools and expert support.");
-  }
+  const { showAdvisorPopover } = useAdvisor();
 
   return (
     <CarouselItem>
@@ -36,7 +32,7 @@ export default function AmplifyBanner(props: ComponentProps<"div">) {
           <p className={"mt-5 max-w-2xl text-sm leading-6 text-blue-50/85 md:text-lg"}>
             Find practical services, experienced collaborators, and relevant support in one place.
           </p>
-          <Button className={"mt-7"} size={"lg"} onClick={handleStart}>
+          <Button className={"mt-7"} size={"lg"} onClick={showAdvisorPopover}>
             Ask the AI advisor
           </Button>
           <div className={"mt-7 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-blue-50/80"}>

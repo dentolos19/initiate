@@ -44,10 +44,8 @@ export default function Page() {
           <div className={"mb-4 aspect-square w-max rounded-lg bg-purple-500 p-4 text-white"}>
             <PencilRulerIcon className={"size-8"} />
           </div>
-          <h1 className={"mb-2 text-2xl font-medium"}>Editor's Pick</h1>
-          <p className={"text-muted-foreground"}>
-            Discover curated opportunities and resources handpicked by our experts.
-          </p>
+          <h1 className={"mb-2 text-2xl font-medium"}>Recommended Services</h1>
+          <p className={"text-muted-foreground"}>Explore services matched to your profile and interests.</p>
         </CardContent>
       </Card>
       <div className={"grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"}>

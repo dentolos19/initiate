@@ -27,8 +27,8 @@ export default function End() {
             <Button variant={"default"} asChild>
               <Link href={"/auth/new"}>Sign Up</Link>
             </Button>
-            <Button variant={"outline"}>
-              <Link href={"/demo"}>Try Demo</Link>
+            <Button variant={"outline"} asChild>
+              <Link href={"/market"}>Explore Marketplace</Link>
             </Button>
           </div>
         </div>

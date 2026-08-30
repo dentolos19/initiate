@@ -3,7 +3,6 @@ import { ComponentProps } from "react";
 import { Badge } from "#/components/ui/badge";
 import { CarouselItem } from "#/components/ui/carousel";
 import GradientBadge from "#/components/ui/custom/gradient-badge";
-import ShinyBadge from "#/components/ui/custom/shiny-badge";
 import ImageWrapper from "#/components/ui/wrappers/image";
 import { Service } from "#/lib/backend/schema";
 import Link from "#/lib/router";
@@ -34,7 +33,9 @@ export default function ServiceBanner(props: ComponentProps<"div"> & { data: Ser
         >
           {/* Tags */}
           <div className={"mb-1"}>
-            <Badge variant={"outline"}>{getLabel(domains, props.data.tags[0], "Unknown")}</Badge>
+            <Badge variant={"outline"}>
+              {getLabel(domains, props.data.tags[0], props.data.tags[0] ?? "Uncategorized")}
+            </Badge>
           </div>
 
           {/* Name and Tagline */}
@@ -45,9 +46,6 @@ export default function ServiceBanner(props: ComponentProps<"div"> & { data: Ser
         {/* Badges */}
         <div className={"absolute inset-4"}>
           <GradientBadge>Recommended For You</GradientBadge>
-        </div>
-        <div className={"absolute top-4 right-4"}>
-          <ShinyBadge>✨ 4.4</ShinyBadge>
         </div>
       </Link>
     </CarouselItem>

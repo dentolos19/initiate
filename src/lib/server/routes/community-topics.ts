@@ -62,7 +62,7 @@ communityTopics.get("/topic/:topic", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   }));
 
   return c.json(posts);
@@ -184,7 +184,7 @@ communityTopics.get("/feed/following", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   }));
 
   return c.json(posts);

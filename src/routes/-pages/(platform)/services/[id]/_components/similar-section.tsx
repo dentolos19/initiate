@@ -26,7 +26,7 @@ export default function SimilarSection() {
     backend.service
       .similarServices(id)
       .then((services) => {
-        setServices(services);
+        setServices(services.filter((service) => service.id !== id));
       })
       .catch((error: Error) => {
         console.error(error);
@@ -35,7 +35,7 @@ export default function SimilarSection() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [backend.service, id]);
 
   return (
     <Card className={"gap-0 py-6"}>

@@ -7,7 +7,7 @@ import { cn } from "#/lib/utils";
 export default function VerifiedBadge(props: ComponentProps<"div">) {
   return (
     <Tooltip>
-      <TooltipTrigger className={"size-max"}>
+      <TooltipTrigger asChild>
         <div className={cn("bg-primary grid size-6 place-content-center rounded-sm", props.className)}>
           <TriangleIcon className={"size-3"} />
         </div>

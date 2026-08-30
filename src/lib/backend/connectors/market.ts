@@ -8,7 +8,10 @@ export const comparisonSchema = z.object({
   categories: z
     .object({
       name: z.string(),
-      description: z.string(),
+      description: z
+        .string()
+        .nullish()
+        .transform((value) => value ?? ""),
       features: z
         .object({
           name: z.string(),

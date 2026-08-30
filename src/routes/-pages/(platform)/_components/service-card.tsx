@@ -36,7 +36,7 @@ export default function ServiceCard(props: ComponentProps<"div"> & { data: Servi
       <div className={"p-3"}>
         <div className={"flex justify-between"}>
           {/* Tag */}
-          <Badge variant={"outline"}>{getLabel(domains, service.tags[0], "Unknown")}</Badge>
+          <Badge variant={"outline"}>{getLabel(domains, service.tags[0], service.tags[0] ?? "Uncategorized")}</Badge>
 
           {/* Verified Badge */}
           {service.verified && <VerifiedBadge />}
@@ -51,7 +51,7 @@ export default function ServiceCard(props: ComponentProps<"div"> & { data: Servi
         <div className={"mt-1 flex items-center justify-between text-xs"}>
           <div className={"flex items-center gap-1"}>
             <CoinsIcon className={"size-3"} />
-            <span>{service.plan?.priceData ? formatPrice(service.plan.priceData) : "No Plan"}</span>
+            <span>{service.plan?.priceData ? formatPrice(service.plan.priceData) : "Contact for pricing"}</span>
           </div>
           <div className={"flex items-center gap-1"}>
             <StoreIcon className={"size-3"} />

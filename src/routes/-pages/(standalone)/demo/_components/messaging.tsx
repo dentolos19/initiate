@@ -31,11 +31,11 @@ export default function Messaging() {
               <div className={"bg-muted w-max max-w-[80%] rounded-lg p-3"}>
                 <div className={"mb-3 text-3xl font-medium"}>S$1000</div>
                 <div className={"flex gap-2"}>
-                  <Button variant={"default"} size={"sm"}>
+                  <Button variant={"default"} size={"sm"} disabled title={"Static payment preview"}>
                     <BanknoteIcon />
                     <span>Pay</span>
                   </Button>
-                  <Button variant={"outline"} size={"sm"}>
+                  <Button variant={"outline"} size={"sm"} disabled title={"Static invoice preview"}>
                     <ScrollTextIcon />
                     <span>View Invoice</span>
                   </Button>

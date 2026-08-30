@@ -35,7 +35,7 @@ community.get("/latest", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   }));
 
   return c.json(posts);
@@ -63,7 +63,7 @@ community.get("/popular", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   }));
 
   return c.json(posts);
@@ -128,7 +128,7 @@ community.post("/", async (c) => {
     ...post!,
     comments: post!.commentsCount,
     likes: post!.likesCount,
-    liked: post!.likes.length > 0,
+    liked: (post!.likes?.length ?? 0) > 0,
   });
 });
 
@@ -208,7 +208,7 @@ community.put("/:id", async (c) => {
     ...post!,
     comments: post!.commentsCount,
     likes: post!.likesCount,
-    liked: post!.likes.length > 0,
+    liked: (post!.likes?.length ?? 0) > 0,
   });
 });
 
@@ -237,7 +237,7 @@ community.get("/:id", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   });
 });
 
@@ -388,7 +388,7 @@ community.get("/user/:userId", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   }));
 
   return c.json(posts);
@@ -422,7 +422,7 @@ community.get("/organization/:orgId", async (c) => {
     ...post,
     comments: post.commentsCount,
     likes: post.likesCount,
-    liked: post.likes.length > 0,
+    liked: (post.likes?.length ?? 0) > 0,
   }));
 
   return c.json(posts);

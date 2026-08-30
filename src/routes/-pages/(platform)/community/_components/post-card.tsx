@@ -77,20 +77,29 @@ export default function PostCard({ post, onLike, onComment, onShare }: PostCardP
     router.push(`/community/${post.id}`);
   }
 
-  function handleShare(event: React.MouseEvent) {
+  async function handleShare(event: React.MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
 
-    navigator
-      .share({
-        title: post.title,
-        text: `${post.title} – Check out this post`,
-        url: `${window.location.origin}/community/${post.id}`,
-      })
-      .catch((error: Error) => {
-        console.error(error);
-        toast.error("Failed to share post.");
-      });
+    const url = `${window.location.origin}/community/${post.id}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: post.title,
+          text: `${post.title} – Check out this post`,
+          url,
+        });
+        toast.success("Post shared successfully.");
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied to clipboard.");
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      console.error(error);
+      toast.error("Failed to share post.");
+    }
   }
 
   function handleManage(event: React.MouseEvent) {

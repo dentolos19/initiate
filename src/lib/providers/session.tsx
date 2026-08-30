@@ -12,7 +12,6 @@ const SessionContext = createContext<{
   organization: Organization | null;
   refreshUser: () => Promise<void>;
   refreshOrganization: () => Promise<void>;
-  showOrganizationProfile: () => Promise<void>;
   switchOrganization: (id: string) => void;
   signOut: () => Promise<void>;
 }>({
@@ -21,7 +20,6 @@ const SessionContext = createContext<{
   organization: null,
   refreshUser: async () => {},
   refreshOrganization: async () => {},
-  showOrganizationProfile: async () => {},
   switchOrganization: async (_id: string) => {},
   signOut: async () => {},
 });
@@ -62,11 +60,6 @@ export default function SessionProvider(props: { children?: ReactNode }) {
   const refreshOrganization = useCallback(async () => {
     setOrganization(await loadOrganization());
   }, [loadOrganization]);
-
-  async function showOrganizationProfile() {
-    if (!activeOrganization) return;
-    window.location.assign("/manage/organization");
-  }
 
   function switchOrganization(id: string) {
     if (organization?.id === id) return;
@@ -109,7 +102,6 @@ export default function SessionProvider(props: { children?: ReactNode }) {
         organization,
         refreshUser,
         refreshOrganization,
-        showOrganizationProfile,
         switchOrganization,
         signOut,
       }}

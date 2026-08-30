@@ -132,7 +132,7 @@ export default function Page() {
               </TableCell>
               <TableCell>{getLabel(serviceTypes, service.type, "Unknown")}</TableCell>
               <TableCell>{getLabel(serviceStatus, service.status, "Unknown")}</TableCell>
-              <TableCell>Unknown</TableCell>
+              <TableCell>{service.plan?.name ?? "No default plan"}</TableCell>
               <TableCell>{service.likes}</TableCell>
               <TableCell>{service.orders}</TableCell>
               <TableCell className={"flex gap-2"}>

@@ -115,7 +115,7 @@ services.get("/", async (c) => {
       plan: service.plans[0] ?? null,
       orders: service.ordersCount,
       likes: service.likesCount,
-      isLiked: service.likes.length > 0,
+      isLiked: (service.likes?.length ?? 0) > 0,
     })),
   );
 });
@@ -158,7 +158,7 @@ services.get("/latest", async (c) => {
     plan: service.plans[0] ?? null,
     orders: service.ordersCount,
     likes: service.likesCount,
-    isLiked: service.likes.length > 0,
+    isLiked: (service.likes?.length ?? 0) > 0,
   }));
 
   return c.json(services);
@@ -225,7 +225,7 @@ services.get("/relevant", async (c) => {
         plan: service.plans[0] ?? null,
         orders: service.ordersCount,
         likes: service.likesCount,
-        isLiked: service.likes.length > 0,
+        isLiked: (service.likes?.length ?? 0) > 0,
         similarity: item.similarity,
       };
     })
@@ -249,7 +249,7 @@ services.post("/", async (c) => {
     .object({
       imageUrl: z.string().optional(),
       bannerUrl: z.string().optional(),
-      name: z.string(),
+      name: z.string().trim().min(1),
       type: serviceTypeSchema.default("other"),
       status: z.string().optional(),
       description: z.string().optional(),
@@ -300,7 +300,7 @@ services.put("/:id", async (c) => {
     .object({
       imageUrl: z.string().optional(),
       bannerUrl: z.string().optional(),
-      name: z.string().optional(),
+      name: z.string().trim().min(1).optional(),
       type: serviceTypeSchema.optional(),
       status: z.string().optional(),
       description: z.string().optional(),
@@ -373,7 +373,7 @@ services.put("/:id", async (c) => {
     plan: service.plans[0] ?? null,
     orders: service.ordersCount,
     likes: service.likesCount,
-    isLiked: service.likes.length > 0,
+    isLiked: (service.likes?.length ?? 0) > 0,
   });
 });
 
@@ -412,7 +412,7 @@ services.get("/:id", async (c) => {
     plan: service.plans[0] ?? null,
     orders: service.ordersCount,
     likes: service.likesCount,
-    isLiked: service.likes.length > 0,
+    isLiked: (service.likes?.length ?? 0) > 0,
   });
 });
 
@@ -531,7 +531,7 @@ services.get("/:id/similar", async (c) => {
     similarities
       .map((item) => {
         const service = services.find((service) => service.id === item.id);
-        if (!service) return null;
+        if (!service || service.id === id) return null;
 
         return {
           ...service,
@@ -539,7 +539,7 @@ services.get("/:id/similar", async (c) => {
           plan: service.plans[0] ?? null,
           orders: service.ordersCount,
           likes: service.likesCount,
-          isLiked: service.likes.length > 0,
+          isLiked: (service.likes?.length ?? 0) > 0,
           similarity: item.similarity,
         };
       })

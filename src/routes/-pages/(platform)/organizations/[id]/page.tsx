@@ -119,7 +119,7 @@ export default function Page() {
               <div className={"mb-2 flex gap-1"}>
                 {organization?.tags.map((tag) => (
                   <Badge key={tag} variant={"outline"}>
-                    {getLabel(domains, tag, "Unknown")}
+                    {getLabel(domains, tag, tag || "Uncategorized")}
                   </Badge>
                 ))}
               </div>

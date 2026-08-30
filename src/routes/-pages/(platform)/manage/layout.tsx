@@ -10,11 +10,13 @@ import {
   CoinsIcon,
   CommandIcon,
   LayoutDashboardIcon,
+  MailIcon,
   PanelLeftIcon,
   PlusIcon,
   ScrollTextIcon,
   ShoppingCartIcon,
   UserIcon,
+  UsersIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -50,6 +52,7 @@ import { useSession } from "#/lib/providers/session";
 import Link from "#/lib/router";
 import { usePathname } from "#/lib/router";
 import { cn } from "#/lib/utils";
+import Loading from "#/routes/-pages/loading";
 import { LayoutProps } from "#/types";
 
 const userLinks = [
@@ -92,6 +95,11 @@ const organizationLinks = [
     url: "/manage/organization/analytics",
   },
   {
+    icon: UsersIcon,
+    name: "Manage Members",
+    url: "/manage/organization/members",
+  },
+  {
     icon: AppWindowIcon,
     name: "Manage Services",
     url: "/manage/organization/services",
@@ -113,6 +121,11 @@ const platformLinks = [
     icon: ScrollTextIcon,
     name: "Manage Resources",
     url: "/manage/platform/resources",
+  },
+  {
+    icon: MailIcon,
+    name: "Email Preferences",
+    url: "/manage/platform/email",
   },
   {
     icon: CommandIcon,
@@ -147,6 +160,10 @@ function NestedLayout(props: LayoutProps) {
         toast.error(error.message);
       });
   }, [session.user, session.organization]);
+
+  if (session.loading) {
+    return <Loading />;
+  }
 
   return (
     <>

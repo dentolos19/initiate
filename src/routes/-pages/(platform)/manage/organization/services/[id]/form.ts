@@ -5,7 +5,7 @@ export const formSchema = z.object({
   id: z.string().optional(),
   imageUrl: z.string().optional(),
   bannerUrl: z.string().optional(),
-  name: z.string(),
+  name: z.string().trim().min(1, "Enter a service name."),
   type: z.string(),
   status: z.string(),
   description: z.string().optional(),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import useBackend from "#/lib/backend/client";
 import { EmailPreferences } from "#/lib/backend/connectors/email";
@@ -27,7 +28,8 @@ export default function EmailPreferencesPage() {
         const data = await backend.email.getEmailPreferences();
         setPreferences(data);
       } catch (error) {
-        console.log("⚠️ Backend not connected, using defaults. Error:", error);
+        console.error(error);
+        toast.error(error instanceof Error ? error.message : "Could not load email preferences.");
       } finally {
         setLoading(false);
       }
@@ -43,7 +45,8 @@ export default function EmailPreferencesPage() {
       const updated = await backend.email.updateEmailPreferences(newPrefs);
       setPreferences(updated);
     } catch (error) {
-      console.log("❌ Failed to update preferences:", error);
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : "Could not update email preferences.");
     } finally {
       setSaving(false);
     }

@@ -27,7 +27,9 @@ export default function OrganizationCard(props: ComponentProps<"div"> & { data: 
       <div className={"p-3"}>
         {/* Badges */}
         <div className={"mb-1"}>
-          <Badge variant={"outline"}>{getLabel(industries, props.data.tags[0], "Unknown")}</Badge>
+          <Badge variant={"outline"}>
+            {getLabel(industries, props.data.tags[0], props.data.tags[0] ?? "Uncategorized")}
+          </Badge>
         </div>
 
         {/* Name and Likes */}
