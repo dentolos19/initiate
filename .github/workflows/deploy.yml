@@ -1,0 +1,83 @@
+name: Web Deployment
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+jobs:
+  deploy:
+    name: Deploy
+    environment: Production
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: latest
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Project
+        run: bun run build
+        env:
+          VITE_ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+
+      - name: Migrate Database
+        run: bun run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Deploy Worker
+        uses: dentolos19/dentolos19/actions/deploy-cloudflare-worker@main
+        with:
+          secrets: |
+            ENVIRONMENT
+            PLATFORM_URL
+            BETTER_AUTH_SECRET
+            BETTER_AUTH_URL
+            EMAIL_FROM_ADDRESS
+            EMAIL_FROM_NAME
+            ELEVENLABS_API_KEY
+            ELEVENLABS_AGENT_ID
+            OPENROUTER_API_KEY
+            OPENROUTER_TITLE
+            OPENROUTER_REFERER
+            OPENROUTER_MODEL
+            OPENROUTER_EMBEDDING_MODEL
+            OPENROUTER_EMBEDDING_DIMENSIONS
+            REALTIMEKIT_APP_ID
+            REALTIMEKIT_PRESET_NAME
+        env:
+          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          PLATFORM_URL: ${{ vars.PLATFORM_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
+          EMAIL_FROM_ADDRESS: ${{ vars.EMAIL_FROM_ADDRESS }}
+          EMAIL_FROM_NAME: ${{ vars.EMAIL_FROM_NAME }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_AGENT_ID: ${{ vars.ELEVENLABS_AGENT_ID }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_TITLE: ${{ vars.OPENROUTER_TITLE }}
+          OPENROUTER_REFERER: ${{ vars.OPENROUTER_REFERER }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+          OPENROUTER_EMBEDDING_MODEL: ${{ vars.OPENROUTER_EMBEDDING_MODEL }}
+          OPENROUTER_EMBEDDING_DIMENSIONS: ${{ vars.OPENROUTER_EMBEDDING_DIMENSIONS }}
+          REALTIMEKIT_APP_ID: ${{ vars.REALTIMEKIT_APP_ID }}
+          REALTIMEKIT_PRESET_NAME: ${{ vars.REALTIMEKIT_PRESET_NAME }}
+          # STRIPE_PUBLISHABLE_KEY: ${{ vars.STRIPE_PUBLISHABLE_KEY }}
+          # STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          # STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}

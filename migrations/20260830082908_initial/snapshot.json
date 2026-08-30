@@ -1,9 +1,9 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "c6ffdd35-4543-4564-b765-ac87ed37098c",
+  "id": "5e0c69c0-dfff-40d3-8c50-67746a112c86",
   "prevIds": [
-    "887fefe0-036f-471f-b9bf-535b94b509da"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -334,6 +334,19 @@
       "generated": null,
       "identity": null,
       "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "auth_accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "issuer",
       "entityType": "columns",
       "schema": "public",
       "table": "auth_accounts"
@@ -4086,6 +4099,97 @@
       "nameExplicit": true,
       "columns": [
         {
+          "value": "issuer",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "accountId",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "auth_accounts_issuer_accountId_key",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_accounts"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "userId",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "authAccount_userId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_accounts"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "organizationId",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "authInvitation_organizationId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_invitations"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "email",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "authInvitation_email_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_invitations"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
           "value": "organizationId",
           "isExpression": false,
           "asc": true,
@@ -4109,6 +4213,69 @@
       "entityType": "indexes",
       "schema": "public",
       "table": "auth_members"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "userId",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "authMember_userId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_members"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "userId",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "authSession_userId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_sessions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "identifier",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "authVerification_identifier_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_verifications"
     },
     {
       "nameExplicit": true,
@@ -5440,49 +5607,5 @@
       "entityType": "uniques"
     }
   ],
-  "renames": [
-    "public.communication_calls.communication_calls_initiatorId_fkey->public.communication_calls.communication_calls_initiatorId_users_id_fkey",
-    "public.call_participants.call_participants_callId_fkey->public.call_participants.call_participants_callId_communication_calls_id_fkey",
-    "public.call_participants.call_participants_userId_fkey->public.call_participants.call_participants_userId_users_id_fkey",
-    "public.community_comments.community_comments_userId_fkey->public.community_comments.community_comments_userId_users_id_fkey",
-    "public.community_comments.community_comments_postId_fkey->public.community_comments.community_comments_postId_community_posts_id_fkey",
-    "public.community_follows.community_follows_userId_fkey->public.community_follows.community_follows_userId_users_id_fkey",
-    "public.community_likes.community_likes_userId_fkey->public.community_likes.community_likes_userId_users_id_fkey",
-    "public.community_likes.community_likes_postId_fkey->public.community_likes.community_likes_postId_community_posts_id_fkey",
-    "public.community_posts.community_posts_userId_fkey->public.community_posts.community_posts_userId_users_id_fkey",
-    "public.community_posts.community_posts_organizationId_fkey->public.community_posts.community_posts_organizationId_organizations_id_fkey",
-    "public.community_proposals.community_proposals_postId_fkey->public.community_proposals.community_proposals_postId_community_posts_id_fkey",
-    "public.community_proposals.community_proposals_userId_fkey->public.community_proposals.community_proposals_userId_users_id_fkey",
-    "public.community_proposals.community_proposals_organizationId_fkey->public.community_proposals.community_proposals_organizationId_organizations_id_fkey",
-    "public.communication_messages.communication_messages_userId_fkey->public.communication_messages.communication_messages_userId_users_id_fkey",
-    "public.communication_messages.communication_messages_roomId_fkey->public.communication_messages.communication_messages_roomId_communication_rooms_id_fkey",
-    "public.user_notifications.user_notifications_userId_fkey->public.user_notifications.user_notifications_userId_users_id_fkey",
-    "public.service_orders.service_orders_userId_fkey->public.service_orders.service_orders_userId_users_id_fkey",
-    "public.service_orders.service_orders_serviceId_fkey->public.service_orders.service_orders_serviceId_services_id_fkey",
-    "public.service_orders.service_orders_planId_fkey->public.service_orders.service_orders_planId_service_plans_id_fkey",
-    "public.service_orders.service_orders_organizationId_fkey->public.service_orders.service_orders_organizationId_organizations_id_fkey",
-    "public.order_disputes.order_disputes_orderId_fkey->public.order_disputes.order_disputes_orderId_service_orders_id_fkey",
-    "public.service_invoices.service_invoices_userId_fkey->public.service_invoices.service_invoices_userId_users_id_fkey",
-    "public.service_invoices.service_invoices_orderId_fkey->public.service_invoices.service_invoices_orderId_service_orders_id_fkey",
-    "public.service_invoices.service_invoices_milestoneId_fkey->public.service_invoices.service_invoices_milestoneId_order_milestones_id_fkey",
-    "public.order_milestones.order_milestones_orderId_fkey->public.order_milestones.order_milestones_orderId_service_orders_id_fkey",
-    "public.organization_likes.organization_likes_userId_fkey->public.organization_likes.organization_likes_userId_users_id_fkey",
-    "public.organization_likes.organization_likes_organizationId_fkey->public.organization_likes.organization_likes_organizationId_organizations_id_fkey",
-    "public.organization_notifications.organization_notifications_organizationId_fkey->public.organization_notifications.organization_notifications_organizationId_organizations_id_fkey",
-    "public.organization_reviews.organization_reviews_userId_fkey->public.organization_reviews.organization_reviews_userId_users_id_fkey",
-    "public.organization_reviews.organization_reviews_organizationId_fkey->public.organization_reviews.organization_reviews_organizationId_organizations_id_fkey",
-    "public.organization_participants.organization_participants_organizationId_fkey->public.organization_participants.organization_participants_organizationId_organizations_id_fkey",
-    "public.organization_participants.organization_participants_roomId_fkey->public.organization_participants.organization_participants_roomId_communication_rooms_id_fkey",
-    "public.user_participants.user_participants_userId_fkey->public.user_participants.user_participants_userId_users_id_fkey",
-    "public.user_participants.user_participants_roomId_fkey->public.user_participants.user_participants_roomId_communication_rooms_id_fkey",
-    "public.services.services_organizationId_fkey->public.services.services_organizationId_organizations_id_fkey",
-    "public.service_likes.service_likes_userId_fkey->public.service_likes.service_likes_userId_users_id_fkey",
-    "public.service_likes.service_likes_serviceId_fkey->public.service_likes.service_likes_serviceId_services_id_fkey",
-    "public.service_plans.service_plans_serviceId_fkey->public.service_plans.service_plans_serviceId_services_id_fkey",
-    "public.service_reviews.service_reviews_userId_fkey->public.service_reviews.service_reviews_userId_users_id_fkey",
-    "public.service_reviews.service_reviews_serviceId_fkey->public.service_reviews.service_reviews_serviceId_services_id_fkey",
-    "public.user_chats.user_chats_userId_fkey->public.user_chats.user_chats_userId_users_id_fkey",
-    "public.user_follows.user_follows_userId_fkey->public.user_follows.user_follows_userId_users_id_fkey",
-    "public.user_follows.user_follows_followId_fkey->public.user_follows.user_follows_followId_users_id_fkey"
-  ]
+  "renames": []
 }

@@ -1,15 +1,22 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
-import { OPENROUTER_API_KEY, OPENROUTER_CHAT_MODEL, PLATFORM_URL } from "#/lib/server/environment.js";
+import {
+  OPENROUTER_API_KEY,
+  OPENROUTER_MODEL,
+  OPENROUTER_REFERER,
+  OPENROUTER_TITLE,
+} from "#/lib/server/environment.js";
+
+const attributionHeaders = {
+  "HTTP-Referer": OPENROUTER_REFERER,
+  "X-OpenRouter-Title": OPENROUTER_TITLE,
+};
 
 const openrouter = createOpenRouter({
   apiKey: OPENROUTER_API_KEY,
-  headers: {
-    "HTTP-Referer": PLATFORM_URL,
-    "X-OpenRouter-Title": "Initiate",
-  },
+  headers: attributionHeaders,
 });
 
-const generationModel = openrouter(OPENROUTER_CHAT_MODEL);
+const generationModel = openrouter(OPENROUTER_MODEL);
 
-export { generationModel, openrouter };
+export { attributionHeaders, generationModel, openrouter };

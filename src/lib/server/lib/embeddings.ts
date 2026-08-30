@@ -4,8 +4,8 @@ import {
   OPENROUTER_API_KEY,
   OPENROUTER_EMBEDDING_DIMENSIONS,
   OPENROUTER_EMBEDDING_MODEL,
-  PLATFORM_URL,
 } from "#/lib/server/environment.js";
+import { attributionHeaders } from "#/lib/server/integrations/ai.js";
 
 type Embedding = {
   content: string;
@@ -18,8 +18,7 @@ async function createEmbeddings(inputs: string[]): Promise<number[][]> {
     headers: {
       Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": PLATFORM_URL,
-      "X-OpenRouter-Title": "Initiate",
+      ...attributionHeaders,
     },
     body: JSON.stringify({
       input: inputs,

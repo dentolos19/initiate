@@ -1,4 +1,4 @@
-.PHONY: setup start check build migrate
+.PHONY: setup start check build deploy migrate
 .PHONY: start-app start-database stop generate studio
 
 setup:
@@ -12,6 +12,9 @@ check:
 
 build:
 	bun run build
+
+deploy:
+	bun run deploy
 
 migrate:
 	bun run db:migrate

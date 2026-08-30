@@ -29,10 +29,12 @@ export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET as string
 
 // OpenRouter
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY as string;
-export const OPENROUTER_CHAT_MODEL = process.env.OPENROUTER_CHAT_MODEL || "openai/gpt-4.1-mini";
-export const OPENROUTER_EMBEDDING_MODEL = process.env.OPENROUTER_EMBEDDING_MODEL || "openai/text-embedding-3-small";
 export const OPENROUTER_EMBEDDING_DIMENSIONS = Number(process.env.OPENROUTER_EMBEDDING_DIMENSIONS || 768);
+export const OPENROUTER_EMBEDDING_MODEL = process.env.OPENROUTER_EMBEDDING_MODEL || "openai/text-embedding-3-small";
+export const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openrouter/auto";
+export const OPENROUTER_REFERER = process.env.OPENROUTER_REFERER || PLATFORM_URL;
+export const OPENROUTER_TITLE = process.env.OPENROUTER_TITLE || "Initiate";
 
 // Email Sending
-export const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS || "noreply@initiate.global";
+export const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS || "apps@dennise.me";
 export const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || "Initiate";

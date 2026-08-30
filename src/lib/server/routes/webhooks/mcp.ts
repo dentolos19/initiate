@@ -5,6 +5,7 @@ import { toFetchResponse, toReqRes } from "fetch-to-node";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { PLATFORM_URL } from "#/lib/server/environment.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database } from "#/lib/server/integrations/database.js";
 import { searchServices, searchOrganizations, searchGrants, createCommunityPost } from "#/lib/server/lib/utils.js";
@@ -72,7 +73,7 @@ const getServer = (context: AppContext) => {
             text: `Found ${services.length} services for "${query}":\n\n${services
               .map(
                 (service) =>
-                  `**${service.name}** (${service.type})\n${service.tagline || "No tagline"}\n- ${service.likes} likes, ${service.orders} orders\n- Tags: ${service.tags.join(", ") || "None"}\n- View: https://initiate.global/services/${service.id}\n`,
+                  `**${service.name}** (${service.type})\n${service.tagline || "No tagline"}\n- ${service.likes} likes, ${service.orders} orders\n- Tags: ${service.tags.join(", ") || "None"}\n- View: ${PLATFORM_URL}/services/${service.id}\n`,
               )
               .join("\n")}`,
           },
@@ -108,7 +109,7 @@ const getServer = (context: AppContext) => {
             text: `Found ${grants.length} grants for "${query}":\n\n${grants
               .map(
                 (grant) =>
-                  `**${grant.name}** by ${grant.provider}\n${grant.description || "No description"}\n- Location: ${grant.location || "Not specified"}\n- Grant Amount: ${grant.grant || "Not specified"}\n- Deadline: ${grant.deadlineAt ? new Date(grant.deadlineAt).toLocaleDateString() : "Not specified"}\n- Apply: ${grant.applyUrl || grant.websiteUrl || "Contact provider"}\n - View: https://initiate.global/resources\n`,
+                  `**${grant.name}** by ${grant.provider}\n${grant.description || "No description"}\n- Location: ${grant.location || "Not specified"}\n- Grant Amount: ${grant.grant || "Not specified"}\n- Deadline: ${grant.deadlineAt ? new Date(grant.deadlineAt).toLocaleDateString() : "Not specified"}\n- Apply: ${grant.applyUrl || grant.websiteUrl || "Contact provider"}\n - View: ${PLATFORM_URL}/resources\n`,
               )
               .join("\n")}`,
           },
@@ -626,7 +627,7 @@ const getServer = (context: AppContext) => {
           };
         }
 
-        const postUrl = result.redirectUrl ? `https://initiate.global${result.redirectUrl}` : "";
+        const postUrl = result.redirectUrl ? `${PLATFORM_URL}${result.redirectUrl}` : "";
 
         return {
           content: [

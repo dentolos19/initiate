@@ -10,7 +10,7 @@
     "dev": "vite dev",
     "build": "vite build && tsc --noEmit",
     "preview": "vite preview",
-    "deploy": "wrangler deploy",
+    "deploy": "bun run build && wrangler deploy",
     "types": "wrangler types && tsr generate",
     "check": "oxfmt --write && oxlint --fix",
     "db:generate": "drizzle-kit generate",

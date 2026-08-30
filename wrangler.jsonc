@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "account_id": "3e25dc098d36fb6dbeb697225bd94d86",
+  "account_id": "d910f54eba4cf3d1634aa41c3d9a93bc",
   "name": "initiate",
   "main": "src/server.ts",
   "compatibility_date": "2026-08-30",
@@ -10,20 +10,39 @@
   },
   "observability": {
     "enabled": true,
-    "logs": { "head_sampling_rate": 1 },
-    "traces": { "enabled": true, "head_sampling_rate": 0.01 },
+    "logs": {
+      "head_sampling_rate": 1,
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01,
+    },
   },
-  "routes": [{ "pattern": "initiate.global", "custom_domain": true }],
+  "routes": [
+    {
+      "pattern": "initiate.dennise.me",
+      "custom_domain": true,
+    },
+  ],
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "500a328941f24935a1fb44b04600cfde",
+      "id": "8e4d525848d441b6ac3570d793e522ac",
       "localConnectionString": "postgresql://initiate:initiate@localhost:5432/initiate",
     },
   ],
-  "send_email": [{ "name": "EMAIL" }],
+  "send_email": [
+    {
+      "name": "EMAIL",
+    },
+  ],
   "queues": {
-    "producers": [{ "binding": "NOTIFICATION_QUEUE", "queue": "initiate-notifications" }],
+    "producers": [
+      {
+        "binding": "NOTIFICATION_QUEUE",
+        "queue": "initiate-notifications",
+      },
+    ],
     "consumers": [
       {
         "queue": "initiate-notifications",
@@ -34,12 +53,32 @@
       },
     ],
   },
-  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "initiate" }],
-  "vectorize": [{ "binding": "VECTORIZE", "index_name": "initiate-search" }],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "initiate",
+    },
+  ],
+  "vectorize": [
+    {
+      "binding": "VECTORIZE",
+      "index_name": "initiate-search",
+    },
+  ],
   "durable_objects": {
-    "bindings": [{ "name": "MESSAGING", "class_name": "Messaging" }],
+    "bindings": [
+      {
+        "name": "MESSAGING",
+        "class_name": "Messaging",
+      },
+    ],
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Messaging"] }],
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Messaging"],
+    },
+  ],
   "workflows": [
     {
       "name": "synchronize",
