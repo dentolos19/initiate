@@ -4,7 +4,7 @@ import { organization } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
 import * as schema from "#/lib/database/schema";
-import { BETTER_AUTH_SECRET, BETTER_AUTH_URL } from "#/lib/server/environment";
+import { BETTER_AUTH_SECRET, BETTER_AUTH_URL, BETTER_AUTH_URLS } from "#/lib/server/environment";
 import { createDrizzleDatabase } from "#/lib/server/integrations/database";
 
 export function createAuth(connection: D1Database) {
@@ -14,7 +14,7 @@ export function createAuth(connection: D1Database) {
     appName: "Initiate",
     baseURL: BETTER_AUTH_URL,
     secret: BETTER_AUTH_SECRET,
-    trustedOrigins: ["https://initiate.dennise.me", "https://initiate.global"],
+    trustedOrigins: BETTER_AUTH_URLS,
     database: drizzleAdapter(database, {
       provider: "sqlite",
       schema,

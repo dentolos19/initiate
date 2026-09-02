@@ -5,7 +5,14 @@ export const PLATFORM_URL = ENVIRONMENT === "production" ? "https://initiate.den
 
 // Better Auth
 export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET as string;
-export const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || PLATFORM_URL;
+export const BETTER_AUTH_URLS = (
+  process.env.BETTER_AUTH_URL ||
+  (ENVIRONMENT === "production" ? "https://initiate.dennise.me,https://initiate.global" : PLATFORM_URL)
+)
+  .split(",")
+  .map((url) => url.trim())
+  .filter(Boolean);
+export const BETTER_AUTH_URL = BETTER_AUTH_URLS[0] || PLATFORM_URL;
 
 // Cloudflare RealtimeKit
 export const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID as string;
