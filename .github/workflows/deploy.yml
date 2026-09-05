@@ -37,8 +37,11 @@ jobs:
         run: bun run db:migrate:remote
 
       - name: Deploy Worker
-        uses: dentolos19/dentolos19/actions/deploy-cloudflare-worker@main
+        uses: cloudflare/wrangler-action@v4
         with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy
           secrets: |
             BETTER_AUTH_SECRET
             BETTER_AUTH_URL

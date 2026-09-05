@@ -1,4 +1,4 @@
-.PHONY: build check deploy generate migrate migrate-remote setup start
+.PHONY: setup start check build deploy types migrate generate
 
 setup:
 	bun install
@@ -15,11 +15,11 @@ build:
 deploy:
 	bun run deploy
 
+types:
+	bun run types
+
 migrate:
 	bun run db:migrate
-
-migrate-remote:
-	bun run db:migrate:remote
 
 generate:
 	bun run db:generate
