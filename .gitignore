@@ -19,7 +19,7 @@ coverage/
 .dev.vars*
 !.dev.vars*.template
 
-# Project files
+# Project-specific rules
 /.postgres/
 /src/routeTree.gen.ts
 

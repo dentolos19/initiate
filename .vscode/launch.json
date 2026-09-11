@@ -6,7 +6,6 @@
       "type": "node-terminal",
       "request": "launch",
       "command": "make start",
-      "postDebugTask": "Stop",
       "serverReadyAction": {
         "pattern": "Local:.+(https?://.+)",
         "uriFormat": "%s",

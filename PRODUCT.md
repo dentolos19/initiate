@@ -1,4 +1,4 @@
-# Product Definition
+# Product Specifications
 
 Last updated: August 30, 2026.
 
