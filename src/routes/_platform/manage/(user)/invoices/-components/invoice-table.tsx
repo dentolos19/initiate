@@ -66,7 +66,7 @@ export default function InvoiceTable({ invoices, loading, emptyMessage }: Invoic
                     <Button variant={"default"} size={"sm"} asChild>
                       <Link href={`/manage/invoices/${invoice.id}`}>
                         <BanknoteIcon className={"h-4 w-4"} />
-                        <span>Demo payment</span>
+                        <span>Pay invoice</span>
                       </Link>
                     </Button>
                   )}

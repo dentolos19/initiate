@@ -10,58 +10,38 @@ const team = [
   {
     name: "Keshuram Ramani",
     initials: "KR",
-    role: "Founder & Chief Executive Officer",
     imageUrl: "/assets/people/keshu.jpg",
     profileUrl: "https://linkedin.com/in/keshuramramani",
   },
   {
     name: "Iqbal Amran",
     initials: "IA",
-    role: "Co-Founder & Chief Operating Officer",
     imageUrl: "/assets/people/iqbal.jpg",
     profileUrl: "https://linkedin.com/in/iqbal-amran-b0842131b",
   },
   {
     name: "Dennise Catolos",
     initials: "DC",
-    role: "Chief Technology Officer",
     imageUrl: "/assets/people/dennise.jpg",
     profileUrl: "https://dennise.me/go/linkedin",
   },
   {
-    name: "Sean Lee",
-    initials: "SL",
-    role: "Chief Information Officer",
-    imageUrl: "/assets/people/sean.jpg",
-    profileUrl: "https://www.linkedin.com/in/seanleejunhong",
-  },
-  {
     name: "Zuhair Hussain",
     initials: "ZH",
-    role: "Cloud Engineer",
     imageUrl: "/assets/people/zuhair.jpg",
     profileUrl: "https://linkedin.com/in/mohammed-zuhair-hussain-689606350",
   },
   {
     name: "Aryan Desai",
     initials: "AD",
-    role: "AI Engineer",
     imageUrl: "/assets/people/aryan.jpg",
     profileUrl: "https://linkedin.com/in/aryan-d-781b08317",
   },
   {
     name: "Ivan Dochev",
     initials: "ID",
-    role: "Solutions Architect",
     imageUrl: "/assets/people/ivan.jpg",
     profileUrl: "https://linkedin.com/in/ivan-dochev-961957319",
-  },
-  {
-    name: "Aryan Kota",
-    initials: "AK",
-    role: "QA Engineer",
-    imageUrl: "/assets/people/kota.jpg",
-    profileUrl: "https://linkedin.com/in/neil-aryan-kota",
   },
 ];
 
@@ -163,7 +143,7 @@ export default function Page() {
         </header>
 
         {/* Content */}
-        <div className={"grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"}>
+        <div className={"grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6"}>
           {team.map((member) => (
             <article
               key={member.name}
@@ -188,7 +168,6 @@ export default function Page() {
                 ) : (
                   <h3 className={"text-lg font-semibold text-balance sm:text-xl"}>{member.name}</h3>
                 )}
-                <p className={"text-muted-foreground text-sm leading-5 text-pretty sm:text-base"}>{member.role}</p>
               </div>
             </article>
           ))}

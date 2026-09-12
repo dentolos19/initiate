@@ -79,7 +79,7 @@ export default function InvoicesPage() {
     <PageShell>
       <PageHeader>
         <PageHeading>
-          <PageTitle>Demo Invoices</PageTitle>
+          <PageTitle>Invoices</PageTitle>
           <PageDescription>Run approved and declined payment scenarios without moving real money.</PageDescription>
         </PageHeading>
       </PageHeader>
@@ -121,9 +121,7 @@ export default function InvoicesPage() {
               <ReceiptIcon className="text-muted-foreground size-4" aria-hidden="true" />
             </div>
             <div className="mt-1 text-2xl font-semibold tabular-nums">{statistics.refundedInvoices}</div>
-            <p className={"text-muted-foreground text-xs"}>
-              {formatAmount(statistics.refundedAmount, "usd")} simulated
-            </p>
+            <p className={"text-muted-foreground text-xs"}>{formatAmount(statistics.refundedAmount, "usd")} refunded</p>
           </section>
         </div>
       )}

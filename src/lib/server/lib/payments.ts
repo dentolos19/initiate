@@ -3,8 +3,21 @@ import { eq } from "drizzle-orm";
 import { organization as organizationTable } from "#/lib/database/schema.js";
 import { database } from "#/lib/server/integrations/database.js";
 
-export function createPaymentReference(prefix: "account" | "customer" | "invoice" | "price" | "product") {
-  return `demo_${prefix}_${crypto.randomUUID().replaceAll("-", "").slice(0, 16)}`;
+export function createPaymentReference(
+  prefix: "account" | "charge" | "customer" | "invoice" | "intent" | "price" | "product" | "refund" | "transaction",
+) {
+  const identifiers = {
+    account: "acct",
+    charge: "ch",
+    customer: "cus",
+    intent: "pi",
+    invoice: "in",
+    price: "price",
+    product: "prod",
+    refund: "re",
+    transaction: "txn",
+  } as const;
+  return `${identifiers[prefix]}_${crypto.randomUUID().replaceAll("-", "").slice(0, 16)}`;
 }
 
 export async function ensurePaymentAccount(organizationId: string, paymentAccountId?: string | null) {

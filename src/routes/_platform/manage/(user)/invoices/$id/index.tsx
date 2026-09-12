@@ -4,11 +4,11 @@ import {
   CalendarIcon,
   CheckCircle2Icon,
   CreditCardIcon,
+  LockIcon,
   ReceiptIcon,
-  ShieldCheckIcon,
   XCircleIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -16,6 +16,8 @@ import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#/components/ui/card";
+import { Input } from "#/components/ui/input";
+import { Label } from "#/components/ui/label";
 import { Separator } from "#/components/ui/separator";
 import useBackend from "#/lib/backend/client";
 import { OrderInvoice } from "#/lib/backend/connectors/orders";
@@ -28,6 +30,47 @@ export const Route = createFileRoute("/_platform/manage/(user)/invoices/$id/")({
   component: InvoiceDetailPage,
 });
 
+function formatCard(value: string) {
+  return value
+    .replace(/\D/g, "")
+    .slice(0, 19)
+    .replace(/(.{4})/g, "$1 ")
+    .trim();
+}
+
+function formatExpiry(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 4);
+  return digits.length > 2 ? `${digits.slice(0, 2)} / ${digits.slice(2)}` : digits;
+}
+
+function isValidCard(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length < 16 || digits.length > 19) return false;
+  return (
+    digits
+      .split("")
+      .reverse()
+      .reduce((sum, digit, index) => {
+        let number = Number(digit);
+        if (index % 2 === 1) {
+          number *= 2;
+          if (number > 9) number -= 9;
+        }
+        return sum + number;
+      }, 0) %
+      10 ===
+    0
+  );
+}
+
+function isValidExpiry(value: string) {
+  const [month, year] = value.replaceAll(" ", "").split("/").map(Number);
+  if (!month || month > 12 || !year) return false;
+  const now = new Date();
+  const expiry = new Date(2000 + year, month);
+  return expiry > new Date(now.getFullYear(), now.getMonth());
+}
+
 export default function InvoiceDetailPage() {
   const router = useRouter();
   const backend = useBackend();
@@ -35,7 +78,10 @@ export default function InvoiceDetailPage() {
   const [invoice, setInvoice] = useState<OrderInvoice | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [scenario, setScenario] = useState<"approved" | "declined">("approved");
+  const [cardholder, setCardholder] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cvc, setCvc] = useState("");
+  const [expiry, setExpiry] = useState("");
   const [declineMessage, setDeclineMessage] = useState<string>();
 
   useEffect(() => {
@@ -49,21 +95,40 @@ export default function InvoiceDetailPage() {
       .finally(() => setLoading(false));
   }, [params.id, backend.payments, router]);
 
-  async function handlePayment() {
+  async function handlePayment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (!invoice) return;
+    if (cardholder.trim().length < 2) {
+      setDeclineMessage("Enter the name shown on the card.");
+      return;
+    }
+    if (!isValidCard(cardNumber)) {
+      setDeclineMessage("Enter a valid card number.");
+      return;
+    }
+    if (!isValidExpiry(expiry)) {
+      setDeclineMessage("Enter a valid expiration date.");
+      return;
+    }
+    if (!/^\d{3,4}$/.test(cvc)) {
+      setDeclineMessage("Enter a valid security code.");
+      return;
+    }
+
     setProcessing(true);
     setDeclineMessage(undefined);
     try {
-      const result = await backend.payments.payInvoice(invoice.id, scenario);
+      const outcome = cardNumber.replace(/\D/g, "").endsWith("0002") ? "declined" : "approved";
+      const result = await backend.payments.payInvoice(invoice.id, outcome);
       setInvoice((current) => (current ? { ...current, ...result.invoice } : result.invoice));
       if (result.outcome === "declined") {
         setDeclineMessage(result.message);
-        toast.error("Demo payment declined");
+        toast.error("Payment declined");
       } else {
         toast.success(result.message);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not run the demo payment.");
+      toast.error(error instanceof Error ? error.message : "Could not process the payment.");
     } finally {
       setProcessing(false);
     }
@@ -98,18 +163,10 @@ export default function InvoiceDetailPage() {
 
   return (
     <div className="w-full space-y-6 p-4 sm:p-6">
-      <Alert className="border-primary/30 bg-primary/5">
-        <ShieldCheckIcon />
-        <AlertTitle>Demo payment environment</AlertTitle>
-        <AlertDescription>
-          No card is charged and no real money moves. Choose an outcome to demonstrate the full flow.
-        </AlertDescription>
-      </Alert>
-
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Badge>Demo invoice</Badge>
+            <Badge>Invoice</Badge>
             <Badge variant="outline">{getLabel(invoiceStatus, invoice.status, "Unknown")}</Badge>
           </div>
           <h1 className="text-2xl font-bold">{serviceName}</h1>
@@ -128,7 +185,7 @@ export default function InvoiceDetailPage() {
               <ReceiptIcon className="size-5" />
               Invoice summary
             </CardTitle>
-            <CardDescription>Internal references make this flow portable and self-contained.</CardDescription>
+            <CardDescription>Review the invoice details before completing payment.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between gap-4">
@@ -174,42 +231,64 @@ export default function InvoiceDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCardIcon className="size-5" />
-              {invoice.status === "open" ? "Run payment" : "Payment result"}
+              {invoice.status === "open" ? "Payment details" : "Payment result"}
             </CardTitle>
             <CardDescription>
               {invoice.status === "open"
-                ? "Select the deterministic result you want to demonstrate."
-                : "This receipt records a simulated transaction."}
+                ? `Pay ${formatAmount(invoice.amount, invoice.currency)} securely.`
+                : "This receipt records the transaction status."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {invoice.status === "open" ? (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    type="button"
-                    variant={scenario === "approved" ? "default" : "outline"}
-                    className="h-auto justify-start py-3"
-                    onClick={() => setScenario("approved")}
-                  >
-                    <CheckCircle2Icon />
-                    <span className="text-left">
-                      <span className="block">Approve</span>
-                      <span className="text-xs opacity-70">Successful demo</span>
-                    </span>
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={scenario === "declined" ? "destructive" : "outline"}
-                    className="h-auto justify-start py-3"
-                    onClick={() => setScenario("declined")}
-                  >
-                    <XCircleIcon />
-                    <span className="text-left">
-                      <span className="block">Decline</span>
-                      <span className="text-xs opacity-70">Failure path</span>
-                    </span>
-                  </Button>
+              <form className="space-y-4" onSubmit={handlePayment}>
+                <div className="space-y-2">
+                  <Label htmlFor="card-number">Card information</Label>
+                  <div className="border-input focus-within:border-ring focus-within:ring-ring/50 overflow-hidden rounded-md border shadow-xs focus-within:ring-[3px]">
+                    <Input
+                      id="card-number"
+                      className="h-11 rounded-none border-0 shadow-none focus-visible:ring-0"
+                      autoComplete="cc-number"
+                      inputMode="numeric"
+                      placeholder="1234 1234 1234 1234"
+                      value={cardNumber}
+                      disabled={processing}
+                      onChange={(event) => setCardNumber(formatCard(event.target.value))}
+                    />
+                    <div className="grid grid-cols-2 border-t">
+                      <Input
+                        aria-label="Expiration date"
+                        className="h-11 rounded-none border-0 border-r shadow-none focus-visible:ring-0"
+                        autoComplete="cc-exp"
+                        inputMode="numeric"
+                        placeholder="MM / YY"
+                        value={expiry}
+                        disabled={processing}
+                        onChange={(event) => setExpiry(formatExpiry(event.target.value))}
+                      />
+                      <Input
+                        aria-label="Security code"
+                        className="h-11 rounded-none border-0 shadow-none focus-visible:ring-0"
+                        autoComplete="cc-csc"
+                        inputMode="numeric"
+                        placeholder="CVC"
+                        value={cvc}
+                        disabled={processing}
+                        onChange={(event) => setCvc(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cardholder">Name on card</Label>
+                  <Input
+                    id="cardholder"
+                    className="h-11"
+                    autoComplete="cc-name"
+                    value={cardholder}
+                    disabled={processing}
+                    onChange={(event) => setCardholder(event.target.value)}
+                  />
                 </div>
                 {declineMessage && (
                   <Alert variant="destructive">
@@ -218,15 +297,19 @@ export default function InvoiceDetailPage() {
                     <AlertDescription>{declineMessage}</AlertDescription>
                   </Alert>
                 )}
-                <Button className="w-full" disabled={processing} onClick={handlePayment}>
-                  {processing ? "Running simulation…" : `Run ${scenario} payment`}
+                <Button className="h-11 w-full" disabled={processing} type="submit">
+                  {processing ? "Processing…" : `Pay ${formatAmount(invoice.amount, invoice.currency)}`}
                 </Button>
-              </>
+                <p className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
+                  <LockIcon className="size-3.5" />
+                  Card details are protected and never stored.
+                </p>
+              </form>
             ) : (
               <div className="bg-muted rounded-lg p-4 text-center">
                 <CheckCircle2Icon className="mx-auto mb-2 size-8 text-emerald-600" />
                 <p className="font-semibold">{getLabel(invoiceStatus, invoice.status, "Complete")}</p>
-                <p className="text-muted-foreground text-sm">No real funds were processed.</p>
+                <p className="text-muted-foreground text-sm">The invoice status has been updated.</p>
               </div>
             )}
           </CardContent>

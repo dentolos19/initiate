@@ -47,7 +47,7 @@ export default function Page() {
       await backend.service
         .orderServicePlan(id, planId, values)
         .then((result) => {
-          toast.success("Order created. Continue with the demo payment.");
+          toast.success("Order created. Continue with payment.");
           router.push(`/manage/invoices/${result.invoice.id}`);
         })
         .catch((error: Error) => {
@@ -169,7 +169,7 @@ export default function Page() {
           <CardFooter className={"flex-col gap-2"}>
             <Button className={"w-full"} type={"submit"} variant={"default"} disabled={form.formState.isSubmitting}>
               <ShoppingCartIcon />
-              <span>Continue to demo payment</span>
+              <span>Continue to payment</span>
             </Button>
             <Button
               className={"w-full"}

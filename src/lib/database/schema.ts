@@ -373,6 +373,89 @@ export const orderInvoice = sqliteTable("service_invoices", {
   milestoneId: text().references(() => orderMilestone.id, { onDelete: "set null", onUpdate: "cascade" }),
 });
 
+export const paymentIntent = sqliteTable(
+  "payment_intents",
+  {
+    id: id(),
+    invoiceId: text()
+      .notNull()
+      .references(() => orderInvoice.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    paymentAccountId: text().notNull(),
+    customerReference: text().notNull(),
+    amount: integer().notNull(),
+    currency: text().notNull(),
+    status: text().default("requires_payment_method").notNull(),
+    latestChargeId: text(),
+    createdAt: integer({ mode: "timestamp_ms" })
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+    updatedAt: integer({ mode: "timestamp_ms" })
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+  },
+  (table) => [uniqueIndex("payment_intents_invoiceId_key").on(table.invoiceId)],
+);
+
+export const paymentCharge = sqliteTable(
+  "payment_charges",
+  {
+    id: id(),
+    paymentIntentId: text()
+      .notNull()
+      .references(() => paymentIntent.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    invoiceId: text()
+      .notNull()
+      .references(() => orderInvoice.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    amount: integer().notNull(),
+    currency: text().notNull(),
+    status: text().notNull(),
+    failureCode: text(),
+    failureMessage: text(),
+    refundedAmount: integer().default(0).notNull(),
+    createdAt: integer({ mode: "timestamp_ms" })
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+  },
+  (table) => [index("payment_charges_paymentIntentId_idx").on(table.paymentIntentId)],
+);
+
+export const paymentRefund = sqliteTable("payment_refunds", {
+  id: id(),
+  chargeId: text()
+    .notNull()
+    .references(() => paymentCharge.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  invoiceId: text()
+    .notNull()
+    .references(() => orderInvoice.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  amount: integer().notNull(),
+  currency: text().notNull(),
+  status: text().default("succeeded").notNull(),
+  reason: text(),
+  createdAt: integer({ mode: "timestamp_ms" })
+    .default(sql`(unixepoch() * 1000)`)
+    .notNull(),
+});
+
+export const paymentBalanceTransaction = sqliteTable(
+  "payment_balance_transactions",
+  {
+    id: id(),
+    paymentAccountId: text().notNull(),
+    sourceId: text().notNull(),
+    type: text().notNull(),
+    amount: integer().notNull(),
+    currency: text().notNull(),
+    status: text().default("available").notNull(),
+    availableAt: integer({ mode: "timestamp_ms" })
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+    createdAt: integer({ mode: "timestamp_ms" })
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+  },
+  (table) => [uniqueIndex("payment_balance_transactions_sourceId_key").on(table.sourceId)],
+);
+
 export const serviceLike = sqliteTable(
   "service_likes",
   {

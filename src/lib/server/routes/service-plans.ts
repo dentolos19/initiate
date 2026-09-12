@@ -216,7 +216,7 @@ servicePlans.post("/:serviceId/plans/:planId/order", async (c) => {
 
   await notification.queueNotification([user.id], {
     title: "Service Order Created",
-    description: `Your order for "${service.name}" is ready for demo payment.`,
+    description: `Your order for "${service.name}" is ready for payment.`,
     content: ServiceOrderedUserMail({
       userName: `${user.firstName} ${user.lastName ?? ""}`.trim(),
       serviceName: service.name,
@@ -229,11 +229,11 @@ servicePlans.post("/:serviceId/plans/:planId/order", async (c) => {
   });
   await notification.queueNotification([service.organization.id], {
     title: "New Service Order",
-    description: `A demo order was created for "${service.name}".`,
-    content: `A new demo order was created by ${user.firstName} ${user.lastName ?? ""}. The order ID is ${order.id}.`,
+    description: `An order was created for "${service.name}".`,
+    content: `A new order was created by ${user.firstName} ${user.lastName ?? ""}. The order ID is ${order.id}.`,
   });
 
-  return c.json({ message: "Order created. Complete the simulated payment to continue.", order, invoice });
+  return c.json({ message: "Order created. Complete the payment to continue.", order, invoice });
 });
 
 servicePlans.get("/:serviceId/plans", async (c) => {

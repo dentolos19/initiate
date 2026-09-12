@@ -113,6 +113,8 @@ users.put("/:id", async (c) => {
     .object({
       bannerUrl: z.string().optional(),
       description: z.string().optional(),
+      firstName: z.string().trim().min(1).optional(),
+      lastName: z.string().trim().nullable().optional(),
       location: z.string().optional(),
       prompt: z.string().optional(),
       settings: z.any().optional(),

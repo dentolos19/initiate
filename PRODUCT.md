@@ -72,19 +72,19 @@ The provider journey begins with organization setup, then service and plan creat
 
 ## Product Areas
 
-| Area                    | Current Capability                                                                                                                                                                    | Product Role                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Identity and onboarding | Authentication, user profiles, organization membership, customer, investor, company, and administrator account types.                                                                 | Gives recommendations and permissions the context they need.                  |
-| Marketplace             | Service discovery, keyword and semantic search, profile-based recommendations, latest and popular listings, similar services, likes, reviews, and comparison for up to five services. | Helps buyers build and evaluate a shortlist.                                  |
-| AI advisor              | Text chat, voice access, conversation history, suggested prompts, summaries, and problem-statement improvement.                                                                       | Helps a buyer move from uncertainty to a clearer next action.                 |
-| Service catalog         | Organization profiles, service pages, API, MCP, SaaS, and custom service types, plans, pricing, features, and publishing status.                                                      | Gives providers a structured offer and buyers comparable information.         |
-| Orders and delivery     | Order states, instructions, milestones, invoices, due dates, and buyer and provider workspaces.                                                                                       | Carries a match into an accountable engagement.                               |
-| Payments                | Demo account balances, approved or declined demo payments, refunds, and invoice states. No real money moves.                                                                          | Validates the transaction experience before a production payment integration. |
-| Messaging and calls     | Personal and organization rooms, real-time messages, attachments, conversation summaries, voice calls, video calls, and call history.                                                 | Keeps buyer and provider collaboration attached to the engagement.            |
-| Community               | Posts, topics, follows, comments, likes, problem statements, proposals, and proposal decisions.                                                                                       | Lets demand emerge before a buyer knows which service to choose.              |
-| Resources               | Grants, documentation, application links, eligibility criteria, processes, and organization-specific AI grant analysis.                                                               | Connects solution adoption with funding and implementation guidance.          |
-| Provider analytics      | Revenue, recurring revenue, transaction count, average order value, top services, recent transactions, and AI insights.                                                               | Helps providers understand marketplace performance.                           |
-| Notifications           | In-app and email notifications for order and platform activity.                                                                                                                       | Keeps time-sensitive work moving.                                             |
+| Area                    | Current Capability                                                                                                                                                                    | Product Role                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Identity and onboarding | Authentication, user profiles, organization membership, customer, investor, company, and administrator account types.                                                                 | Gives recommendations and permissions the context they need.          |
+| Marketplace             | Service discovery, keyword and semantic search, profile-based recommendations, latest and popular listings, similar services, likes, reviews, and comparison for up to five services. | Helps buyers build and evaluate a shortlist.                          |
+| AI advisor              | Text chat, voice access, conversation history, suggested prompts, summaries, and problem-statement improvement.                                                                       | Helps a buyer move from uncertainty to a clearer next action.         |
+| Service catalog         | Organization profiles, service pages, API, MCP, SaaS, and custom service types, plans, pricing, features, and publishing status.                                                      | Gives providers a structured offer and buyers comparable information. |
+| Orders and delivery     | Order states, instructions, milestones, invoices, due dates, and buyer and provider workspaces.                                                                                       | Carries a match into an accountable engagement.                       |
+| Payments                | Account balances, approved or declined payments, refunds, and invoice states.                                                                                                         | Supports the transaction experience across the order lifecycle.       |
+| Messaging and calls     | Personal and organization rooms, real-time messages, attachments, conversation summaries, voice calls, video calls, and call history.                                                 | Keeps buyer and provider collaboration attached to the engagement.    |
+| Community               | Posts, topics, follows, comments, likes, problem statements, proposals, and proposal decisions.                                                                                       | Lets demand emerge before a buyer knows which service to choose.      |
+| Resources               | Grants, documentation, application links, eligibility criteria, processes, and organization-specific AI grant analysis.                                                               | Connects solution adoption with funding and implementation guidance.  |
+| Provider analytics      | Revenue, recurring revenue, transaction count, average order value, top services, recent transactions, and AI insights.                                                               | Helps providers understand marketplace performance.                   |
+| Notifications           | In-app and email notifications for order and platform activity.                                                                                                                       | Keeps time-sensitive work moving.                                     |
 
 ## Product Principles
 
@@ -137,7 +137,6 @@ The main product outcome is a qualified match that progresses into a completed e
 ## Current Boundaries
 
 - Initiate is a web product. It does not have a native mobile client.
-- Payments and refunds are simulated. The product must not claim that it moves or holds customer funds.
 - Initiate does not submit or own government grant applications.
 - Investment matching, crowdfunding, portfolio tracking, and equity transactions are outside the implemented product.
 - Automated API-key creation, SaaS account provisioning, and provider-side deployment are planned workflow concepts, not current platform capabilities.
@@ -147,7 +146,7 @@ The main product outcome is a qualified match that progresses into a completed e
 
 1. Choose whether the first market is specifically SME procurement of AI services or a broader startup, investor, and customer network. The current application is strongest in SME procurement.
 2. Define what qualifies a provider and which credentials buyers should be able to verify.
-3. Replace demo payments with a production transaction model, including commissions, payouts, refunds, disputes, and compliance.
+3. Expand the transaction model to include commissions, payouts, refunds, disputes, and compliance.
 4. Define match-quality signals and measure whether semantic recommendations lead to better conversations and completed orders.
 5. Decide how negotiated work should become a structured plan, order, milestone schedule, and invoice set.
 6. Expand the resource hub only where partner data is reliable and every recommendation can link back to an authoritative source.

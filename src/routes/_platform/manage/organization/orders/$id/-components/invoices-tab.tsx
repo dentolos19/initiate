@@ -105,7 +105,7 @@ export default function InvoicesTab(props: { order: Order }) {
   }
 
   async function handleRefundInvoice(invoice: OrderInvoice) {
-    if (!(await confirm("Run a demo refund for this invoice? No real money will move."))) return;
+    if (!(await confirm("Refund this invoice?"))) return;
     await backend.payments
       .refundInvoice(invoice.id)
       .then((result) => {
@@ -208,7 +208,7 @@ export default function InvoicesTab(props: { order: Order }) {
                     {invoice.status === "paid" && (
                       <Button variant={"outline"} size={"sm"} onClick={() => handleRefundInvoice(invoice)}>
                         <RotateCcwIcon />
-                        <span>Demo refund</span>
+                        <span>Refund</span>
                       </Button>
                     )}
                   </div>

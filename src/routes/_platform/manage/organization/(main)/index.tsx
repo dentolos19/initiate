@@ -1,12 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
-import { EyeIcon, InfoIcon, SaveIcon, UsersIcon, WalletCardsIcon } from "lucide-react";
+import { EyeIcon, SaveIcon, UsersIcon } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
-import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Button } from "#/components/ui/button";
 import { MultiSelect } from "#/components/ui/custom/multi-select";
 import { RichEditor } from "#/components/ui/custom/rich";
@@ -16,11 +15,9 @@ import { PageContent, PageDescription, PageHeader, PageHeading, PageShell, PageT
 import FormWrapper from "#/components/ui/wrappers/form";
 import ImageWrapper from "#/components/ui/wrappers/image";
 import useBackend from "#/lib/backend/client";
-import { PaymentAccount } from "#/lib/backend/schema/payments";
 import { useSession } from "#/lib/providers/session";
 import Link from "#/lib/router";
 import industries from "#/lib/store/industries";
-import { formatAmount } from "#/lib/utils";
 import Loading from "#/routes/-components/loading";
 
 const schema = z.object({
@@ -57,7 +54,6 @@ export default function Page() {
   });
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [paymentAccount, setPaymentAccount] = useState<PaymentAccount>();
 
   const saveOrganization = form.handleSubmit(async (values) => {
     if (!organization) return;
@@ -123,9 +119,7 @@ export default function Page() {
       });
     });
 
-    const loadPayments = backend.payments.getAccount().then(setPaymentAccount);
-
-    Promise.all([loadOrganization, loadPayments])
+    loadOrganization
       .catch((error: Error) => {
         console.error(error);
         toast.error(error.message);
@@ -144,57 +138,11 @@ export default function Page() {
       <PageHeader>
         <PageHeading>
           <PageTitle>Manage Organization</PageTitle>
-          <PageDescription>Update your organization profile and review its demo payment account.</PageDescription>
+          <PageDescription>Update your organization profile.</PageDescription>
         </PageHeading>
       </PageHeader>
       <FormWrapper form={form} onSubmit={saveOrganization}>
         <PageContent className="space-y-5">
-          <Alert className="border-primary/30 bg-primary/5">
-            <InfoIcon />
-            <AlertTitle>Demo payment environment</AlertTitle>
-            <AlertDescription>
-              Balances, payments, declines, and refunds are simulated locally. No financial account or real transfer is
-              created.
-            </AlertDescription>
-          </Alert>
-
-          <section className="border-y">
-            <div className="border-b p-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <WalletCardsIcon className="size-5" />
-                  <h2 className="font-semibold">Payment account</h2>
-                </div>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  {paymentAccount ? `Automatically active · ${paymentAccount.id}` : "Preparing demo payments…"}
-                </p>
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-3 sm:divide-x">
-              <div className="p-4">
-                <p className="text-muted-foreground text-xs">Available</p>
-                <p className="text-xl font-semibold">
-                  {formatAmount(paymentAccount?.availableBalance ?? 0, paymentAccount?.currency ?? "sgd")}
-                </p>
-                <p className="text-muted-foreground text-xs">{paymentAccount?.paidInvoices ?? 0} paid invoices</p>
-              </div>
-              <div className="border-t p-4 sm:border-t-0">
-                <p className="text-muted-foreground text-xs">Awaiting payment</p>
-                <p className="text-xl font-semibold">
-                  {formatAmount(paymentAccount?.pendingBalance ?? 0, paymentAccount?.currency ?? "sgd")}
-                </p>
-                <p className="text-muted-foreground text-xs">{paymentAccount?.openInvoices ?? 0} open invoices</p>
-              </div>
-              <div className="border-t p-4 sm:border-t-0">
-                <p className="text-muted-foreground text-xs">Refunded</p>
-                <p className="text-xl font-semibold">
-                  {formatAmount(paymentAccount?.refundedAmount ?? 0, paymentAccount?.currency ?? "sgd")}
-                </p>
-                <p className="text-muted-foreground text-xs">Simulated lifecycle total</p>
-              </div>
-            </div>
-          </section>
-
           <div className={"flex gap-4 max-sm:flex-col"}>
             {/* Avatar */}
             <FormField

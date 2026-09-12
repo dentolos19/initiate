@@ -17,6 +17,8 @@ import { useSession } from "#/lib/providers/session";
 import countries from "#/lib/store/countries";
 
 const schema = z.object({
+  firstName: z.string().trim().min(1, "Enter your first name."),
+  lastName: z.string().trim(),
   location: z.string().min(1, "Select your location."),
   terms: z.boolean().refine(Boolean, "Accept the terms and privacy policy to continue."),
 });
@@ -25,13 +27,13 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
   const backend = useBackend();
   const session = useSession();
   const form = useForm({
-    defaultValues: { location: "", terms: false },
+    defaultValues: { firstName: "", lastName: "", location: "", terms: false },
     resolver: zodResolver(schema),
   });
 
-  const save = form.handleSubmit(async ({ location }) => {
+  const save = form.handleSubmit(async ({ firstName, lastName, location }) => {
     try {
-      await backend.user.updateUser("current", { location });
+      await backend.user.updateUser("current", { firstName, lastName: lastName || null, location });
       await session.refreshUser();
       onNext();
     } catch (saveError) {
@@ -42,7 +44,12 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
 
   useEffect(() => {
     if (!session.user) return;
-    form.reset({ location: session.user.location ?? "", terms: false });
+    form.reset({
+      firstName: session.user.firstName,
+      lastName: session.user.lastName ?? "",
+      location: session.user.location ?? "",
+      terms: false,
+    });
   }, [form, session.user]);
 
   return (
@@ -54,18 +61,32 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4 max-sm:flex-col [&>*]:flex-1">
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input value={session.user?.firstName ?? ""} readOnly />
-              </FormControl>
-            </FormItem>
-            <FormItem>
-              <FormLabel>Last Name</FormLabel>
-              <FormControl>
-                <Input value={session.user?.lastName ?? ""} readOnly />
-              </FormControl>
-            </FormItem>
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} autoComplete="given-name" disabled={form.formState.isSubmitting} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} autoComplete="family-name" disabled={form.formState.isSubmitting} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <FormItem>
@@ -109,8 +130,8 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
                   <FormControl>
                     <Checkbox className="mt-0.5" checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
-                  <FormLabel className="text-muted-foreground text-sm leading-5">
-                    I accept the{" "}
+                  <FormLabel className="text-muted-foreground block cursor-pointer text-sm leading-5 font-normal">
+                    I accept the&nbsp;
                     <a
                       className="text-primary hover:underline"
                       href="https://dennise.me/terms"
@@ -118,8 +139,8 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
                       rel="noreferrer"
                     >
                       Terms of Service
-                    </a>{" "}
-                    and{" "}
+                    </a>
+                    &nbsp;and&nbsp;
                     <a
                       className="text-primary hover:underline"
                       href="https://dennise.me/privacy"

@@ -82,7 +82,7 @@ export default function InvoicesTab(props: { order: Order }) {
                       <Button variant={"default"} size={"sm"} asChild>
                         <Link href={`/manage/invoices/${invoice.id}`}>
                           <BanknoteIcon />
-                          <span>Demo payment</span>
+                          <span>Pay invoice</span>
                         </Link>
                       </Button>
                     )}

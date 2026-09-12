@@ -1,10 +1,16 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { orderInvoice } from "#/lib/database/schema.js";
+import {
+  orderInvoice,
+  paymentBalanceTransaction,
+  paymentCharge,
+  paymentIntent,
+  paymentRefund,
+} from "#/lib/database/schema.js";
 import { database } from "#/lib/server/integrations/database.js";
-import { ensurePaymentAccount } from "#/lib/server/lib/payments.js";
+import { createPaymentReference, ensurePaymentAccount } from "#/lib/server/lib/payments.js";
 import { checkMembership, getOrganization, getUser } from "#/lib/server/lib/utils.js";
 
 const payments = new Hono();
@@ -24,7 +30,6 @@ async function getAccountSummary(organizationId: string, paymentAccountId: strin
 
   return {
     id: paymentAccountId,
-    mode: "demo" as const,
     status: "ready" as const,
     currency: invoices[0]?.currency ?? "sgd",
     availableBalance: invoices.reduce((sum, invoice) => sum + (invoice.status === "paid" ? invoice.amount : 0), 0),
@@ -33,6 +38,25 @@ async function getAccountSummary(organizationId: string, paymentAccountId: strin
     paidInvoices: invoices.filter((invoice) => invoice.status === "paid").length,
     openInvoices: invoices.filter((invoice) => invoice.status === "open").length,
   };
+}
+
+async function getIntent(invoice: typeof orderInvoice.$inferSelect) {
+  const existing = await database.query.paymentIntent.findFirst({ where: { invoiceId: invoice.id } });
+  if (existing) return existing;
+
+  const [intent] = await database
+    .insert(paymentIntent)
+    .values({
+      id: createPaymentReference("intent"),
+      amount: invoice.amount,
+      currency: invoice.currency,
+      customerReference: invoice.customerReference,
+      invoiceId: invoice.id,
+      paymentAccountId: invoice.paymentAccountId,
+      status: invoice.status === "paid" || invoice.status === "refunded" ? "succeeded" : "requires_payment_method",
+    })
+    .returning();
+  return intent;
 }
 
 payments.get("/account", async (c) => {
@@ -63,39 +87,86 @@ payments.get("/invoices/:invoiceId", async (c) => {
 
 payments.post("/invoices/:invoiceId/pay", async (c) => {
   const user = await getUser(c);
-  if (!user) return c.json({ message: "Sign in to run a demo payment." }, 401);
+  if (!user) return c.json({ message: "Sign in to pay this invoice." }, 401);
 
   const invoice = await database.query.orderInvoice.findFirst({ where: { id: c.req.param("invoiceId") } });
   if (!invoice || invoice.userId !== user.id) return c.json({ message: "Invoice not found." }, 404);
   if (invoice.status !== "open") return c.json({ message: "Only open invoices can be paid." }, 400);
 
   const parsed = z.object({ outcome: z.enum(["approved", "declined"]) }).safeParse(await c.req.json());
-  if (!parsed.success) return c.json({ message: "Choose a valid demo outcome." }, 400);
+  if (!parsed.success) return c.json({ message: "Choose a valid payment outcome." }, 400);
+
+  const intent = await getIntent(invoice);
+  if (intent.status === "succeeded") {
+    return c.json({ outcome: "approved" as const, message: "Payment already completed.", invoice });
+  }
+
+  const chargeId = createPaymentReference("charge");
 
   if (parsed.data.outcome === "declined") {
+    await database.batch([
+      database.insert(paymentCharge).values({
+        id: chargeId,
+        amount: invoice.amount,
+        currency: invoice.currency,
+        failureCode: "card_declined",
+        failureMessage: "The payment was declined.",
+        invoiceId: invoice.id,
+        paymentIntentId: intent.id,
+        status: "failed",
+      }),
+      database
+        .update(paymentIntent)
+        .set({ latestChargeId: chargeId, status: "requires_payment_method", updatedAt: new Date() })
+        .where(eq(paymentIntent.id, intent.id)),
+    ]);
     return c.json({
       outcome: "declined" as const,
-      message: "The demo card was declined. No money moved and the invoice remains open.",
+      message: "The payment was declined and the invoice remains open.",
       invoice,
     });
   }
 
-  const [paidInvoice] = await database
-    .update(orderInvoice)
-    .set({ status: "paid", paidAt: new Date() })
-    .where(eq(orderInvoice.id, invoice.id))
-    .returning();
+  const [updatedInvoices] = await database.batch([
+    database
+      .update(orderInvoice)
+      .set({ status: "paid", paidAt: new Date() })
+      .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "open")))
+      .returning(),
+    database.insert(paymentCharge).values({
+      id: chargeId,
+      amount: invoice.amount,
+      currency: invoice.currency,
+      invoiceId: invoice.id,
+      paymentIntentId: intent.id,
+      status: "succeeded",
+    }),
+    database
+      .update(paymentIntent)
+      .set({ latestChargeId: chargeId, status: "succeeded", updatedAt: new Date() })
+      .where(eq(paymentIntent.id, intent.id)),
+    database.insert(paymentBalanceTransaction).values({
+      id: createPaymentReference("transaction"),
+      amount: invoice.amount,
+      currency: invoice.currency,
+      paymentAccountId: invoice.paymentAccountId,
+      sourceId: chargeId,
+      type: "charge",
+    }),
+  ]);
+  const paidInvoice = updatedInvoices[0];
+  if (!paidInvoice) throw new Error("The invoice is no longer open.");
 
   return c.json({
     outcome: "approved" as const,
-    message: "Demo payment approved. No real money was moved.",
+    message: "Payment approved.",
     invoice: paidInvoice,
   });
 });
 
 payments.post("/invoices/:invoiceId/refund", async (c) => {
   const user = await getUser(c);
-  if (!user) return c.json({ message: "Sign in to run a demo refund." }, 401);
+  if (!user) return c.json({ message: "Sign in to refund this invoice." }, 401);
 
   const invoice = await database.query.orderInvoice.findFirst({
     where: { id: c.req.param("invoiceId") },
@@ -107,15 +178,69 @@ payments.post("/invoices/:invoiceId/refund", async (c) => {
   }
   if (invoice.status !== "paid") return c.json({ message: "Only paid invoices can be refunded." }, 400);
 
-  const [refundedInvoice] = await database
-    .update(orderInvoice)
-    .set({ status: "refunded" })
-    .where(eq(orderInvoice.id, invoice.id))
-    .returning();
+  let charge = await database.query.paymentCharge.findFirst({
+    where: { invoiceId: invoice.id, status: "succeeded" },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!charge) {
+    const intent = await getIntent(invoice);
+    const chargeId = createPaymentReference("charge");
+    [charge] = await database
+      .insert(paymentCharge)
+      .values({
+        id: chargeId,
+        amount: invoice.amount,
+        currency: invoice.currency,
+        invoiceId: invoice.id,
+        paymentIntentId: intent.id,
+        status: "succeeded",
+      })
+      .returning();
+    await database
+      .update(paymentIntent)
+      .set({ latestChargeId: chargeId, status: "succeeded", updatedAt: new Date() })
+      .where(eq(paymentIntent.id, intent.id));
+    await database.insert(paymentBalanceTransaction).values({
+      id: createPaymentReference("transaction"),
+      amount: invoice.amount,
+      currency: invoice.currency,
+      paymentAccountId: invoice.paymentAccountId,
+      sourceId: chargeId,
+      type: "charge",
+    });
+  }
+
+  const refundId = createPaymentReference("refund");
+  const [updatedInvoices] = await database.batch([
+    database
+      .update(orderInvoice)
+      .set({ status: "refunded" })
+      .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "paid")))
+      .returning(),
+    database.insert(paymentRefund).values({
+      id: refundId,
+      amount: invoice.amount,
+      chargeId: charge.id,
+      currency: invoice.currency,
+      invoiceId: invoice.id,
+      reason: "requested_by_customer",
+    }),
+    database.update(paymentCharge).set({ refundedAmount: invoice.amount }).where(eq(paymentCharge.id, charge.id)),
+    database.insert(paymentBalanceTransaction).values({
+      id: createPaymentReference("transaction"),
+      amount: -invoice.amount,
+      currency: invoice.currency,
+      paymentAccountId: invoice.paymentAccountId,
+      sourceId: refundId,
+      type: "refund",
+    }),
+  ]);
+  const refundedInvoice = updatedInvoices[0];
+  if (!refundedInvoice) throw new Error("The invoice is no longer paid.");
 
   return c.json({
     outcome: "approved" as const,
-    message: "Demo refund completed. No real money was moved.",
+    message: "Refund completed.",
     invoice: refundedInvoice,
   });
 });

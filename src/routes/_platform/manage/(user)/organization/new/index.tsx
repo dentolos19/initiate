@@ -8,19 +8,10 @@ import { Label } from "#/components/ui/label";
 import { PageContent, PageDescription, PageHeader, PageHeading, PageShell, PageTitle } from "#/components/ui/page";
 import { authClient } from "#/lib/auth/auth";
 
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
 export const Route = createFileRoute("/_platform/manage/(user)/organization/new/")({ component: Page });
 
 export default function Page() {
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
   const [error, setError] = useState<string>();
   const [pending, setPending] = useState(false);
 
@@ -29,7 +20,7 @@ export default function Page() {
     setPending(true);
     setError(undefined);
 
-    const result = await authClient.organization.create({ name, slug });
+    const result = await authClient.organization.create({ name, slug: `org-${crypto.randomUUID()}` });
     if (result.error || !result.data) {
       setError(result.error?.message ?? "Could not create the organization.");
       setPending(false);
@@ -52,25 +43,7 @@ export default function Page() {
         <PageContent className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="organization-name">Name</Label>
-            <Input
-              id="organization-name"
-              value={name}
-              onChange={(event) => {
-                setName(event.target.value);
-                setSlug(slugify(event.target.value));
-              }}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="organization-slug">Slug</Label>
-            <Input
-              id="organization-slug"
-              value={slug}
-              onChange={(event) => setSlug(slugify(event.target.value))}
-              required
-            />
-            <p className="text-muted-foreground text-xs">Used as a stable identifier for your organization.</p>
+            <Input id="organization-name" value={name} onChange={(event) => setName(event.target.value)} required />
           </div>
           {error && (
             <p className="text-destructive text-sm" role="alert">
