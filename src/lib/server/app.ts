@@ -121,7 +121,7 @@ if (ENVIRONMENT === "development") {
 }
 
 // Cloudflare Exports
-export { MessagingObject as Messaging } from "#/lib/server/integrations/cloudflare/messaging.js";
-export { SynchronizeWorkflow } from "#/lib/server/integrations/cloudflare/synchronize.js";
+export { Messenger } from "#/lib/server/integrations/cloudflare/messenger.js";
+export { Synchronizer } from "#/lib/server/integrations/cloudflare/synchronizer.js";
 
 export default app;

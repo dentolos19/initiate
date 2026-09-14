@@ -401,8 +401,8 @@ messages.get("/rooms/:roomId/connect", async (c) => {
     return c.json({ message: "Room not found." }, 404);
   }
 
-  const id = c.env.MESSAGING.idFromName(room.id);
-  const stub = c.env.MESSAGING.get(id);
+  const id = c.env.MESSENGER.idFromName(room.id);
+  const stub = c.env.MESSENGER.get(id);
   return stub.fetch(c.req.raw);
 });
 

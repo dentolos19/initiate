@@ -52,7 +52,7 @@ admin.get("/statistics", async (c) => {
 
 // Synchronize embeddings
 admin.post("/synchronize", async (c) => {
-  const instance = await c.env.SYNCHRONIZE.create();
+  const instance = await c.env.SYNCHRONIZER.create();
   return c.json({
     id: instance.id,
     details: instance.status(),

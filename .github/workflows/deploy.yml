@@ -27,6 +27,9 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
+      - name: Setup Just
+        uses: extractions/setup-just@v4
+
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
@@ -34,7 +37,7 @@ jobs:
         run: bun run build
 
       - name: Migrate Database
-        run: bun run db:migrate:remote
+        run: just migrate --remote
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v4

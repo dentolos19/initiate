@@ -3,8 +3,8 @@ import handler, { createServerEntry } from "@tanstack/react-start/server-entry";
 import { createDatabase } from "#/lib/server/integrations/database";
 import { deliverNotification, type NotificationMessage } from "#/lib/server/integrations/notification";
 
-export { MessagingObject as Messaging } from "#/lib/server/integrations/cloudflare/messaging";
-export { SynchronizeWorkflow } from "#/lib/server/integrations/cloudflare/synchronize";
+export { Messenger } from "#/lib/server/integrations/cloudflare/messenger";
+export { Synchronizer } from "#/lib/server/integrations/cloudflare/synchronizer";
 
 const start = createServerEntry({
   fetch(request) {

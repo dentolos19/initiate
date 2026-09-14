@@ -4,7 +4,7 @@ import { createDatabase, insertEmbedding } from "#/lib/server/integrations/datab
 import { generateEmbeddings, aggregateEmbeddings } from "#/lib/server/lib/embeddings.js";
 import { forceSerializable } from "#/lib/server/lib/utils.js";
 
-export class SynchronizeWorkflow extends WorkflowEntrypoint<Env, unknown> {
+export class Synchronizer extends WorkflowEntrypoint<Env, unknown> {
   async run(event: Readonly<WorkflowEvent<unknown>>, step: WorkflowStep) {
     const database = createDatabase(this.env.DB);
 
