@@ -36,9 +36,9 @@
   },
   "workflows": [
     {
-      "binding": "SYNCHRONIZE",
+      "binding": "SYNCHRONIZER",
       "name": "initiate-synchronizer",
-      "class_name": "SynchronizeWorkflow"
+      "class_name": "Synchronizer"
     }
   ],
   "vectorize": [
@@ -71,15 +71,15 @@
   "durable_objects": {
     "bindings": [
       {
-        "name": "MESSAGING",
-        "class_name": "Messaging"
+        "name": "MESSENGER",
+        "class_name": "Messenger"
       }
     ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["Messaging"]
+      "new_sqlite_classes": ["Messenger"]
     }
   ]
 }

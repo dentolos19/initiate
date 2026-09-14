@@ -15,7 +15,7 @@ const messageSchema = z.object({
   attachments: z.array(z.unknown()).default([]),
 });
 
-export class MessagingObject extends DurableObject<Env> {
+export class Messenger extends DurableObject<Env> {
   database: AppDatabase;
 
   constructor(state: DurableObjectState, environment: Env) {
