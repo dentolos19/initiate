@@ -1,6 +1,11 @@
-import { convertToCoreMessages, generateObject, streamText } from "ai";
+import {
+  createUIMessageStreamResponse,
+  toUIMessageStream,
+  convertToModelMessages,
+  generateObject,
+  streamText,
+} from "ai";
 import { Hono } from "hono";
-import { stream } from "hono/streaming";
 import z from "zod";
 
 import { generationModel } from "#/lib/server/integrations/ai.js";
@@ -13,8 +18,13 @@ problemChat.post("/chat", async (c) => {
 
   // Check for skip commands in the latest message
   const latestMessage = messages[messages.length - 1];
-  const skipQuestion = latestMessage?.content?.toLowerCase().includes("skip this question");
-  const skipAll = latestMessage?.content?.toLowerCase().includes("skip all");
+  const text =
+    latestMessage?.parts
+      ?.filter((part: { type: string }) => part.type === "text")
+      .map((part: { text: string }) => part.text)
+      .join("") ?? "";
+  const skipQuestion = text.toLowerCase().includes("skip this question");
+  const skipAll = text.toLowerCase().includes("skip all");
 
   const systemPrompt = `
     You are an AI assistant whose ONLY job is to help the user articulate their **problem**, NOT to propose solutions.
@@ -32,22 +42,18 @@ problemChat.post("/chat", async (c) => {
 
   const payload = {
     model: generationModel,
-    messages: convertToCoreMessages(
+    messages: await convertToModelMessages(
       [
-        { role: "system", content: systemPrompt },
+        { id: "system", role: "system", parts: [{ type: "text", text: systemPrompt }] },
         ...messages,
-        userContent && { role: "user", content: userContent },
+        userContent && { id: "skip", role: "user", parts: [{ type: "text", text: userContent }] },
       ].filter(Boolean),
     ),
-    maxSteps: 1,
-    stream: true,
   };
 
   const result = streamText(payload);
 
-  c.header("X-Vercel-AI-Data-Stream", "v1");
-  c.header("Content-Type", "text/plain; charset=utf-8");
-  return stream(c, (stream) => stream.pipe(result.toDataStream()));
+  return createUIMessageStreamResponse({ stream: toUIMessageStream({ stream: result.stream }) });
 });
 
 // final draft generator
@@ -71,7 +77,10 @@ problemChat.post("/draft", async (c) => {
 
   const result = await generateObject({
     model: generationModel,
-    messages: convertToCoreMessages([{ role: "system", content: systemPrompt }, ...messages]),
+    messages: await convertToModelMessages([
+      { id: "system", role: "system", parts: [{ type: "text", text: systemPrompt }] },
+      ...messages,
+    ]),
     schema: z.object({
       description: z.string(),
       budget: z.string().nullish(),

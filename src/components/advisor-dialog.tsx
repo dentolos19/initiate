@@ -133,8 +133,7 @@ export default function AdvisorDialog(
           {
             id: message.id,
             role: "assistant",
-            content: message.message || "",
-            createdAt: new Date(message.created_at),
+            parts: [{ type: "text", text: message.message || "" }],
           },
         ]);
       }
@@ -145,8 +144,7 @@ export default function AdvisorDialog(
           {
             id: message.id,
             role: "user",
-            content: message.message || "",
-            createdAt: new Date(message.created_at),
+            parts: [{ type: "text", text: message.message || "" }],
           },
         ]);
       }
@@ -245,9 +243,8 @@ export default function AdvisorDialog(
     }
 
     // normal suggestion handling
-    await props.data.append({
-      role: "user",
-      content: suggestion,
+    await props.data.sendMessage({
+      text: suggestion,
     });
   };
 

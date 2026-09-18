@@ -1,3 +1,4 @@
+import { ConversationProvider } from "@elevenlabs/react";
 import { ReactNode } from "react";
 
 import { TooltipProvider } from "#/components/ui/tooltip";
@@ -15,9 +16,11 @@ export default function AppProvider(props: { children?: ReactNode }) {
         <SessionProvider>
           <TooltipProvider>
             <PromptProvider>
-              <AdvisorProvider>
-                <TourProvider>{props.children}</TourProvider>
-              </AdvisorProvider>
+              <ConversationProvider>
+                <AdvisorProvider>
+                  <TourProvider>{props.children}</TourProvider>
+                </AdvisorProvider>
+              </ConversationProvider>
             </PromptProvider>
           </TooltipProvider>
         </SessionProvider>

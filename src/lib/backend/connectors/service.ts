@@ -144,7 +144,7 @@ export default function mapConnectors(primitives: BackendPrimitives) {
     ): Promise<{ message: string; order: Record<string, unknown>; invoice: OrderInvoice }> => {
       const response = await primitives.post(`/service/${serviceId}/plans/${planId}/order`, data);
       return z
-        .object({ message: z.string(), order: z.record(z.unknown()), invoice: orderInvoiceSchema })
+        .object({ message: z.string(), order: z.record(z.string(), z.unknown()), invoice: orderInvoiceSchema })
         .parse(response);
     },
 

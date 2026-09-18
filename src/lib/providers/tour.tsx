@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import Joyride, { Step } from "react-joyride";
+import { Joyride, Step } from "react-joyride";
 
 const TourContext = createContext<{
   startTour: (steps: Step[]) => void;
@@ -30,7 +30,7 @@ export default function TourProvider(props: { children?: ReactNode }) {
   return (
     <TourContext.Provider value={{ startTour, stopTour }}>
       {props.children}
-      <Joyride steps={steps} run={run} disableScrollParentFix />
+      <Joyride steps={steps} run={run} />
     </TourContext.Provider>
   );
 }

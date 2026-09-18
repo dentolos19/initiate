@@ -49,11 +49,11 @@ export default function AdvisorProvider(props: LayoutProps) {
   const [summaryCallback, setSummaryCallback] = useState<((summary: string) => void) | undefined>();
 
   const chat = useChatInternal({
-    initialMessages: [
+    messages: [
       {
         id: "initial",
         role: "assistant",
-        content: "Hello! How can I assist you today?",
+        parts: [{ type: "text", text: "Hello! How can I assist you today?" }],
       },
     ],
     onError: (error) => {
@@ -64,9 +64,8 @@ export default function AdvisorProvider(props: LayoutProps) {
   function askAdvisor(message?: string) {
     setPopoverOpen(true);
     if (message) {
-      chat.append({
-        role: "user",
-        content: message,
+      chat.sendMessage({
+        text: message,
       });
     }
   }
@@ -111,9 +110,8 @@ export default function AdvisorProvider(props: LayoutProps) {
     setDialogOpen(true);
     setPopoverOpen(false);
     if (message) {
-      chat.append({
-        role: "user",
-        content: message,
+      chat.sendMessage({
+        text: message,
       });
     }
   }

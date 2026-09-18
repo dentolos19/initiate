@@ -1,4 +1,4 @@
-import { Message } from "@ai-sdk/react";
+import type { UIMessage as Message } from "ai";
 import z from "zod";
 
 import { BackendPrimitives } from "#/lib/backend/primitives";

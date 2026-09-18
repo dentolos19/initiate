@@ -1,7 +1,13 @@
-import { convertToCoreMessages, generateObject, streamText, tool } from "ai";
+import {
+  createUIMessageStreamResponse,
+  toUIMessageStream,
+  convertToModelMessages,
+  generateObject,
+  streamText,
+  tool,
+} from "ai";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { stream } from "hono/streaming";
 import { z } from "zod";
 
 import { userChat } from "#/lib/database/schema.js";
@@ -17,7 +23,7 @@ aiChat.post("/chat", async (c) => {
 
   const result = streamText({
     model: generationModel,
-    messages: convertToCoreMessages(messages),
+    messages: await convertToModelMessages(messages),
     system: `
       You are an expert virtual assistant on a digital services platform that also provides access to grants and funding opportunities, and also helps users articulate their business problems.
       Your tone should always be friendly, concise, and professional—sounding knowledgeable without being overly formal.
@@ -123,7 +129,7 @@ aiChat.post("/chat", async (c) => {
     tools: {
       searchServices: tool({
         description: "Search for services on our platform.",
-        parameters: z.object({
+        inputSchema: z.object({
           query: z.string(),
           page: z.number().optional().default(1),
           limit: z.number().optional().default(5),
@@ -143,7 +149,7 @@ aiChat.post("/chat", async (c) => {
       }),
       searchGrants: tool({
         description: "Search for grants and funding opportunities on our platform.",
-        parameters: z.object({
+        inputSchema: z.object({
           query: z.string(),
           page: z.number().optional().default(1),
           limit: z.number().optional().default(5),
@@ -163,7 +169,7 @@ aiChat.post("/chat", async (c) => {
       }),
       createCommunityPost: tool({
         description: "Create or preview a community post.",
-        parameters: z.object({
+        inputSchema: z.object({
           type: z.string(),
           title: z.string(),
           content: z.string(),
@@ -188,7 +194,7 @@ aiChat.post("/chat", async (c) => {
       }),
       getMyAnalytics: tool({
         description: "Get organization analytics for a period (revenue and order stats).",
-        parameters: z.object({ period: z.enum(["week", "month", "quarter"]).optional().default("month") }),
+        inputSchema: z.object({ period: z.enum(["week", "month", "quarter"]).optional().default("month") }),
         execute: async ({ period = "month" }) => {
           try {
             const auth = getAuth(c);
@@ -243,7 +249,7 @@ aiChat.post("/chat", async (c) => {
       }),
       getNotifications: tool({
         description: "Get the user's notifications from the platform.",
-        parameters: z.object({
+        inputSchema: z.object({
           filter: z.enum(["inbox", "archived", "all"]).optional().default("inbox"),
           limit: z.number().optional().default(5),
         }),
@@ -280,7 +286,7 @@ aiChat.post("/chat", async (c) => {
       }),
       checkMessages: tool({
         description: "Check recent messages and conversations.",
-        parameters: z.object({
+        inputSchema: z.object({
           unreadOnly: z.boolean().optional().default(true),
           limit: z.number().optional().default(5),
         }),
@@ -320,7 +326,7 @@ aiChat.post("/chat", async (c) => {
       }),
       getMyOrders: tool({
         description: "Get the user's orders with optional status filtering.",
-        parameters: z.object({
+        inputSchema: z.object({
           status: z.enum(["pending", "confirmed", "completed", "all"]).optional().default("all"),
           limit: z.number().optional().default(5),
         }),
@@ -357,13 +363,23 @@ aiChat.post("/chat", async (c) => {
       }),
       findServicesByNeed: tool({
         description: "Find AI services that match specific business problems or needs using intelligent matching.",
-        parameters: z.object({
+        inputSchema: z.object({
           businessProblem: z.string(),
           budget: z.string().optional(),
           industry: z.string().optional(),
           limit: z.number().optional().default(3),
         }),
-        execute: async ({ businessProblem, budget, industry, limit = 3 }) => {
+        execute: async ({
+          businessProblem,
+          budget,
+          industry,
+          limit = 3,
+        }: {
+          businessProblem: string;
+          budget?: string;
+          industry?: string;
+          limit?: number;
+        }) => {
           try {
             const searchQuery = [businessProblem, industry && `for ${industry}`, budget && `budget ${budget}`]
               .filter(Boolean)
@@ -426,9 +442,7 @@ aiChat.post("/chat", async (c) => {
     },
   });
 
-  c.header("X-Vercel-AI-Data-Stream", "v1");
-  c.header("Content-Type", "text/plain; charset=utf-8");
-  return stream(c, (s) => s.pipe(result.toDataStream()));
+  return createUIMessageStreamResponse({ stream: toUIMessageStream({ stream: result.stream }) });
 });
 
 // generate problem statement summary from chat conversation
@@ -440,7 +454,7 @@ aiChat.post("/chat/generate-summary", async (c) => {
 
   const result = await generateObject({
     model: generationModel,
-    messages: convertToCoreMessages(messages),
+    messages: await convertToModelMessages(messages),
     system: `
     Generate a comprehensive problem statement summary in clean HTML with headings and lists when appropriate.
     The document should be structured with the following sections if the information is available:
@@ -472,7 +486,7 @@ aiChat.post("/chat/suggest", async (c) => {
 
   const result = await generateObject({
     model: generationModel,
-    messages: convertToCoreMessages(messages),
+    messages: await convertToModelMessages(messages),
     system: `
     Return up to 6 short, business-relevant follow-up suggestions for the user on Initiate.
     If the current context is about articulating a business problem, include 'Skip this question' and 'Skip all questions and generate draft' options to allow the user to bypass questions.
