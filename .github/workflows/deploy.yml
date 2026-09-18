@@ -1,4 +1,4 @@
-name: Web Deployment
+name: Cloudflare Deployment
 on:
   push:
     branches:
@@ -9,9 +9,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy Worker
     environment: Production
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -30,34 +31,8 @@ jobs:
       - name: Setup Just
         uses: extractions/setup-just@v4
 
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build Project
-        run: bun run build
-
-      - name: Migrate Database
-        run: just migrate --remote
-
       - name: Deploy Worker
-        uses: cloudflare/wrangler-action@v4
-        with:
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          secrets: |
-            BETTER_AUTH_SECRET
-            BETTER_AUTH_URL
-            ELEVENLABS_AGENT_ID
-            ELEVENLABS_API_KEY
-            EMAIL_FROM_ADDRESS
-            EMAIL_FROM_NAME
-            OPENROUTER_API_KEY
-            OPENROUTER_EMBEDDING_DIMENSIONS
-            OPENROUTER_EMBEDDING_MODEL
-            OPENROUTER_MODEL
-            OPENROUTER_REFERER
-            OPENROUTER_TITLE
-            REALTIMEKIT_APP_ID
+        run: just deploy
         env:
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
@@ -72,3 +47,6 @@ jobs:
           OPENROUTER_REFERER: ${{ vars.OPENROUTER_REFERER }}
           OPENROUTER_TITLE: ${{ vars.OPENROUTER_TITLE }}
           REALTIMEKIT_APP_ID: ${{ vars.REALTIMEKIT_APP_ID }}
+
+      - name: Migrate Database
+        run: just migrate --remote
