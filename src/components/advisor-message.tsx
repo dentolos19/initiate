@@ -1,4 +1,4 @@
-import { Message } from "@ai-sdk/react";
+import { isToolUIPart, getToolName, type UIMessage as Message } from "ai";
 import Markdown from "react-markdown";
 
 import ImageWrapper from "#/components/ui/wrappers/image";
@@ -36,19 +36,25 @@ export default function AdvisorMessage(props: { data: Message }) {
             props.data.role === "user" && "bg-primary text-primary-foreground",
           )}
         >
-          <Markdown>{props.data.content}</Markdown>
+          <Markdown>
+            {props.data.parts
+              .filter((part) => part.type === "text")
+              .map((part) => part.text)
+              .join("")}
+          </Markdown>
         </div>
         {props.data.parts && (
           <div className={"mt-2"}>
             {props.data.parts.map((part) => {
-              if (part.type !== "tool-invocation") return null;
+              if (!isToolUIPart(part)) return null;
 
-              const { toolName, toolCallId, state } = part.toolInvocation;
+              const toolName = getToolName(part);
+              const { toolCallId, state } = part;
 
-              if (state !== "result") return null;
+              if (state !== "output-available") return null;
 
               if (toolName === "searchServices") {
-                const services = serviceSchema.array().parse(part.toolInvocation.result);
+                const services = serviceSchema.array().parse(part.output);
                 return <SearchServicesWidget key={toolCallId} data={services} />;
               }
             })}

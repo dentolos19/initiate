@@ -1,4 +1,4 @@
-import { Message } from "@ai-sdk/react";
+import type { UIMessage as Message } from "ai";
 import { BotIcon, UserIcon } from "lucide-react";
 import Markdown from "react-markdown";
 
@@ -26,9 +26,19 @@ export default function ProblemMessage(props: { data: Message }) {
         )}
       >
         {props.data.role === "assistant" ? (
-          <Markdown>{props.data.content}</Markdown>
+          <Markdown>
+            {props.data.parts
+              .filter((part) => part.type === "text")
+              .map((part) => part.text)
+              .join("")}
+          </Markdown>
         ) : (
-          <p className={"text-sm whitespace-pre-wrap"}>{props.data.content}</p>
+          <p className={"text-sm whitespace-pre-wrap"}>
+            {props.data.parts
+              .filter((part) => part.type === "text")
+              .map((part) => part.text)
+              .join("")}
+          </p>
         )}
       </div>
 

@@ -2,27 +2,34 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "initiate",
   "main": "src/server.ts",
-  "compatibility_date": "2026-08-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2026-10-01",
   "observability": {
-    "enabled": true
+    "logs": {
+      "enabled": true,
+    },
+    "traces": {
+      "enabled": true,
+    },
+    "issues": {
+      "enabled": true,
+    },
   },
   "routes": [
     {
       "pattern": "initiate.dennise.me",
-      "custom_domain": true
+      "custom_domain": true,
     },
     {
       "pattern": "initiate.global",
-      "custom_domain": true
-    }
+      "custom_domain": true,
+    },
   ],
   "queues": {
     "producers": [
       {
         "binding": "NOTIFICATIONS",
-        "queue": "initiate-notifications"
-      }
+        "queue": "initiate-notifications",
+      },
     ],
     "consumers": [
       {
@@ -30,22 +37,22 @@
         "max_batch_size": 10,
         "max_batch_timeout": 5,
         "max_retries": 3,
-        "dead_letter_queue": "initiate-notifications-dlq"
-      }
-    ]
+        "dead_letter_queue": "initiate-notifications-dlq",
+      },
+    ],
   },
   "workflows": [
     {
       "binding": "SYNCHRONIZER",
       "name": "initiate-synchronizer",
-      "class_name": "Synchronizer"
-    }
+      "class_name": "Synchronizer",
+    },
   ],
   "vectorize": [
     {
       "binding": "VECTORIZE",
-      "index_name": "initiate-search"
-    }
+      "index_name": "initiate-search",
+    },
   ],
   "d1_databases": [
     {
@@ -53,33 +60,33 @@
       "database_id": "0981b552-4d0d-47da-8759-61b61ac8b927",
       "database_name": "initiate",
       "migrations_dir": "migrations",
-      "migrations_pattern": "migrations/*/migration.sql"
-    }
+      "migrations_pattern": "migrations/*/migration.sql",
+    },
   ],
   "r2_buckets": [
     {
       "binding": "BUCKET",
-      "bucket_name": "initiate"
-    }
+      "bucket_name": "initiate",
+    },
   ],
   "send_email": [
     {
       "name": "EMAIL",
-      "remote": true
-    }
+      "remote": true,
+    },
   ],
   "durable_objects": {
     "bindings": [
       {
         "name": "MESSENGER",
-        "class_name": "Messenger"
-      }
-    ]
+        "class_name": "Messenger",
+      },
+    ],
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["Messenger"]
-    }
-  ]
+      "new_sqlite_classes": ["Messenger"],
+    },
+  ],
 }

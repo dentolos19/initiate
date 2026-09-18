@@ -216,7 +216,7 @@ export default function MilestoneDialog(props: MilestoneDialogProps) {
                         disabled={(date) =>
                           date < new Date(new Date().setHours(0, 0, 0, 0)) || form.formState.isSubmitting
                         }
-                        initialFocus
+                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>

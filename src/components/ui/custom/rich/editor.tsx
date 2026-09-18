@@ -1,3 +1,4 @@
+import { BubbleMenu } from "@tiptap/react/menus";
 
 import "#/components/ui/custom/rich/rich.styles.css";
 
@@ -8,7 +9,7 @@ import { Toggle } from "#/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/ui/tooltip";
 import useBackend from "#/lib/backend/client";
 import { cn } from "#/lib/utils";
-import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import {
   BoldIcon,
   CodeIcon,
@@ -109,7 +110,7 @@ export function RichEditor(props: RichEditorProps) {
     if (!editor) return;
     const html = editor.getHTML();
     if (props.value !== html) {
-      editor.commands.setContent(props.value || "");
+      editor.commands.setContent(props.value || "", { emitUpdate: false });
     }
   }, [editor, props.value]);
 

@@ -45,8 +45,8 @@ resources.post("/grants", async (c) => {
     const result = schema.safeParse(body);
     console.log("2. Validation result:", result);
     if (!result.success) {
-      console.log("3. Validation errors:", result.error.errors);
-      return c.json({ message: "Invalid data", errors: result.error.errors }, 400);
+      console.log("3. Validation errors:", result.error.issues);
+      return c.json({ message: "Invalid data", errors: result.error.issues }, 400);
     }
 
     const { confirmation: _confirmation, deadlineAt, ...grantData } = result.data;
@@ -117,8 +117,8 @@ resources.put("/grants/:id", async (c) => {
     const result = schema.safeParse(body);
     console.log("3. Validation result:", result.success);
     if (!result.success) {
-      console.log("4. Validation errors:", result.error.errors);
-      return c.json({ message: "Invalid data", errors: result.error.errors }, 400);
+      console.log("4. Validation errors:", result.error.issues);
+      return c.json({ message: "Invalid data", errors: result.error.issues }, 400);
     }
 
     const { confirmation: _confirmation, deadlineAt, ...grantData } = result.data;
@@ -311,8 +311,8 @@ resources.put("/documentation/:id", async (c) => {
     const result = schema.safeParse(body);
     console.log("3. Validation result:", result.success);
     if (!result.success) {
-      console.log("4. Validation errors:", result.error.errors);
-      return c.json({ message: "Invalid data", errors: result.error.errors }, 400);
+      console.log("4. Validation errors:", result.error.issues);
+      return c.json({ message: "Invalid data", errors: result.error.issues }, 400);
     }
 
     const { confirmation: _confirmation, ...docData } = result.data;

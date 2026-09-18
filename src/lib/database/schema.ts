@@ -664,7 +664,6 @@ export const authAccount = sqliteTable(
   "auth_accounts",
   {
     id: id(),
-    issuer: text().notNull(),
     accountId: text().notNull(),
     providerId: text().notNull(),
     userId: text()
@@ -684,10 +683,7 @@ export const authAccount = sqliteTable(
       .default(sql`(unixepoch() * 1000)`)
       .notNull(),
   },
-  (table) => [
-    uniqueIndex("auth_accounts_issuer_accountId_key").on(table.issuer, table.accountId),
-    index("authAccount_userId_idx").on(table.userId),
-  ],
+  (table) => [index("authAccount_userId_idx").on(table.userId)],
 );
 
 export const authVerification = sqliteTable(

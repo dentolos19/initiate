@@ -1,4 +1,3 @@
-import { useChat } from "@ai-sdk/react";
 import { BotIcon, SendIcon, SkipForwardIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -11,6 +10,7 @@ import { ScrollArea } from "#/components/ui/scroll-area";
 import { Separator } from "#/components/ui/separator";
 import { BACKEND_URL } from "#/environment";
 import useBackend from "#/lib/backend/client";
+import { useChatInternal } from "#/lib/hooks";
 import ProblemMessage from "#/routes/_platform/community/manage/$id/-components/problem-message";
 
 interface ProblemChatProps {
@@ -22,26 +22,32 @@ export default function ProblemChat({ disabled = false, onDraftGenerated }: Prob
   const backend = useBackend();
   const [conversationStage, setConversationStage] = useState<"initial" | "gathering" | "complete">("initial");
 
-  const chat = useChat({
-    initialMessages: [
+  const chat = useChatInternal({
+    messages: [
       {
         id: "1",
         role: "assistant",
-        content:
-          "Hi! I'm here to help you define your problem statement. Let's work together to create a clear and detailed description of what you're trying to solve. What challenge are you facing?",
+        parts: [
+          {
+            type: "text",
+            text: "Hi! I'm here to help you define your problem statement. Let's work together to create a clear and detailed description of what you're trying to solve. What challenge are you facing?",
+          },
+        ],
       },
     ],
     api: `${BACKEND_URL}/problem/chat`,
-    fetch: backend.primitives.fetch,
-    sendExtraMessageFields: true,
     onError: (error) => {
       console.error("Chat error:", error);
       toast.error(error.message || "Failed to send message");
     },
-    onFinish: async (message, { finishReason: _finishReason }) => {
+    onFinish: async ({ message }) => {
+      const content = message.parts
+        .filter((part) => part.type === "text")
+        .map((part) => part.text)
+        .join("");
       if (
-        (message.role === "assistant" && message.content.toLowerCase().includes("summary")) ||
-        message.content.toLowerCase().includes("ready to generate") ||
+        (message.role === "assistant" && content.toLowerCase().includes("summary")) ||
+        content.toLowerCase().includes("ready to generate") ||
         chat.messages.length >= 8
       ) {
         setConversationStage("complete");
@@ -74,18 +80,16 @@ export default function ProblemChat({ disabled = false, onDraftGenerated }: Prob
   const handleSkip = async () => {
     if (chat.isLoading) return;
 
-    await chat.append({
-      role: "user",
-      content: "Skip this question",
+    await chat.sendMessage({
+      text: "Skip this question",
     });
   };
 
   const handleSkipAll = async () => {
     if (chat.isLoading) return;
 
-    await chat.append({
-      role: "user",
-      content: "Skip all remaining questions and generate the draft",
+    await chat.sendMessage({
+      text: "Skip all remaining questions and generate the draft",
     });
 
     // Generate draft immediately when skipping all
