@@ -1,5 +1,5 @@
 import { HeartIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -14,7 +14,7 @@ export default function LikesTab() {
   const [loading, setLoading] = useState<boolean>(true);
   const [services, setServices] = useState<Service[]>([]);
 
-  function loadServices() {
+  const loadServices = useCallback(() => {
     setLoading(true);
     backend.user
       .getUserServices("current")
@@ -28,11 +28,11 @@ export default function LikesTab() {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [backend.user]);
 
   useEffect(() => {
     loadServices();
-  }, []);
+  }, [loadServices]);
 
   if (loading) {
     return (

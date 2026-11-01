@@ -1,5 +1,5 @@
 import { CheckIcon, EditIcon, PlusIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -24,7 +24,7 @@ export default function InvoicesTab(props: { order: Order }) {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedInvoice, setSelectedInvoice] = useState<OrderInvoice | null>(null);
 
-  function loadInvoices() {
+  const loadInvoices = useCallback(() => {
     setLoading(true);
     backend.orders
       .getOrderInvoices(props.order.id)
@@ -38,9 +38,9 @@ export default function InvoicesTab(props: { order: Order }) {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [backend.orders, props.order.id]);
 
-  function loadMilestones() {
+  const loadMilestones = useCallback(() => {
     backend.orders
       .getOrderMilestones(props.order.id)
       .then((milestones) => {
@@ -50,7 +50,7 @@ export default function InvoicesTab(props: { order: Order }) {
         console.error(error);
         toast.error(error.message);
       });
-  }
+  }, [backend.orders, props.order.id]);
 
   function handleCreateInvoice() {
     setSelectedInvoice(null);
@@ -124,7 +124,7 @@ export default function InvoicesTab(props: { order: Order }) {
   useEffect(() => {
     loadInvoices();
     loadMilestones();
-  }, []);
+  }, [loadInvoices, loadMilestones]);
 
   if (loading) {
     return (

@@ -55,6 +55,8 @@ export default function MilestoneDialog(props: MilestoneDialogProps) {
     },
   });
 
+  const { reset } = form;
+
   const isEditing = Boolean(props.milestone);
 
   async function onSubmit(data: MilestoneFormData) {
@@ -78,36 +80,36 @@ export default function MilestoneDialog(props: MilestoneDialogProps) {
 
       props.onSuccess(result);
       props.onOpenChange(false);
-      form.reset();
-    } catch (error: any) {
+      reset();
+    } catch (error) {
       console.error(error);
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Could not save milestone.");
     }
   }
 
   function handleCancel() {
     props.onOpenChange(false);
-    form.reset();
+    reset();
   }
 
   // Update form data when milestone prop changes
   useEffect(() => {
     if (props.milestone) {
-      form.reset({
+      reset({
         name: props.milestone.name,
         content: props.milestone.content || "",
-        status: props.milestone.status as any,
+        status: props.milestone.status,
         dueAt: props.milestone.dueAt ? new Date(props.milestone.dueAt) : undefined,
       });
     } else {
-      form.reset({
+      reset({
         name: "",
         content: "",
         status: "draft",
         dueAt: undefined,
       });
     }
-  }, [props.milestone, props.open]);
+  }, [props.milestone, props.open, reset]);
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>

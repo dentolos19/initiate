@@ -29,6 +29,7 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
   const [organization, setOrganization] = useState<Organization>();
   const [organizationLiked, setOrganizationLiked] = useState<boolean>(false);
+  const [loadedFor, setLoadedFor] = useState<{ id: string; backend: typeof backend.organization }>();
 
   async function handleContact() {
     if (!organization) return;
@@ -68,22 +69,32 @@ export default function Page() {
   }
 
   useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setOrganization(undefined);
     backend.organization
       .getOrganization(id)
       .then((org) => {
+        if (!active) return;
         setOrganization(org);
         setOrganizationLiked(org.isLiked);
       })
       .catch((error: Error) => {
+        if (!active) return;
         console.error(error);
         toast.error(error.message);
       })
       .finally(() => {
+        if (!active) return;
+        setLoadedFor({ id, backend: backend.organization });
         setLoading(false);
       });
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [backend.organization, id]);
 
-  if (loading) {
+  if (loading || loadedFor?.id !== id || loadedFor.backend !== backend.organization) {
     return <Loading />;
   }
 

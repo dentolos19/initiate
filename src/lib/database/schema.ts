@@ -77,7 +77,7 @@ export const message = sqliteTable("communication_messages", {
   createdAt: integer({ mode: "timestamp_ms" })
     .default(sql`(unixepoch() * 1000)`)
     .notNull(),
-  attachments: text({ mode: "json" }).$type<any[]>().default([]).notNull(),
+  attachments: text({ mode: "json" }).$type<unknown[]>().default([]).notNull(),
   isDeleted: integer({ mode: "boolean" }).default(false).notNull(),
   isRead: integer({ mode: "boolean" }).default(false).notNull(),
 });
@@ -498,11 +498,11 @@ export const servicePlan = sqliteTable("service_plans", {
     .references(() => service.id, { onDelete: "cascade", onUpdate: "cascade" }),
   name: text().notNull(),
   description: text(),
-  priceData: text({ mode: "json" }).$type<Record<string, any>>(),
+  priceData: text({ mode: "json" }).$type<Record<string, unknown>>(),
   priceReference: text(),
   default: integer({ mode: "boolean" }).default(false).notNull(),
-  deployment: text({ mode: "json" }).$type<Record<string, any>>(),
-  features: text({ mode: "json" }).$type<any[]>(),
+  deployment: text({ mode: "json" }).$type<Record<string, unknown>>(),
+  features: text({ mode: "json" }).$type<unknown[]>(),
   status: text().default("active").notNull(),
   amount: integer().default(0).notNull(),
   currency: text().default("sgd").notNull(),
@@ -548,7 +548,7 @@ export const service = sqliteTable("services", {
     .notNull(),
   type: text().default("other").notNull(),
   productReference: text(),
-  features: text({ mode: "json" }).$type<any[]>(),
+  features: text({ mode: "json" }).$type<unknown[]>(),
 });
 
 export const userChat = sqliteTable("user_chats", {
@@ -557,7 +557,7 @@ export const userChat = sqliteTable("user_chats", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
   name: text().default("Untitled Chat").notNull(),
-  messages: text({ mode: "json" }).$type<any[]>().notNull(),
+  messages: text({ mode: "json" }).$type<unknown[]>().notNull(),
   updatedAt: integer({ mode: "timestamp_ms" })
     .default(sql`(unixepoch() * 1000)`)
     .notNull(),
@@ -634,7 +634,7 @@ export const user = sqliteTable("users", {
     .default(sql`(unixepoch() * 1000)`)
     .notNull(),
   prompt: text(),
-  settings: text({ mode: "json" }).$type<Record<string, any>>().default({}).notNull(),
+  settings: text({ mode: "json" }).$type<Record<string, unknown>>().default({}).notNull(),
   location: text(),
 });
 

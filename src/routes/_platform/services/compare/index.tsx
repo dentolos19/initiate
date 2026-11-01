@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PlusIcon, TrashIcon } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Skeleton } from "#/components/ui/skeleton";
@@ -24,7 +24,7 @@ export default function Page() {
   const [comparison, setComparison] = useState<Comparison>();
   const [comparisonLoading, setComparisonLoading] = useState<boolean>(true);
 
-  function generateComparison(ids: string[]) {
+  const generateComparison = useCallback((ids: string[]) => {
     setServicesLoading(true);
     setServices([]);
     setComparisonLoading(true);
@@ -65,7 +65,7 @@ export default function Page() {
           setComparisonLoading(false);
         });
     }
-  }
+  }, [backend.market, backend.service]);
 
   function removeService(id: string) {
     if (comparisonLoading) {
@@ -97,7 +97,7 @@ export default function Page() {
     localStorage.setItem("comparisonIds", JSON.stringify(serviceIds));
 
     generateComparison(serviceIds);
-  }, []);
+  }, [generateComparison, searchParams]);
 
   return (
     <div className={"w-full space-y-4 p-4 sm:p-6"}>

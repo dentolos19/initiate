@@ -31,7 +31,7 @@ export default function InvoicesTab(props: { order: Order }) {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [backend.orders, props.order.id]);
 
   if (loading) {
     return (

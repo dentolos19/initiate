@@ -109,7 +109,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }, [id]);
+  }, [id, backend.community]);
 
   if (loading) {
     return (

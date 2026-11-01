@@ -3,7 +3,7 @@ import { Node } from "@tiptap/core";
 export interface IframeOptions {
   allowFullscreen: boolean;
   HTMLAttributes: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
@@ -52,7 +52,7 @@ const Iframe = Node.create<IframeOptions>({
     ];
   },
 
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
+  renderHTML({ HTMLAttributes }) {
     return ["div", this.options.HTMLAttributes, ["iframe", HTMLAttributes]];
   },
 
@@ -60,7 +60,7 @@ const Iframe = Node.create<IframeOptions>({
     return {
       setIframe:
         (options: { src: string }) =>
-        ({ tr, dispatch }: { tr: any; dispatch: any }) => {
+        ({ tr, dispatch }) => {
           const { selection } = tr;
           const node = this.type.create(options);
 

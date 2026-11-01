@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import EmojiPicker from "emoji-picker-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 import { Edit, Mic, MicOff, MoreVertical, SendIcon, SmilePlus, Trash2, X, FileText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
@@ -47,9 +47,9 @@ export default function Page() {
   const backend = useBackend();
   const session = useSession();
   const params = useParams();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const searchParams = useSearchParams();
-  const messagesContext = useMessagesContext();
+  const { refreshRooms } = useMessagesContext();
 
   const id = params.id as string;
   const act = searchParams.get("act") || null;
@@ -195,32 +195,24 @@ export default function Page() {
 
     if (!content && attachments.length === 0) return;
 
-    console.log("Sending message with attachments:", attachments);
-
     if (socket && socket.readyState === WebSocket.OPEN) {
       if (selectedMessageId) {
         // Edit existing message
         const data = JSON.stringify({
-          userId: session.user!.id,
-          roomId: id,
           id: selectedMessageId,
           action: "edit",
           content,
           attachments,
         });
-        console.log("Sending edit data:", data);
         socket.send(data);
         setSelectedMessageId(null);
       } else {
         // Send new message
         const data = JSON.stringify({
-          userId: session.user!.id,
-          roomId: id,
           action: "send",
           content,
           attachments,
         });
-        console.log("Sending new message data:", data);
         socket.send(data);
       }
       setChatInput("");
@@ -231,9 +223,14 @@ export default function Page() {
   }
 
   useEffect(() => {
+    let active = true;
+    let roomSocket: WebSocket | undefined;
+    setLoading(true);
+    setConnecting(true);
     backend.messages
       .getRoom(id)
       .then((room) => {
+        if (!active) return;
         if (act === "organization") {
           const otherUser = room.users?.[0]?.user;
           if (otherUser) {
@@ -261,24 +258,33 @@ export default function Page() {
         setChatMessages(room.messages || []);
       })
       .then(() => {
+        if (!active) return;
         const socket = backend.messages.connectRoom(id);
+        roomSocket = socket;
         setSocket(socket);
 
         socket.addEventListener("open", () => {
+          if (!active) return;
           console.log("The connection to a room is established.");
           setConnecting(false);
         });
 
         socket.addEventListener("close", () => {
+          if (!active) return;
           console.log("The connection to a room is closed.");
+          setConnecting(false);
+          setSocket(undefined);
         });
 
         socket.addEventListener("error", (error) => {
+          if (!active) return;
           console.error("An error had occurred during socket connection.", error);
           toast.error("An error occurred with the socket connection. Please check the console for more details.");
+          setConnecting(false);
         });
 
         socket.addEventListener("message", (event) => {
+          if (!active) return;
           const data = JSON.parse(event.data);
 
           const { success: errorParsed, data: errorData } = z.object({ error: z.string() }).safeParse(data);
@@ -288,8 +294,6 @@ export default function Page() {
             return;
           }
 
-          console.log("Received message:", data);
-
           const { success: messageParsed, data: messageData } = messageWrapperSchema.safeParse(data);
 
           if (!messageParsed) {
@@ -298,10 +302,7 @@ export default function Page() {
             return;
           }
 
-          console.log("Parsed message data:", messageData);
-
           if (messageData.action === "send" && messageData.data) {
-            console.log("Adding new message with attachments:", messageData.data.attachments);
             setChatMessages((previous) => {
               const messageExists = previous.some((msg) => msg.id === messageData.data!.id);
               if (messageExists) return previous;
@@ -309,9 +310,8 @@ export default function Page() {
             });
 
             // Notify the layout to refresh room list
-            messagesContext.updateRoomWithMessage(id, messageData.data);
+            refreshRooms();
           } else if (messageData.action === "edit" && messageData.data) {
-            console.log("Editing message with attachments:", messageData.data.attachments);
             setChatMessages((previous) => {
               return previous.map((msg) => {
                 if (msg.id === messageData.data!.id) {
@@ -327,28 +327,35 @@ export default function Page() {
             });
 
             // Notify the layout to refresh room list for edited messages too
-            messagesContext.updateRoomWithMessage(id, messageData.data);
+            refreshRooms();
           } else if (messageData.action === "delete") {
             setChatMessages((previous) => {
               return previous.filter((msg) => msg.id !== messageData.id);
             });
 
             // Notify the layout to refresh room list
-            messagesContext.updateRoomWithMessage(id, null);
+            refreshRooms();
           } else {
             toast.error("No action.");
           }
         });
       })
+      .catch((error: unknown) => {
+        if (!active) return;
+        console.error("Failed to load the conversation:", error);
+        toast.error("Failed to load the conversation.");
+        setConnecting(false);
+      })
       .finally(() => {
-        setLoading(false);
+        if (active) setLoading(false);
       });
 
     return () => {
-      socket?.close();
+      active = false;
+      roomSocket?.close();
       setSocket(undefined);
     };
-  }, [id, act, session.user, session.organization]);
+  }, [id, act, session.user?.id, backend.messages, refreshRooms]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -375,8 +382,6 @@ export default function Page() {
   const handleDeleteMessage = (messageId: string) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       const data = JSON.stringify({
-        userId: session.user!.id,
-        roomId: id,
         id: messageId,
         action: "delete",
       });
@@ -607,7 +612,7 @@ export default function Page() {
                 <PopoverContent className="w-full">
                   <EmojiPicker
                     onEmojiClick={(emoji) => setChatInput((prev) => prev + emoji.emoji)}
-                    theme={theme as any}
+                    theme={resolvedTheme === "dark" ? Theme.DARK : Theme.LIGHT}
                   />
                 </PopoverContent>
               </Popover>

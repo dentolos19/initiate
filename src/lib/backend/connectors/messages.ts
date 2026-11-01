@@ -107,24 +107,12 @@ export default function mapConnectors(primitives: BackendPrimitives) {
     },
 
     connectRoom: (roomId: string): WebSocket => {
-      const domain = BACKEND_URL.replace(/^https?:\/\//, "");
-      const protocol = domain.includes("localhost") ? "ws" : "wss";
-      return new WebSocket(`${protocol}://${domain}/messages/rooms/${roomId}/connect`);
+      const url = new URL(`${BACKEND_URL}/messages/rooms/${encodeURIComponent(roomId)}/connect`, window.location.href);
+      url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+      return new WebSocket(url);
     },
 
-    // Messages
-
-    // createMessage: async (roomId: string, data: any) => {
-    //   const response = await primitives.post(`/messages/${roomId}`, data);
-    //   return messageSchema.parse(response);
-    // },
-
-    // getMessages: async (roomId: string) => {
-    //   const response = await primitives.get(`/messages/${roomId}`);
-    //   return messageSchema.array().parse(response);
-    // },
-
-    updateMessage: async (messageId: string, data: any) => {
+    updateMessage: async (messageId: string, data: Record<string, unknown>) => {
       const response = await primitives.put(`/messages/${messageId}`, data);
       return messageSchema.parse(response);
     },

@@ -34,7 +34,7 @@ export default function SearchUsers() {
       .finally(() => {
         setLoading(false);
       });
-  }, [query]);
+  }, [query, backend.user]);
 
   if (loading) {
     return (

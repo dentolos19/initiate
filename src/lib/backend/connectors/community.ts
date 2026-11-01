@@ -33,7 +33,7 @@ export const communityPostSchema = z.object({
   organization: organizationSchema.nullish(),
 });
 
-export const communityCommentSchema = z.object({
+const communityCommentBaseSchema = z.object({
   id: z.string(),
   userId: z.string(),
   postId: z.string(),
@@ -44,8 +44,12 @@ export const communityCommentSchema = z.object({
 
   // Relationships
   user: userSchema,
-  replies: z.lazy((): z.ZodArray<z.ZodType<any>> => communityCommentSchema.array()).nullish(),
   replyingTo: userSchema.nullish(),
+});
+
+export type CommunityComment = z.infer<typeof communityCommentBaseSchema> & { replies?: CommunityComment[] | null };
+export const communityCommentSchema: z.ZodType<CommunityComment> = communityCommentBaseSchema.extend({
+  replies: z.lazy(() => communityCommentSchema.array()).nullish(),
 });
 
 export const communityProposalSchema = z.object({
@@ -67,7 +71,6 @@ export const communityProposalSchema = z.object({
 });
 
 export type CommunityPost = z.infer<typeof communityPostSchema>;
-export type CommunityComment = z.infer<typeof communityCommentSchema>;
 export type CommunityProposal = z.infer<typeof communityProposalSchema>;
 
 export default function mapConnectors(primitives: BackendPrimitives) {
@@ -112,7 +115,7 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return communityPostSchema.array().parse(response);
     },
 
-    createPost: async (data: any): Promise<CommunityPost> => {
+    createPost: async (data: Record<string, unknown>): Promise<CommunityPost> => {
       const response = await primitives.post("/community", data);
       return communityPostSchema.parse(response);
     },
@@ -122,7 +125,7 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return communityPostSchema.parse(response);
     },
 
-    updatePost: async (id: string, data: any): Promise<CommunityPost> => {
+    updatePost: async (id: string, data: Record<string, unknown>): Promise<CommunityPost> => {
       const response = await primitives.put(`/community/${id}`, data);
       return communityPostSchema.parse(response);
     },
@@ -179,7 +182,7 @@ export default function mapConnectors(primitives: BackendPrimitives) {
 
     deleteComment: async (commentId: string): Promise<{ message: string }> => {
       const response = await primitives.delete(`/community/_/comments/${commentId}`);
-      return response;
+      return z.object({ message: z.string() }).parse(response);
     },
 
     // Topics
@@ -224,12 +227,12 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return communityProposalSchema.array().parse(response);
     },
 
-    createProposal: async (postId: string, data: any): Promise<CommunityProposal> => {
+    createProposal: async (postId: string, data: Record<string, unknown>): Promise<CommunityProposal> => {
       const response = await primitives.post(`/community/${postId}/proposals`, data);
       return communityProposalSchema.parse(response);
     },
 
-    updateProposal: async (proposalId: string, data: any): Promise<CommunityProposal> => {
+    updateProposal: async (proposalId: string, data: Record<string, unknown>): Promise<CommunityProposal> => {
       const response = await primitives.put(`/community/proposals/${proposalId}`, data);
       return communityProposalSchema.parse(response);
     },

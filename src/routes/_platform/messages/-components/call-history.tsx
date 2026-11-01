@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
 import useBackend from "#/lib/backend/client";
+import type { MessageRoom } from "#/lib/backend/connectors/messages";
 import { RealtimeKitCallHistory } from "#/lib/backend/connectors/realtimekit";
 import { useSession } from "#/lib/providers/session";
 import { cn } from "#/lib/utils";
@@ -13,7 +14,7 @@ export default function CallHistory() {
   const session = useSession();
   const [callHistory, setCallHistory] = useState<RealtimeKitCallHistory | null>(null);
   const [loading, setLoading] = useState(true);
-  const [messageRooms, setMessageRooms] = useState<Map<string, any>>(new Map());
+  const [messageRooms, setMessageRooms] = useState<Map<string, MessageRoom>>(new Map());
 
   useEffect(() => {
     backend.realtimekit
@@ -27,7 +28,7 @@ export default function CallHistory() {
         );
 
         // Fetch message room data for each unique room ID
-        const roomDataMap = new Map();
+        const roomDataMap = new Map<string, MessageRoom>();
         const roomPromises = Array.from(messageRoomIds).map(async (roomId) => {
           try {
             const room = await backend.messages.getRoom(roomId);
@@ -47,7 +48,7 @@ export default function CallHistory() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [backend.messages, backend.realtimekit]);
 
   function formatCallTime(dateString: string) {
     const date = new Date(dateString);
@@ -82,10 +83,10 @@ export default function CallHistory() {
 
     if (messageRoom) {
       // Find the other participant in the message room (not the current user)
-      const otherUser = messageRoom.users?.find((userRoom: any) => userRoom.user.id !== session.user?.id)?.user;
+      const otherUser = messageRoom.users?.find((userRoom) => userRoom.user.id !== session.user?.id)?.user;
 
       const otherOrganization = messageRoom.organizations?.find(
-        (orgRoom: any) => orgRoom.organization.id !== session.organization?.id,
+        (orgRoom) => orgRoom.organization.id !== session.organization?.id,
       )?.organization;
 
       if (otherUser) {

@@ -70,7 +70,7 @@ export default function Page() {
       })
       .catch((requestError: Error) => setError(requestError.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [backend.service]);
 
   return (
     <main className="w-full space-y-10 px-4 py-6 sm:px-6 lg:space-y-14 lg:py-10">

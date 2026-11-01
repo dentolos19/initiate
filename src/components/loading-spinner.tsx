@@ -8,19 +8,7 @@ export default function LoadingSpinner(
     size?: "sm" | "md" | "lg";
   },
 ) {
-  let size = "size-6";
-
-  switch (props.size) {
-    case "sm":
-      size = "size-4";
-      break;
-    case "lg":
-      size = "size-8";
-      break;
-    default:
-      size = "size-6";
-      break;
-  }
+  const size = props.size === "sm" ? "size-4" : props.size === "lg" ? "size-8" : "size-6";
 
   return (
     <div {...props} className={cn("mx-auto size-min animate-spin motion-reduce:animate-none", props.className)}>

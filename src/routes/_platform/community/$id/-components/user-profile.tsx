@@ -64,7 +64,7 @@ export default function UserProfile(props: { data: User }) {
         console.error(error);
         toast.error(error.message);
       });
-  }, [props.data]);
+  }, [props.data, backend.user]);
 
   if (!user) {
     return null;

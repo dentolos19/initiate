@@ -127,15 +127,19 @@ communityComments.get("/:id/comments/thread", async (c) => {
       },
     });
 
-    const commentsById = new Map<string, any>();
-    for (const comment of comments as any[]) {
+    type CommentThread = (typeof comments)[number] & {
+      replyingTo: (typeof comments)[number]["user"] | null;
+      replies: CommentThread[];
+    };
+    const commentsById = new Map<string, CommentThread>();
+    for (const comment of comments) {
       commentsById.set(comment.id, {
         ...comment,
         replyingTo: null,
         replies: [],
       });
     }
-    const parentComments: any[] = [];
+    const parentComments: CommentThread[] = [];
 
     for (const comment of commentsById.values()) {
       const parent = comment.parentId ? commentsById.get(comment.parentId) : undefined;

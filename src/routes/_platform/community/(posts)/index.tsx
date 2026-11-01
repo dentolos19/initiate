@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckIcon, LightbulbIcon, PlusIcon, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -33,7 +33,7 @@ export default function Page() {
   const [topic] = useStateUrl("topic", "");
 
   // Function to check if user is following the current topic
-  const checkFollowingStatus = async (topicName: string) => {
+  const checkFollowingStatus = useCallback(async (topicName: string) => {
     if (!topicName) {
       setIsFollowingTopic(false);
       return;
@@ -45,7 +45,7 @@ export default function Page() {
     } catch (error) {
       console.error("Failed to check following status:", error);
     }
-  };
+  }, [backend.community]);
 
   // Function to handle follow/unfollow
   const handleFollowToggle = async () => {
@@ -104,7 +104,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }, [sort, topic]);
+  }, [sort, topic, backend.community, checkFollowingStatus]);
 
   return (
     <div className={"flex w-full gap-4 p-4"}>

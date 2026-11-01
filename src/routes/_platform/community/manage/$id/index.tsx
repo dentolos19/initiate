@@ -28,6 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import FormWrapper from "#/components/ui/wrappers/form";
 import useBackend from "#/lib/backend/client";
+import type { CommunityPost } from "#/lib/backend/connectors/community";
 import { useAdvisor } from "#/lib/providers/advisor";
 import { useSession } from "#/lib/providers/session";
 import { useParams, useRouter } from "#/lib/router";
@@ -52,6 +53,7 @@ export default function Page() {
   const router = useRouter();
   const params = useParams();
   const form = useForm({ resolver: zodResolver(schema) });
+  const { reset } = form;
   const { user } = useSession();
   const advisor = useAdvisor();
 
@@ -61,7 +63,7 @@ export default function Page() {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [tag, setTag] = useState<string>("");
-  const [post, setPost] = useState<any>(null);
+  const [post, setPost] = useState<CommunityPost | null>(null);
 
   const handleSubmit = form.handleSubmit(async (data) => {
     if (mode === "create") {
@@ -138,7 +140,7 @@ export default function Page() {
   useEffect(() => {
     setLoading(true);
     if (mode === "create") {
-      form.reset({
+      reset({
         title: "",
         tags: [],
         type: "general",
@@ -153,7 +155,7 @@ export default function Page() {
         .getPost(id)
         .then((post) => {
           setPost(post);
-          form.reset({
+          reset({
             title: post.title,
             tags: post.tags || [],
             type: post.type,
@@ -171,7 +173,7 @@ export default function Page() {
           setLoading(false);
         });
     }
-  }, [id, mode]);
+  }, [id, mode, backend.community, reset]);
 
   if (loading) {
     return (

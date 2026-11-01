@@ -52,7 +52,7 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return organizationSchema.parse(response);
     },
 
-    updateOrganization: async (id: "current" | string = "current", data: any): Promise<Organization> => {
+    updateOrganization: async (id: "current" | string = "current", data: Record<string, unknown>): Promise<Organization> => {
       const response = await primitives.put(`/organization/${id}`, data);
       return organizationSchema.parse(response);
     },
@@ -93,12 +93,12 @@ export default function mapConnectors(primitives: BackendPrimitives) {
 
     // Organization Reviews
 
-    createOrganizationReview: async (id: string, data: any): Promise<OrganizationReview> => {
+    createOrganizationReview: async (id: string, data: Record<string, unknown>): Promise<OrganizationReview> => {
       const response = await primitives.post(`/organization/${id}/reviews`, data);
       return organizationReviewSchema.parse(response);
     },
 
-    updateOrganizationReview: async (id: string, reviewId: string, data: any): Promise<OrganizationReview> => {
+    updateOrganizationReview: async (id: string, reviewId: string, data: Record<string, unknown>): Promise<OrganizationReview> => {
       const response = await primitives.put(`/organization/${id}/reviews/${reviewId}`, data);
       return organizationReviewSchema.parse(response);
     },

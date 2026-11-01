@@ -1,31 +1,24 @@
-# Editor configurations
-.vs/
-.idea/
-
-# Build files
-.tanstack/
-.wrangler/
-node_modules/
-dist/
-build/
-out/
-coverage/
-*.tsbuildinfo
 *.d.ts
-
-# User files
-.env*
-!.env*.template
+*.tsbuildinfo
+.DS_Store
+.cloudflare/
 .dev.vars*
-!.dev.vars*.template
-
-# Project-specific rules
+.env*
+.idea/
+.tanstack/
+.tmp/
+.vs/
+.wrangler/
 /.postgres/
 /src/routeTree.gen.ts
-
-# Miscellaneous files
-.tmp/
-.DS_Store
 Desktop.ini
 Thumbs.db
+build/
+coverage/
+dist/
+node_modules/
+out/
+
+!.dev.vars*.template
+!.env*.template
 !.gitkeep

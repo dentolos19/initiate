@@ -27,6 +27,7 @@ export default function Page() {
 
   const { organization } = useSession();
   const form = useForm<FormValues>({ resolver: zodResolver(formSchema) });
+  const { reset } = form;
 
   const [loading, setLoading] = useState<boolean>(true);
   const [service, setService] = useState<Service>();
@@ -60,7 +61,7 @@ export default function Page() {
 
   useEffect(() => {
     if (mode === "create") {
-      form.reset({
+      reset({
         type: "other",
         status: "draft",
       });
@@ -72,7 +73,7 @@ export default function Page() {
       .getService(id)
       .then((data) => {
         setService(data);
-        form.reset({
+        reset({
           id: data.id,
           imageUrl: data.imageUrl ?? undefined,
           bannerUrl: data.bannerUrl ?? undefined,
@@ -91,7 +92,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }, [id]);
+  }, [id, mode, backend.service, reset]);
 
   if (loading) {
     return <Loading />;

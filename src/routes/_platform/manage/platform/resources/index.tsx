@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AwardIcon, EditIcon, FileTextIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import useBackend from "#/lib/backend/client";
 import { ResourceDocumentation, ResourceGrant } from "#/lib/backend/schema";
 import Link from "#/lib/router";
-import DeleteDialog from "#/routes/_platform/manage/platform/resources/-components/delete-dialog";
+import DeleteDialog, { type DeleteTarget } from "#/routes/_platform/manage/platform/resources/-components/delete-dialog";
 
 export const Route = createFileRoute("/_platform/manage/platform/resources/")({ component: ResourcesPage });
 
@@ -22,10 +22,10 @@ export default function ResourcesPage() {
   const [grants, setGrants] = useState<ResourceGrant[]>([]);
   const [documentation, setDocumentation] = useState<ResourceDocumentation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteItem, setDeleteItem] = useState<{ type: string; item: any } | null>(null);
+  const [deleteItem, setDeleteItem] = useState<DeleteTarget | null>(null);
 
   // Fetch data
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [grantsData, docsData] = await Promise.all([
         backend.resources.getGrants(),
@@ -39,14 +39,14 @@ export default function ResourcesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [backend.resources]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // Handle delete
-  const handleDelete = async (type: string, id: string, confirmation: string) => {
+  const handleDelete = async (type: DeleteTarget["type"], id: string, confirmation: string) => {
     try {
       if (type === "grant") {
         await backend.resources.deleteGrant(id, confirmation);

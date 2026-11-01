@@ -38,12 +38,13 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
   const [service, setService] = useState<Service>();
   const [plan, setPlan] = useState<ServicePlan>();
+  const [loadedSelection, setLoadedSelection] = useState<{ id: string; planId: string; backend: typeof backend.service }>();
 
   const form = useForm({ resolver: zodResolver(schema) });
 
   function createSubmitHandler() {
     return form.handleSubmit(async (values) => {
-      if (!planId) return;
+      if (!planId || loadedSelection?.id !== id || loadedSelection.planId !== planId || loadedSelection.backend !== backend.service) return;
       await backend.service
         .orderServicePlan(id, planId, values)
         .then((result) => {
@@ -62,34 +63,51 @@ export default function Page() {
   }
 
   useEffect(() => {
-    if (!planId) return;
+    if (!planId) {
+      setLoading(false);
+      setService(undefined);
+      setPlan(undefined);
+      setLoadedSelection(undefined);
+      return;
+    }
+    let active = true;
+    setLoading(true);
+    setService(undefined);
+    setPlan(undefined);
     Promise.all([
-      backend.service.getService(id).then((service) => {
-        setService(service);
-      }),
-      backend.service.getServicePlan(id, planId).then((plan) => {
-        setPlan(plan);
-      }),
+      backend.service.getService(id),
+      backend.service.getServicePlan(id, planId),
     ])
+      .then(([service, plan]) => {
+        if (!active) return;
+        setService(service);
+        setPlan(plan);
+      })
       .catch((error: Error) => {
+        if (!active) return;
         console.error(error);
         toast.error(error.message);
       })
       .finally(() => {
+        if (!active) return;
+        setLoadedSelection({ id, planId, backend: backend.service });
         setLoading(false);
       });
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [backend.service, id, planId]);
 
-  if (loading) {
+  if (!planId) {
+    return <div className={"my-20 text-center"}>No plan selected.</div>;
+  }
+
+  if (loading || loadedSelection?.id !== id || loadedSelection.planId !== planId || loadedSelection.backend !== backend.service) {
     return (
       <div className={"my-20"}>
         <LoadingSpinner />
       </div>
     );
-  }
-
-  if (!planId) {
-    return <div className={"my-20 text-center"}>No plan selected.</div>;
   }
 
   if (!service || !plan) {

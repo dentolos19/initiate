@@ -47,6 +47,7 @@ export default function PlanDialog(props: {
 }) {
   const backend = useBackend();
   const form = useForm({ resolver: zodResolver(schema) });
+  const { reset } = form;
 
   function createSubmitHandler() {
     return form.handleSubmit(async (data) => {
@@ -105,7 +106,7 @@ export default function PlanDialog(props: {
 
   useEffect(() => {
     if (!props.open) return;
-    form.reset({
+    reset({
       id: props.plan?.id,
       name: props.plan?.name,
       description: props.plan?.description ?? undefined,
@@ -124,7 +125,7 @@ export default function PlanDialog(props: {
         }
       })(),
     });
-  }, [props.open]);
+  }, [props.open, props.plan, reset]);
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>

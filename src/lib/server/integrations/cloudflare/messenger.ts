@@ -1,19 +1,19 @@
 import { DurableObject } from "cloudflare:workers";
-import { eq } from "drizzle-orm";
 import z from "zod";
 
 import { message as messageTable } from "#/lib/database/schema.js";
 import { createDatabase } from "#/lib/server/integrations/database.js";
+import { ownedMessage } from "#/lib/server/lib/owned-message.js";
+import { canAccessRoom } from "#/lib/server/lib/room-access.js";
 import type { AppDatabase } from "#/lib/server/types.js";
 
 const messageSchema = z.object({
-  userId: z.string(),
-  roomId: z.string(),
   id: z.string().optional(),
   action: z.enum(["send", "edit", "delete"]).default("send"),
   content: z.string().optional(),
   attachments: z.array(z.unknown()).default([]),
 });
+const socketIdentitySchema = z.object({ userId: z.string().min(1), roomId: z.string().min(1) });
 
 export class Messenger extends DurableObject<Env> {
   database: AppDatabase;
@@ -23,7 +23,11 @@ export class Messenger extends DurableObject<Env> {
     this.database = createDatabase(environment.DB);
 
     this.ctx.blockConcurrencyWhile(async () => {
-      // TODO
+      for (const socket of this.ctx.getWebSockets()) {
+        if (!socketIdentitySchema.safeParse(socket.deserializeAttachment()).success) {
+          socket.close(1008, "Reconnect to authenticate.");
+        }
+      }
     });
   }
 
@@ -31,9 +35,16 @@ export class Messenger extends DurableObject<Env> {
     const upgradeHeader = request.headers.get("Upgrade");
     if (upgradeHeader !== "websocket") return new Response("Expected Upgrade: websocket", { status: 426 });
 
+    const identity = socketIdentitySchema.safeParse({
+      userId: request.headers.get("X-Initiate-User-Id"),
+      roomId: request.headers.get("X-Initiate-Room-Id"),
+    });
+    if (!identity.success) return new Response("Unauthorized.", { status: 401 });
+
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
 
+    server.serializeAttachment(identity.data);
     this.ctx.acceptWebSocket(server);
 
     return new Response(null, { status: 101, webSocket: client });
@@ -50,36 +61,41 @@ export class Messenger extends DurableObject<Env> {
       if (!success) {
         throw new Error("Invalid message format.");
       }
+      const identity = socketIdentitySchema.safeParse(socket.deserializeAttachment());
+      if (!identity.success) {
+        socket.close(1008, "Reconnect to authenticate.");
+        return;
+      }
 
       const room = await this.database.query.messageRoom.findFirst({
         where: {
-          id: data.roomId,
+          id: identity.data.roomId,
         },
-        // with: {
-        //   participants: {
-        //     where: {
-        //       userId: data.userId,
-        //     },
-        //   },
-        // },
+        with: {
+          users: { columns: { userId: true } },
+          organizations: { columns: { organizationId: true } },
+        },
       });
 
       if (!room) {
         throw new Error("Room not found.");
       }
+      const isMember = async (userId: string, organizationId: string) => Boolean(
+        await this.database.query.authMember.findFirst({ where: { userId, organizationId }, columns: { id: true } }),
+      );
+      if (!(await canAccessRoom(room, identity.data.userId, isMember))) {
+        socket.close(1008, "Room access revoked.");
+        return;
+      }
 
-      // if (room.participants.length === 0) {
-      //   throw new Error("User is not a participant in this room.");
-      // }
-
-      let messageData: any;
+      let messageData: unknown;
 
       if (data.action === "send" && !data.id) {
         const [createdMessage] = await this.database
           .insert(messageTable)
           .values({
             roomId: room.id,
-            userId: data.userId,
+            userId: identity.data.userId,
             content: data.content ?? "",
             attachments: data.attachments ?? [],
           })
@@ -89,16 +105,22 @@ export class Messenger extends DurableObject<Env> {
           with: { user: true },
         });
       } else if (data.action === "edit" && data.id) {
-        await this.database
+        const [updatedMessage] = await this.database
           .update(messageTable)
           .set({ content: data.content, updatedAt: new Date() })
-          .where(eq(messageTable.id, data.id));
+          .where(ownedMessage(data.id, room.id, identity.data.userId))
+          .returning({ id: messageTable.id });
+        if (!updatedMessage) throw new Error("Message not found.");
         messageData = await this.database.query.message.findFirst({
-          where: { id: data.id },
+          where: { id: updatedMessage.id },
           with: { user: true },
         });
       } else if (data.action === "delete" && data.id) {
-        await this.database.delete(messageTable).where(eq(messageTable.id, data.id));
+        const [deletedMessage] = await this.database
+          .delete(messageTable)
+          .where(ownedMessage(data.id, room.id, identity.data.userId))
+          .returning({ id: messageTable.id });
+        if (!deletedMessage) throw new Error("Message not found.");
       } else {
         // No Action
       }
@@ -111,9 +133,15 @@ export class Messenger extends DurableObject<Env> {
       });
 
       // Broadcast message to all connected clients
-      this.ctx.getWebSockets().forEach((connectedSocket) => {
+      for (const connectedSocket of this.ctx.getWebSockets()) {
+        const connectedIdentity = socketIdentitySchema.safeParse(connectedSocket.deserializeAttachment());
+        if (!connectedIdentity.success || connectedIdentity.data.roomId !== room.id ||
+            !(await canAccessRoom(room, connectedIdentity.data.userId, isMember))) {
+          connectedSocket.close(1008, "Reconnect to authenticate.");
+          continue;
+        }
         connectedSocket.send(messageRaw);
-      });
+      }
     } catch (error) {
       let errorMessageRaw: string;
 

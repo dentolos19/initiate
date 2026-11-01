@@ -13,12 +13,11 @@ import {
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 
+export type DeleteTarget = { type: "grant" | "documentation"; item: { id: string; name: string } };
+
 interface DeleteDialogProps {
-  item: {
-    type: string;
-    item: any;
-  };
-  onConfirm: (type: string, id: string, confirmation: string) => Promise<void>;
+  item: DeleteTarget;
+  onConfirm: (type: DeleteTarget["type"], id: string, confirmation: string) => Promise<void>;
   onCancel: () => void;
 }
 

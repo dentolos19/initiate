@@ -7,7 +7,7 @@ import {
   PackageSearchIcon,
   ShoppingBagIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -65,7 +65,7 @@ export default function Page() {
       });
   }
 
-  function loadOrders() {
+  const loadOrders = useCallback(() => {
     setLoading(true);
     setOrders([]);
 
@@ -84,11 +84,11 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [backend.user, filter]);
 
   useEffect(() => {
     loadOrders();
-  }, [filter]);
+  }, [loadOrders]);
 
   return (
     <div className={"flex h-full flex-col"}>

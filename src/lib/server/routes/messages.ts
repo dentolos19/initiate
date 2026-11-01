@@ -6,6 +6,7 @@ import { messageRoom, roomOrganizationParticipant, roomUserParticipant } from "#
 import { generationModel } from "#/lib/server/integrations/ai.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database } from "#/lib/server/integrations/database.js";
+import { canAccessRoom, isSameOrigin } from "#/lib/server/lib/room-access.js";
 import { checkMembership, getOrganizationId } from "#/lib/server/lib/utils.js";
 
 const messages = new Hono<{ Bindings: Env }>();
@@ -16,14 +17,14 @@ const roomRelations = {
 } as const;
 
 async function createMessageRoom(userIds: string[], organizationId?: string) {
-  const roomId = await database.transaction(async (tx) => {
-    const [room] = await tx.insert(messageRoom).values({}).returning({ id: messageRoom.id });
-    await tx.insert(roomUserParticipant).values(userIds.map((userId) => ({ roomId: room.id, userId })));
-    if (organizationId) {
-      await tx.insert(roomOrganizationParticipant).values({ organizationId, roomId: room.id });
-    }
-    return room.id;
-  });
+  const roomId = crypto.randomUUID();
+  const createRoom = database.insert(messageRoom).values({ id: roomId });
+  const addUsers = database.insert(roomUserParticipant).values(userIds.map((userId) => ({ roomId, userId })));
+  if (organizationId) {
+    await database.batch([createRoom, addUsers, database.insert(roomOrganizationParticipant).values({ organizationId, roomId })]);
+  } else {
+    await database.batch([createRoom, addUsers]);
+  }
 
   return database.query.messageRoom.findFirst({ where: { id: roomId }, with: roomRelations });
 }
@@ -61,6 +62,19 @@ messages.post("/rooms", async (c) => {
 
   if (!data.userId && !data.organizationId) {
     return c.json({ message: "At least one of user's or organization's ID must be provided." }, 400);
+  }
+  if (data.userId === "current") data.userId = auth.userId;
+  if (data.organizationId === "current") {
+    const organizationId = getOrganizationId(c);
+    if (!organizationId) return c.json({ message: "Organization not found." }, 404);
+    data.organizationId = organizationId;
+  }
+  if (data.userId && data.organizationId && data.userId !== auth.userId &&
+      !(await checkMembership(auth.userId, data.organizationId))) {
+    return c.json({ message: "You are not a participant in this room." }, 403);
+  }
+  if (data.userId === auth.userId && !data.organizationId) {
+    return c.json({ message: "Cannot create a conversation with yourself." }, 400);
   }
 
   let room;
@@ -362,22 +376,7 @@ messages.get("/rooms/:roomId", async (c) => {
     return c.json({ message: "Room not found." }, 404);
   }
 
-  // Check if user is a direct participant
-  const isDirectParticipant = room.users.some((participant) => participant.userId === auth.userId);
-
-  // Check if user is part of any organization that participates in this room
-  let isOrganizationMember = false;
-  if (room.organizations.length > 0) {
-    for (const orgParticipant of room.organizations) {
-      const isMember = await checkMembership(auth.userId, orgParticipant.organizationId);
-      if (isMember) {
-        isOrganizationMember = true;
-        break;
-      }
-    }
-  }
-
-  if (!isDirectParticipant && !isOrganizationMember) {
+  if (!(await canAccessRoom(room, auth.userId, checkMembership))) {
     return c.json({ message: "You are not a participant in this room." }, 403);
   }
 
@@ -386,6 +385,14 @@ messages.get("/rooms/:roomId", async (c) => {
 
 // Enable communication via Durable Objects
 messages.get("/rooms/:roomId/connect", async (c) => {
+  const auth = getAuth(c);
+  if (!auth.userId) return c.json({ message: "Unauthorized." }, 401);
+
+  const origin = c.req.header("Origin");
+  if (!isSameOrigin(origin, c.req.url)) {
+    return c.json({ message: "Invalid origin." }, 403);
+  }
+
   const roomId = c.req.param("roomId");
 
   const room = await database.query.messageRoom.findFirst({
@@ -395,15 +402,25 @@ messages.get("/rooms/:roomId/connect", async (c) => {
     columns: {
       id: true,
     },
+    with: {
+      users: { columns: { userId: true } },
+      organizations: { columns: { organizationId: true } },
+    },
   });
 
   if (!room) {
     return c.json({ message: "Room not found." }, 404);
   }
+  if (!(await canAccessRoom(room, auth.userId, checkMembership))) {
+    return c.json({ message: "You are not a participant in this room." }, 403);
+  }
 
   const id = c.env.MESSENGER.idFromName(room.id);
   const stub = c.env.MESSENGER.get(id);
-  return stub.fetch(c.req.raw);
+  const request = new Request(c.req.raw);
+  request.headers.set("X-Initiate-User-Id", auth.userId);
+  request.headers.set("X-Initiate-Room-Id", room.id);
+  return stub.fetch(request);
 });
 
 // AI chat summary route

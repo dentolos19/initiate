@@ -34,7 +34,7 @@ export default function SearchOrganizations() {
       .finally(() => {
         setLoading(false);
       });
-  }, [query]);
+  }, [query, backend.organization]);
 
   if (loading) {
     return (

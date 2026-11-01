@@ -219,14 +219,11 @@ aiChat.post("/chat", async (c) => {
               }),
             ]);
 
-            const totalRevenueCents = paidInvoices.reduce(
-              (sum: number, invoice: any) => sum + (invoice.amount || 0),
-              0,
-            );
+            const totalRevenueCents = paidInvoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
             const totalOrders = orders.length;
-            const pendingOrders = orders.filter((o: any) => o.status === "pending").length;
-            const confirmedOrders = orders.filter((o: any) => o.status === "confirmed").length;
-            const completedOrders = orders.filter((o: any) => o.status === "completed").length;
+            const pendingOrders = orders.filter((o) => o.status === "pending").length;
+            const confirmedOrders = orders.filter((o) => o.status === "confirmed").length;
+            const completedOrders = orders.filter((o) => o.status === "completed").length;
 
             return {
               organizationName: organization.name,
@@ -258,9 +255,10 @@ aiChat.post("/chat", async (c) => {
             const auth = getAuth(c);
             if (!auth?.userId) return { error: "User must be logged in to view notifications" };
 
-            const whereClause: any = { userId: auth.userId };
-            if (filter === "inbox") whereClause.isArchived = false;
-            else if (filter === "archived") whereClause.isArchived = true;
+            const whereClause = {
+              userId: auth.userId,
+              ...(filter === "inbox" ? { isArchived: false } : filter === "archived" ? { isArchived: true } : {}),
+            };
 
             const notifications = await database.query.notification.findMany({
               where: whereClause,
@@ -295,11 +293,10 @@ aiChat.post("/chat", async (c) => {
             const auth = getAuth(c);
             if (!auth?.userId) return { error: "User must be logged in to check messages" };
 
-            const whereClause: any = { OR: [{ userId: auth.userId }] };
-            if (unreadOnly) {
-              whereClause.isRead = false;
-              whereClause.userId = auth.userId;
-            }
+            const whereClause = {
+              OR: [{ userId: auth.userId }],
+              ...(unreadOnly ? { isRead: false, userId: auth.userId } : {}),
+            };
 
             const messages = await database.query.message.findMany({
               where: whereClause,
@@ -307,7 +304,7 @@ aiChat.post("/chat", async (c) => {
               orderBy: { createdAt: "desc" },
               with: { user: { columns: { firstName: true, lastName: true } } },
             });
-            return messages.map((m: any) => ({
+            return messages.map((m) => ({
               id: m.id,
               content: m.content.substring(0, 100) + (m.content.length > 100 ? "..." : ""),
               senderName: m.user ? `${m.user.firstName} ${m.user.lastName ?? ""}`.trim() : undefined,
@@ -335,8 +332,7 @@ aiChat.post("/chat", async (c) => {
             const auth = getAuth(c);
             if (!auth?.userId) return { error: "User must be logged in to view orders" };
 
-            const whereClause: any = { userId: auth.userId };
-            if (status !== "all") whereClause.status = status;
+            const whereClause = { userId: auth.userId, ...(status !== "all" ? { status } : {}) };
 
             const orders = await database.query.order.findMany({
               where: whereClause,
@@ -423,7 +419,7 @@ aiChat.post("/chat", async (c) => {
                 likes: s.likes,
                 orders: s.orders,
                 verified: s.verified,
-                relevanceScore: (s as any).relevanceScore,
+                relevanceScore: s.relevanceScore,
               })),
             };
           } catch (error) {

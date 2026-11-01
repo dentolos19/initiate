@@ -21,7 +21,7 @@ export default function Layout(props: LayoutProps) {
     return () => {
       showAdvisorButton();
     };
-  }, []);
+  }, [hideAdvisorButton, showAdvisorButton]);
 
   return props.children;
 }

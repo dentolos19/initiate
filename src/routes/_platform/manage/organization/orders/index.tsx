@@ -91,7 +91,7 @@ export default function Page() {
       });
   }
 
-  useEffect(loadOrders, [organization, filter]);
+  useEffect(loadOrders, [organization, filter, backend.organization]);
 
   return (
     <div className={"flex h-full flex-col"}>

@@ -50,7 +50,7 @@ function NestedLayout(props: LayoutProps) {
     };
 
     loadTopics();
-  }, []);
+  }, [backend.community]);
 
   return (
     <>

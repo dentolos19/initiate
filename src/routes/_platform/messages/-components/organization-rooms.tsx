@@ -36,7 +36,7 @@ export default function OrganizationRooms() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [backend.messages]);
 
   if (loading) {
     return <div className="p-4">Loading…</div>;

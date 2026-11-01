@@ -23,7 +23,7 @@ export default function Layout(props: LayoutProps) {
     if (loading) return;
     if (user?.type === "admin") return;
     router.push("/manage");
-  }, [loading, user]);
+  }, [loading, user, router]);
 
   if (loading) {
     return <Loading />;

@@ -48,7 +48,7 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return userSchema.parse(response);
     },
 
-    updateUser: async (id: "current" | string, data: any): Promise<User> => {
+    updateUser: async (id: "current" | string, data: Record<string, unknown>): Promise<User> => {
       const response = await primitives.put(`/user/${id}`, data);
       return userSchema.parse(response);
     },

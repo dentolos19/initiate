@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { getSession } from "#/lib/auth/auth.functions";
@@ -13,7 +13,6 @@ import { LayoutProps } from "#/types";
 
 interface MessagesContextType {
   refreshRooms: () => void;
-  updateRoomWithMessage: (roomId: string, message: any) => void;
 }
 
 const MessagesContext = createContext<MessagesContextType | null>(null);
@@ -56,24 +55,19 @@ export default function Layout(props: LayoutProps) {
     router.replace(`${pathname}?${params.toString()}`);
   }
 
-  const refreshRooms = () => {
+  const refreshRooms = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
-  };
-
-  const updateRoomWithMessage = (_roomId: string, _message: any) => {
-    // Trigger a refresh when a new message is sent
-    refreshRooms();
-  };
+  }, []);
 
   useEffect(() => {
     hideAdvisorButton();
     return () => {
       showAdvisorButton();
     };
-  }, []);
+  }, [hideAdvisorButton, showAdvisorButton]);
 
   return (
-    <MessagesContext.Provider value={{ refreshRooms, updateRoomWithMessage }}>
+    <MessagesContext.Provider value={{ refreshRooms }}>
       <div className={"absolute inset-0 flex h-screen pt-16"}>
         <aside
           className={cn(

@@ -36,6 +36,7 @@ export default function Page() {
   const [serviceLiked, setServiceLiked] = useState<boolean>(false);
   const [servicePlans, setPlans] = useState<ServicePlan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string>();
+  const [loadedFor, setLoadedFor] = useState<{ id: string; backend: typeof backend.service }>();
 
   async function handleOrder() {
     if (!session.user) {
@@ -91,26 +92,43 @@ export default function Page() {
   }
 
   useEffect(() => {
-    Promise.all([
-      backend.service.getService(id).then((service) => {
-        setService(service);
-        setServiceLiked(service.isLiked);
-      }),
-      backend.service.getServicePlans(id).then((plans) => {
-        setPlans(plans);
-        if (plans.length > 0) setSelectedPlanId(plans[0].id);
-      }),
+    let active = true;
+    setLoading(true);
+    setService(undefined);
+    setPlans([]);
+    setSelectedPlanId(undefined);
+    Promise.allSettled([
+      backend.service.getService(id),
+      backend.service.getServicePlans(id),
     ])
-      .catch((error: Error) => {
-        console.error(error);
-        toast.error(error.message);
+      .then(([serviceResult, plansResult]) => {
+        if (!active) return;
+        if (serviceResult.status === "fulfilled") {
+          setService(serviceResult.value);
+          setServiceLiked(serviceResult.value.isLiked);
+        } else {
+          console.error(serviceResult.reason);
+          toast.error(serviceResult.reason instanceof Error ? serviceResult.reason.message : "Could not load service.");
+        }
+        if (plansResult.status === "fulfilled") {
+          setPlans(plansResult.value);
+          setSelectedPlanId(plansResult.value[0]?.id);
+        } else {
+          console.error(plansResult.reason);
+          toast.error(plansResult.reason instanceof Error ? plansResult.reason.message : "Could not load plans.");
+        }
       })
       .finally(() => {
+        if (!active) return;
+        setLoadedFor({ id, backend: backend.service });
         setLoading(false);
       });
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [backend.service, id]);
 
-  if (loading) {
+  if (loading || loadedFor?.id !== id || loadedFor.backend !== backend.service) {
     return <Loading />;
   }
 

@@ -3,7 +3,6 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { drizzle } from "drizzle-orm/d1";
 
 import { relations } from "#/lib/database/relations";
-import { generateEmbedding } from "#/lib/server/lib/embeddings";
 
 type DatabaseContext = {
   database: AppDatabase;
@@ -57,6 +56,7 @@ export async function searchEmbeddings(tableName: string, vector: number[], page
 }
 
 export async function searchRecords(tableName: string, query: string, page = 1, limit = 10) {
+  const { generateEmbedding } = await import("#/lib/server/lib/embeddings");
   const embedding = await generateEmbedding(query);
   return searchEmbeddings(tableName, embedding.vector, page, limit);
 }

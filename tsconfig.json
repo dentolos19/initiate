@@ -1,6 +1,5 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["src/instrumentation-client.ts"],
+  "include": ["src", "scripts", "tests", "*.config.ts", ".cloudflare/types"],
   "compilerOptions": {
     "target": "es2023",
     "lib": ["dom", "dom.iterable", "es2023"],
@@ -11,14 +10,11 @@
     "paths": {
       "#/*": ["./src/*"]
     },
-    "types": ["vite/client"],
+    "types": ["bun", "vite/client"],
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": false,
     "skipLibCheck": true,
     "noEmit": true,
     "noImplicitAny": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   }
 }

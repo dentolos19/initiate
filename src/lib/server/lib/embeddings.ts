@@ -46,7 +46,7 @@ export async function generateEmbedding(text: string): Promise<Embedding> {
   };
 }
 
-export async function generateEmbeddings(...texts: any[]): Promise<Embedding[]> {
+export async function generateEmbeddings(...texts: unknown[]): Promise<Embedding[]> {
   const inputs = texts
     .filter((text): text is string => typeof text === "string")
     .map((text) => text.replace(/\n/g, " "))
@@ -74,7 +74,7 @@ export async function aggregateEmbeddings(embeddings: Embedding[]): Promise<Embe
   };
 }
 
-export async function indexEmbeddings(index: (vector: number[]) => Promise<void>, ...texts: any[]) {
+export async function indexEmbeddings(index: (vector: number[]) => Promise<void>, ...texts: unknown[]) {
   try {
     const embeddings = await generateEmbeddings(...texts);
     if (!embeddings.length) return;

@@ -48,9 +48,9 @@ export default function InvoiceTable({ invoices, loading, emptyMessage }: Invoic
               <TableCell className={"font-mono text-sm"}>{invoice.reference}</TableCell>
               <TableCell>
                 <div className={"space-y-1"}>
-                  <div className={"font-medium"}>{(invoice as any).order?.service?.name || "Unknown Service"}</div>
+                  <div className={"font-medium"}>{invoice.order?.service?.name || "Unknown Service"}</div>
                   <div className={"text-muted-foreground text-sm"}>
-                    {(invoice as any).order?.service?.organization?.name || "Unknown Organization"}
+                    {invoice.order?.service?.organization?.name || "Unknown Organization"}
                   </div>
                 </div>
               </TableCell>
@@ -58,7 +58,7 @@ export default function InvoiceTable({ invoices, loading, emptyMessage }: Invoic
               <TableCell>
                 <Badge variant={"outline"}>{getLabel(invoiceStatus, invoice.status, "Unknown")}</Badge>
               </TableCell>
-              <TableCell>{formatDate((invoice as any).createdAt || new Date())}</TableCell>
+              <TableCell>{formatDate(invoice.createdAt || new Date())}</TableCell>
               <TableCell>
                 <div className={"flex gap-2"}>
                   {/* Pay Invoice */}

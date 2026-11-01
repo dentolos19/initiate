@@ -66,7 +66,7 @@ export default function DocumentationPage() {
     };
 
     fetchDocumentation();
-  }, [docId, isNew]);
+  }, [docId, isNew, backend.resources, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

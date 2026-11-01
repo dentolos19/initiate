@@ -36,6 +36,7 @@ export default function ReviewDialog(props: {
 }) {
   const backend = useBackend();
   const form = useForm({ resolver: zodResolver(schema) });
+  const { reset } = form;
 
   function createSubmitHandler() {
     return form.handleSubmit((values) => {
@@ -64,12 +65,12 @@ export default function ReviewDialog(props: {
     if (!props.open) return;
 
     const reviewData = props.data.data;
-    form.reset({
+    reset({
       title: reviewData?.title || "",
       message: reviewData?.message || "",
       stars: reviewData?.stars || 3,
     });
-  }, [props.open, props.data.data]);
+  }, [props.open, props.data.data, reset]);
 
   return (
     <Form form={form} onSubmit={createSubmitHandler()}>
