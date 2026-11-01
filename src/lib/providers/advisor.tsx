@@ -1,5 +1,6 @@
 import { BotMessageSquareIcon } from "lucide-react";
-import { createContext, useContext, useState } from "react";
+import type { UIMessage } from "ai";
+import { createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 
 import AdvisorDialog from "#/components/advisor-dialog";
@@ -21,7 +22,7 @@ const AdvisorContext = createContext<{
   showAdvisorDialogWithVoice: () => void;
   generateSummaryAndApply: (callback?: (summary: string) => void) => Promise<void>;
   askAdvisorWithSummaryCallback: (message?: string, callback?: (summary: string) => void) => void;
-  messages: any[];
+  messages: UIMessage[];
 }>({
   askAdvisor: () => {},
   showAdvisorButton: () => {},
@@ -70,13 +71,13 @@ export default function AdvisorProvider(props: LayoutProps) {
     }
   }
 
-  function showAdvisorButton() {
+  const showAdvisorButton = useCallback(() => {
     setButtonVisible(true);
-  }
+  }, []);
 
-  function hideAdvisorButton() {
+  const hideAdvisorButton = useCallback(() => {
     setButtonVisible(false);
-  }
+  }, []);
 
   function showAdvisorPopover() {
     setPopoverOpen(true);

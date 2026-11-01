@@ -54,7 +54,7 @@ export default function AppProfile() {
         console.error(error);
         toast.error(error.message);
       });
-  }, [user, organization]);
+  }, [user, organization, backend.user]);
 
   return (
     <DropdownMenu>

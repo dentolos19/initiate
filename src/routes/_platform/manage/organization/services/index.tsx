@@ -58,7 +58,7 @@ export default function Page() {
       });
   }
 
-  useEffect(loadServices, [organization]);
+  useEffect(loadServices, [organization, backend.organization]);
 
   const filteredServices = services.filter((service) => {
     const searchLower = searchTerm.toLowerCase();

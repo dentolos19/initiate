@@ -18,14 +18,16 @@ interface PromptContextValue {
   message: (message: string, title?: string) => Promise<void>;
 }
 
-interface DialogState {
+type DialogState = {
   isOpen: boolean;
-  type: "confirm" | "prompt" | "message";
   title: string;
   message: string;
   defaultValue?: string;
-  resolve: (value: any) => void;
-}
+} & (
+  | { type: "confirm"; resolve: (value: boolean) => void }
+  | { type: "prompt"; resolve: (value: string | null) => void }
+  | { type: "message"; resolve: () => void }
+);
 
 const PromptContext = createContext<PromptContextValue | undefined>(undefined);
 
@@ -90,6 +92,7 @@ export function PromptProvider({ children }: PromptProviderProps) {
   }, []);
 
   const handleConfirm = useCallback(() => {
+    if (dialogState.type !== "confirm") return;
     dialogState.resolve(true);
     setDialogState({ ...dialogState, isOpen: false });
   }, [dialogState]);
@@ -100,18 +103,20 @@ export function PromptProvider({ children }: PromptProviderProps) {
     } else if (dialogState.type === "prompt") {
       dialogState.resolve(null);
     } else {
-      dialogState.resolve(undefined);
+      dialogState.resolve();
     }
     setDialogState({ ...dialogState, isOpen: false });
   }, [dialogState]);
 
   const handlePromptSubmit = useCallback(() => {
+    if (dialogState.type !== "prompt") return;
     dialogState.resolve(inputValue);
     setDialogState({ ...dialogState, isOpen: false });
   }, [dialogState, inputValue]);
 
   const handleMessageOk = useCallback(() => {
-    dialogState.resolve(undefined);
+    if (dialogState.type !== "message") return;
+    dialogState.resolve();
     setDialogState({ ...dialogState, isOpen: false });
   }, [dialogState]);
 

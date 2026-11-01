@@ -28,22 +28,8 @@ export default function Page() {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [order, setOrder] = useState<Order>();
-
-  const loadOrder = () => {
-    setLoading(true);
-    backend.orders
-      .getOrder(id)
-      .then((order) => {
-        setOrder(order);
-      })
-      .catch((error: Error) => {
-        console.error(error);
-        toast.error(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  const [loadedFor, setLoadedFor] = useState<{ id: string; backend: typeof backend.orders }>();
+  const [revision, setRevision] = useState(0);
 
   const handlePropose = async () => {
     if (!(await confirm("Are you sure you want to propose this order to the buyer?"))) return;
@@ -52,7 +38,7 @@ export default function Page() {
       backend.orders
         .proposeOrder(id)
         .then((order) => {
-          setOrder(order);
+          setOrder((current) => current?.id === order.id ? order : current);
           toast.success("Order sent to buyer!");
         })
         .catch((error: Error) => {
@@ -68,8 +54,8 @@ export default function Page() {
       "Accepting order…",
       backend.orders
         .confirmOrder(id)
-        .then(() => {
-          setOrder(order);
+        .then((order) => {
+          setOrder((current) => current?.id === order.id ? order : current);
           toast.success("Order accepted successfully.");
         })
         .catch((error: Error) => {
@@ -86,7 +72,7 @@ export default function Page() {
       backend.orders
         .cancelOrder(id)
         .then((order) => {
-          setOrder(order);
+          setOrder((current) => current?.id === order.id ? order : current);
           toast.success("Order rejected successfully.");
         })
         .catch((error: Error) => {
@@ -101,7 +87,7 @@ export default function Page() {
     await backend.orders
       .completeOrder(id)
       .then((order) => {
-        setOrder(order);
+        setOrder((current) => current?.id === order.id ? order : current);
         toast.success("Order completed successfully.");
       })
       .catch((error: Error) => {
@@ -110,9 +96,31 @@ export default function Page() {
       });
   };
 
-  useEffect(loadOrder, [id]);
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setOrder(undefined);
+    backend.orders
+      .getOrder(id)
+      .then((order) => {
+        if (active) setOrder(order);
+      })
+      .catch((error: Error) => {
+        if (!active) return;
+        console.error(error);
+        toast.error(error.message);
+      })
+      .finally(() => {
+        if (!active) return;
+        setLoadedFor({ id, backend: backend.orders });
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [id, backend.orders, revision]);
 
-  if (loading) {
+  if (loading || loadedFor?.id !== id || loadedFor.backend !== backend.orders) {
     return (
       <div className={"my-20"}>
         <LoadingSpinner />
@@ -216,7 +224,7 @@ export default function Page() {
             <TabsTrigger value={"invoices"}>Invoices</TabsTrigger>
           </TabsList>
           <TabsContent value={"overview"}>
-            <OverviewTab order={order} onOrderUpdate={loadOrder} />
+            <OverviewTab order={order} onOrderUpdate={() => setRevision((value) => value + 1)} />
           </TabsContent>
           <TabsContent value={"milestones"}>
             <MilestonesTab order={order} />

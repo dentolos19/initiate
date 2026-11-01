@@ -1,11 +1,11 @@
 import { Form as FormContainer } from "#/components/ui/form";
 import { ComponentProps } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { FieldValues, UseFormReturn } from "react-hook-form";
 
-export default function FormWrapper(props: ComponentProps<"form"> & { form: UseFormReturn<any> }) {
+export default function FormWrapper<T extends FieldValues>({ form, children, ...props }: ComponentProps<"form"> & { form: UseFormReturn<T> }) {
   return (
-    <FormContainer {...props.form}>
-      <form {...props}>{props.children}</form>
+    <FormContainer {...form}>
+      <form {...props}>{children}</form>
     </FormContainer>
   );
 }

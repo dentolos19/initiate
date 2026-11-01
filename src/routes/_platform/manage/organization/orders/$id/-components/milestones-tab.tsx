@@ -48,9 +48,9 @@ export default function MilestonesTab(props: { order: Order }) {
       const updatedMilestone = await backend.orders.updateOrderMilestoneStatus(props.order.id, milestone.id, newStatus);
       setMilestones((prev) => prev.map((m) => (m.id === updatedMilestone.id ? updatedMilestone : m)));
       toast.success("Milestone status updated.");
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Could not update milestone.");
     }
   }
 
@@ -63,9 +63,9 @@ export default function MilestonesTab(props: { order: Order }) {
       await backend.orders.deleteOrderMilestone(props.order.id, milestone.id);
       setMilestones((prev) => prev.filter((m) => m.id !== milestone.id));
       toast.success("Milestone deleted successfully.");
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Could not delete milestone.");
     }
   }
 
@@ -90,7 +90,7 @@ export default function MilestonesTab(props: { order: Order }) {
       .finally(() => {
         setLoading(false);
       });
-  }, [props.order.id]);
+  }, [props.order.id, backend.orders]);
 
   if (loading) {
     return (

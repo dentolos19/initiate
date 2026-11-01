@@ -104,7 +104,7 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
       const { result, similarityScore } = await backend.ai.getGrantSuitability(grant);
       setSummaryText(result);
       setSimilarityScore(similarityScore || 0);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error getting AI result:", err);
       toast.error("Failed to analyze grant suitability. Please try again.");
       setSummaryText("Failed to get AI analysis. Please try again later.");

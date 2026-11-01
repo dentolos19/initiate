@@ -108,12 +108,12 @@ export default function mapConnectors(primitives: BackendPrimitives) {
 
     // Invoices
 
-    createOrderInvoice: async (orderId: string, data: any): Promise<OrderInvoice> => {
+    createOrderInvoice: async (orderId: string, data: Record<string, unknown>): Promise<OrderInvoice> => {
       const response = await primitives.post(`/orders/${orderId}/invoices`, data);
       return orderInvoiceSchema.parse(response);
     },
 
-    updateOrderInvoice: async (invoiceId: string, data: any): Promise<OrderInvoice> => {
+    updateOrderInvoice: async (invoiceId: string, data: Record<string, unknown>): Promise<OrderInvoice> => {
       const response = await primitives.put(`/orders/invoices/${invoiceId}`, data);
       return orderInvoiceSchema.parse(response);
     },
@@ -139,12 +139,12 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return orderMilestoneSchema.parse(response);
     },
 
-    createOrderMilestone: async (orderId: string, data: any): Promise<OrderMilestone> => {
+    createOrderMilestone: async (orderId: string, data: Record<string, unknown>): Promise<OrderMilestone> => {
       const response = await primitives.post(`/orders/${orderId}/milestones`, data);
       return orderMilestoneSchema.parse(response);
     },
 
-    updateOrderMilestone: async (orderId: string, milestoneId: string, data: any): Promise<OrderMilestone> => {
+    updateOrderMilestone: async (orderId: string, milestoneId: string, data: Record<string, unknown>): Promise<OrderMilestone> => {
       const response = await primitives.put(`/orders/${orderId}/milestones/${milestoneId}`, data);
       return orderMilestoneSchema.parse(response);
     },

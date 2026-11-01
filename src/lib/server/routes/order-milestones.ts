@@ -3,8 +3,9 @@ import { Hono } from "hono";
 import z from "zod";
 
 import { orderMilestone } from "#/lib/database/schema.js";
+import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database } from "#/lib/server/integrations/database.js";
-import { getUser } from "#/lib/server/lib/utils.js";
+import { getOrderAccess } from "#/lib/server/lib/order-access.js";
 
 const orderMilestones = new Hono();
 
@@ -12,12 +13,14 @@ const orderMilestones = new Hono();
 orderMilestones.post("/:orderId/milestones", async (c) => {
   const orderId = c.req.param("orderId");
 
-  const user = await getUser(c);
-  const body = await c.req.json();
-
-  if (!user) {
+  if (!getAuth(c).userId) {
     return c.json({ message: "Please login." }, 401);
   }
+  const authorized = await getOrderAccess(c, orderId);
+  if (!authorized) return c.json({ message: "Order not found." }, 404);
+  if (!authorized.access.provider && !authorized.access.admin) return c.json({ message: "Unauthorized." }, 403);
+
+  const body = await c.req.json();
 
   const { success, data } = z
     .object({
@@ -74,11 +77,10 @@ orderMilestones.post("/:orderId/milestones", async (c) => {
 orderMilestones.get("/:orderId/milestones", async (c) => {
   const orderId = c.req.param("orderId");
 
-  const user = await getUser(c);
-
-  if (!user) {
+  if (!getAuth(c).userId) {
     return c.json({ message: "Please login." }, 401);
   }
+  if (!(await getOrderAccess(c, orderId))) return c.json({ message: "Order not found." }, 404);
 
   const order = await database.query.order.findFirst({
     where: { id: orderId },
@@ -115,11 +117,10 @@ orderMilestones.get("/:orderId/milestones/:milestoneId", async (c) => {
   const orderId = c.req.param("orderId");
   const milestoneId = c.req.param("milestoneId");
 
-  const user = await getUser(c);
-
-  if (!user) {
+  if (!getAuth(c).userId) {
     return c.json({ message: "Please login." }, 401);
   }
+  if (!(await getOrderAccess(c, orderId))) return c.json({ message: "Order not found." }, 404);
 
   const milestone = await database.query.orderMilestone.findFirst({
     where: {
@@ -152,11 +153,12 @@ orderMilestones.put("/:orderId/milestones/:milestoneId", async (c) => {
   const orderId = c.req.param("orderId");
   const milestoneId = c.req.param("milestoneId");
 
-  const user = await getUser(c);
-
-  if (!user) {
+  if (!getAuth(c).userId) {
     return c.json({ message: "Please login." }, 401);
   }
+  const authorized = await getOrderAccess(c, orderId);
+  if (!authorized) return c.json({ message: "Order not found." }, 404);
+  if (!authorized.access.provider && !authorized.access.admin) return c.json({ message: "Unauthorized." }, 403);
 
   const body = await c.req.json();
 
@@ -220,11 +222,12 @@ orderMilestones.patch("/:orderId/milestones/:milestoneId", async (c) => {
   const orderId = c.req.param("orderId");
   const milestoneId = c.req.param("milestoneId");
 
-  const user = await getUser(c);
-
-  if (!user) {
+  if (!getAuth(c).userId) {
     return c.json({ message: "Please login." }, 401);
   }
+  const authorized = await getOrderAccess(c, orderId);
+  if (!authorized) return c.json({ message: "Order not found." }, 404);
+  if (!authorized.access.provider && !authorized.access.admin) return c.json({ message: "Unauthorized." }, 403);
 
   const body = await c.req.json();
 
@@ -269,11 +272,12 @@ orderMilestones.delete("/:orderId/milestones/:milestoneId", async (c) => {
   const orderId = c.req.param("orderId");
   const milestoneId = c.req.param("milestoneId");
 
-  const user = await getUser(c);
-
-  if (!user) {
+  if (!getAuth(c).userId) {
     return c.json({ message: "Please login." }, 401);
   }
+  const authorized = await getOrderAccess(c, orderId);
+  if (!authorized) return c.json({ message: "Order not found." }, 404);
+  if (!authorized.access.provider && !authorized.access.admin) return c.json({ message: "Unauthorized." }, 403);
 
   const milestone = await database.query.orderMilestone.findFirst({
     where: {

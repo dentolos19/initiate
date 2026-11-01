@@ -19,18 +19,21 @@ import mapConnectors_service from "#/lib/backend/connectors/service";
 import mapConnectors_user from "#/lib/backend/connectors/user";
 
 export interface BackendPrimitives {
-  get: (endpoint: string) => Promise<any>;
-  post: (endpoint: string, data?: any) => Promise<any>;
-  put: (endpoint: string, data?: any) => Promise<any>;
-  patch: (endpoint: string, data?: any) => Promise<any>;
-  delete: (endpoint: string) => Promise<any>;
+  get: (endpoint: string) => Promise<unknown>;
+  post: (endpoint: string, data?: unknown) => Promise<unknown>;
+  put: (endpoint: string, data?: unknown) => Promise<unknown>;
+  patch: (endpoint: string, data?: unknown) => Promise<unknown>;
+  delete: (endpoint: string) => Promise<unknown>;
   fetch: (info: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
 async function parseResponse(res: Response) {
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error((error as any).message || "Failed to request from backend.");
+    const error: unknown = await res.json();
+    const message = typeof error === "object" && error !== null && "message" in error && typeof error.message === "string"
+      ? error.message
+      : "Failed to request from backend.";
+    throw new Error(message);
   }
   return res.json();
 }
@@ -62,7 +65,7 @@ export function generatePrimitives(session: BackendSession) {
     return response.body;
   }
 
-  async function call(info: RequestInfo, init?: RequestInit) {
+  async function call(info: RequestInfo | URL, init?: RequestInit) {
     const injectedInit = {
       ...init,
       headers: {
@@ -94,44 +97,34 @@ export function generatePrimitives(session: BackendSession) {
     return callServer(endpoint, "GET");
   }
 
-  async function post(endpoint: string, data?: any) {
+  async function post(endpoint: string, data?: unknown) {
     if (!(data instanceof FormData)) return callServer(endpoint, "POST", data);
     const response = await call(`${BACKEND_URL}${endpoint}`, {
       method: "POST",
-      headers: {
-        ...(data instanceof FormData ? {} : { "Content-Type": "application/json" }),
-      },
-      body: data instanceof FormData ? data : JSON.stringify(data),
+      body: data,
     });
     return parseResponse(response);
   }
 
-  async function put(endpoint: string, data?: any) {
+  async function put(endpoint: string, data?: unknown) {
     if (!(data instanceof FormData)) return callServer(endpoint, "PUT", data);
     const response = await call(`${BACKEND_URL}${endpoint}`, {
       method: "PUT",
-      headers: {
-        ...(data instanceof FormData ? {} : { "Content-Type": "application/json" }),
-      },
-      body: data instanceof FormData ? data : JSON.stringify(data),
+      body: data,
     });
     return parseResponse(response);
   }
 
-  async function patch(endpoint: string, data?: any) {
+  async function patch(endpoint: string, data?: unknown) {
     if (!(data instanceof FormData)) return callServer(endpoint, "PATCH", data);
     const res = await call(`${BACKEND_URL}${endpoint}`, {
       method: "PATCH",
-      headers: {
-        ...(await fetchHeaders(session)),
-        ...(data instanceof FormData ? {} : { "Content-Type": "application/json" }),
-      },
-      body: data instanceof FormData ? data : JSON.stringify(data),
+      body: data,
     });
     return parseResponse(res);
   }
 
-  async function del(endpoint: string, data?: any) {
+  async function del(endpoint: string, data?: unknown) {
     return callServer(endpoint, "DELETE", data);
   }
 
@@ -142,7 +135,7 @@ export function generatePrimitives(session: BackendSession) {
     put,
     patch,
     delete: del,
-  } as BackendPrimitives;
+  } satisfies BackendPrimitives;
 }
 
 export function generateMappings(primitives: BackendPrimitives) {

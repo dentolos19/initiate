@@ -57,7 +57,7 @@ export default function Page() {
       .finally(() => {
         setServiceLoading(false);
       });
-  }, [query]);
+  }, [query, backend.market]);
 
   return (
     <div className={"w-full space-y-2 p-4 sm:p-6"}>

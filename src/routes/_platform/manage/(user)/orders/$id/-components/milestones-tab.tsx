@@ -40,7 +40,7 @@ export default function MilestonesTab(props: { order: Order }) {
       .finally(() => {
         setLoading(false);
       });
-  }, [props.order.id]);
+  }, [props.order.id, backend.orders]);
 
   if (loading) {
     return (

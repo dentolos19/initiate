@@ -40,7 +40,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }, [tab]);
+  }, [tab, backend.notifications]);
 
   const handleArchiveNotification = (notificationId: string) => {
     setArchiving(notificationId);

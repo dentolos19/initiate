@@ -30,7 +30,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [backend.community]);
 
   return (
     <div className={"w-full p-4"}>

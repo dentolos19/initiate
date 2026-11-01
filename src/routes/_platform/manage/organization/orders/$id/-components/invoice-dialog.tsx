@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SaveIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -40,8 +40,9 @@ export default function InvoiceDialog(props: {
 
   const [milestones, setMilestones] = useState<OrderMilestone[]>([]);
   const form = useForm({ resolver: zodResolver(schema) });
+  const { reset } = form;
 
-  function loadMilestones() {
+  const loadMilestones = useCallback(() => {
     backend.orders
       .getOrderMilestones(props.data.orderId)
       .then((milestones) => {
@@ -51,7 +52,7 @@ export default function InvoiceDialog(props: {
         console.error(error);
         toast.error(error.message);
       });
-  }
+  }, [backend.orders, props.data.orderId]);
 
   function createSubmitHandler() {
     return form.handleSubmit(async (values) => {
@@ -99,27 +100,27 @@ export default function InvoiceDialog(props: {
 
   useEffect(() => {
     if (props.data.invoice) {
-      form.reset({
+      reset({
         currency: props.data.invoice.currency || "sgd",
         amount: props.data.invoice.amount / 100,
         description: props.data.invoice.description || "",
         milestoneId: props.data.invoice.milestoneId || "none",
       });
     } else {
-      form.reset({
+      reset({
         currency: "sgd",
         amount: 0,
         description: "",
         milestoneId: "none",
       });
     }
-  }, [props.data.invoice]);
+  }, [props.data.invoice, reset]);
 
   useEffect(() => {
     if (props.open) {
       loadMilestones();
     }
-  }, [props.open]);
+  }, [props.open, loadMilestones]);
 
   return (
     <FormWrapper form={form} onSubmit={createSubmitHandler()}>

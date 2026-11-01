@@ -36,7 +36,7 @@ export default function GrantsTab() {
     };
 
     fetchGrants();
-  }, []);
+  }, [backend.resources]);
 
   // Filter and search logic
   useEffect(() => {

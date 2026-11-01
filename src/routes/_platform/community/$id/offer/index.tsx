@@ -15,6 +15,7 @@ import { Input } from "#/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select";
 import FormWrapper from "#/components/ui/wrappers/form";
 import useBackend from "#/lib/backend/client";
+import type { CommunityPost } from "#/lib/backend/connectors/community";
 import { Organization } from "#/lib/backend/schema";
 import { useParams, useRouter, useSearchParams } from "#/lib/router";
 import { notifyLoading } from "#/lib/utils";
@@ -35,13 +36,14 @@ export default function Page() {
   const params = useParams();
   const searchParams = useSearchParams();
   const form = useForm({ resolver: zodResolver(schema) });
+  const { reset } = form;
 
   const postId = params.id as string;
   const proposalId = searchParams.get("edit");
   const mode = proposalId ? "update" : "create";
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [post, setPost] = useState<any>(null);
+  const [post, setPost] = useState<CommunityPost | null>(null);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
 
   const handleSubmit = form.handleSubmit(async (data) => {
@@ -70,7 +72,7 @@ export default function Page() {
 
   useEffect(() => {
     setLoading(true);
-    form.reset({
+    reset({
       title: "",
       description: "",
       duration: 1,
@@ -93,7 +95,7 @@ export default function Page() {
         ? backend.community.getProposals(postId).then((proposals) => {
             const proposal = proposals.find((proposal) => proposal.id === proposalId);
             if (proposal) {
-              form.reset({
+              reset({
                 title: proposal.title,
                 description: proposal.content,
                 duration: proposal.duration ?? 1,
@@ -111,7 +113,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }, [postId, proposalId]);
+  }, [postId, proposalId, backend.community, backend.user, reset, router]);
 
   if (loading) {
     return (

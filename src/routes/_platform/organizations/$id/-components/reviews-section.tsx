@@ -78,7 +78,7 @@ export default function ReviewsSection() {
     }
   }
 
-  useEffect(loadReviews, [id]);
+  useEffect(loadReviews, [id, backend.organization]);
 
   if (loading) {
     return <Loading />;

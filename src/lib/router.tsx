@@ -6,6 +6,7 @@ import {
   useRouter as useTanStackRouter,
 } from "@tanstack/react-router";
 import type { AnchorHTMLAttributes } from "react";
+import { useMemo } from "react";
 
 type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
   href: string;
@@ -20,25 +21,27 @@ export function useRouter() {
   const navigate = useNavigate();
   const router = useTanStackRouter();
 
-  function navigateTo(to: string, replace = false) {
-    const url = new URL(to, window.location.href);
-    const search = Object.fromEntries(url.searchParams.entries());
+  return useMemo(() => {
+    function navigateTo(to: string, replace = false) {
+      const url = new URL(to, window.location.href);
+      const search = Object.fromEntries(url.searchParams.entries());
 
-    return navigate({
-      replace,
-      to: url.pathname as never,
-      search: search as never,
-      hash: url.hash,
-    });
-  }
+      return navigate({
+        replace,
+        to: url.pathname as never,
+        search: search as never,
+        hash: url.hash,
+      });
+    }
 
-  return {
-    back: () => window.history.back(),
-    forward: () => window.history.forward(),
-    push: (to: string) => navigateTo(to),
-    replace: (to: string) => navigateTo(to, true),
-    refresh: () => router.invalidate(),
-  };
+    return {
+      back: () => window.history.back(),
+      forward: () => window.history.forward(),
+      push: (to: string) => navigateTo(to),
+      replace: (to: string) => navigateTo(to, true),
+      refresh: () => router.invalidate(),
+    };
+  }, [navigate, router]);
 }
 
 export function useParams<T extends Record<string, string | undefined> = Record<string, string>>() {
@@ -51,5 +54,6 @@ export function usePathname() {
 }
 
 export function useSearchParams() {
-  return new URLSearchParams(useLocation().search);
+  const search = useLocation().search;
+  return useMemo(() => new URLSearchParams(search), [search]);
 }

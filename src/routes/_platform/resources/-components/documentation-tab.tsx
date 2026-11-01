@@ -25,7 +25,7 @@ export default function DocumentationTab() {
     };
 
     fetchDocs();
-  }, []);
+  }, [backend.resources]);
 
   if (loading) {
     return (

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
 import { EyeIcon, SaveIcon, UsersIcon } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -38,7 +38,8 @@ export const Route = createFileRoute("/_platform/manage/organization/(main)/")({
 
 export default function Page() {
   const backend = useBackend();
-  const { organization, refreshOrganization } = useSession();
+  const { organization, refreshOrganization, loading: sessionLoading } = useSession();
+  const organizationId = organization?.id;
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -53,20 +54,29 @@ export default function Page() {
     },
   });
 
+  const { reset } = form;
+
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadedFor, setLoadedFor] = useState<{ id: string; backend: typeof backend.organization }>();
+  const requestId = useRef(0);
 
   const saveOrganization = form.handleSubmit(async (values) => {
-    if (!organization) return;
+    if (!organization || loadedFor?.id !== organization.id || loadedFor.backend !== backend.organization) return;
+    const currentRequest = requestId.current;
 
     try {
       const updatedOrganization = await backend.organization.updateOrganization(organization.id, values);
+      if (currentRequest !== requestId.current) return;
       await refreshOrganization();
-      form.reset({
+      if (currentRequest !== requestId.current) return;
+      reset({
         ...values,
         name: updatedOrganization.name,
       });
       toast.success("Organization saved.");
     } catch (error) {
+      if (currentRequest !== requestId.current) return;
       console.error(error);
       toast.error(error instanceof Error ? error.message : "Unable to update the organization.");
     }
@@ -75,14 +85,17 @@ export default function Page() {
   function handleBannerUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+    const currentRequest = requestId.current;
 
     backend.assets
       .uploadFile(file)
       .then((data) => {
+        if (currentRequest !== requestId.current) return;
         form.setValue("bannerUrl", "/assets/" + data.id);
         toast.success("Banner uploaded. Save the organization to apply it.");
       })
       .catch((error: Error) => {
+        if (currentRequest !== requestId.current) return;
         console.error(error);
         toast.error(error.message);
       });
@@ -91,24 +104,32 @@ export default function Page() {
   function handleLogoUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+    const currentRequest = requestId.current;
 
     backend.assets
       .uploadFile(file)
       .then((data) => {
+        if (currentRequest !== requestId.current) return;
         form.setValue("imageUrl", "/assets/" + data.id, { shouldDirty: true });
         toast.success("Logo uploaded. Save the organization to apply it.");
       })
       .catch((error: Error) => {
+        if (currentRequest !== requestId.current) return;
         console.error(error);
         toast.error(error.message);
       });
   }
 
   useEffect(() => {
-    if (!organization) return;
+    if (!organizationId) return;
+    let active = true;
+    const request = requestId;
+    request.current++;
     setLoading(true);
-    const loadOrganization = backend.organization.getOrganization(organization.id).then((org) => {
-      form.reset({
+    setLoadFailed(false);
+    const loadOrganization = backend.organization.getOrganization(organizationId).then((org) => {
+      if (!active) return;
+      reset({
         id: org.id,
         imageUrl: org.imageUrl ?? "",
         bannerUrl: org.bannerUrl ?? "",
@@ -121,17 +142,26 @@ export default function Page() {
 
     loadOrganization
       .catch((error: Error) => {
+        if (!active) return;
         console.error(error);
         toast.error(error.message);
+        setLoadFailed(true);
       })
       .finally(() => {
+        if (!active) return;
+        setLoadedFor({ id: organizationId, backend: backend.organization });
         setLoading(false);
       });
-  }, [organization]);
+    return () => {
+      active = false;
+      request.current++;
+    };
+  }, [organizationId, backend.organization, reset]);
 
-  if (loading) {
+  if (sessionLoading || !organizationId || loading || loadedFor?.id !== organizationId || loadedFor.backend !== backend.organization) {
     return <Loading />;
   }
+  if (loadFailed) return <div className={"my-20 text-center"}>Could not load the organization.</div>;
 
   return (
     <PageShell>

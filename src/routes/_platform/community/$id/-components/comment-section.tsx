@@ -96,7 +96,7 @@ export default function CommentSection(props: { data: CommunityPost }) {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [backend.community, props.data.id]);
 
   return (
     <Card>

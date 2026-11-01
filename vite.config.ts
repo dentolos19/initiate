@@ -14,6 +14,7 @@ export default defineConfig({
   },
   plugins: [
     cloudflare({
+      persistState: { path: ".wrangler/state" },
       viteEnvironment: {
         name: "ssr",
       },

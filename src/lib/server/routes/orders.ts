@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
 
@@ -8,12 +8,15 @@ import ServiceCompletedMail from "#/lib/server/components/service-completed-mail
 import ServiceConfirmedMail from "#/lib/server/components/service-confirmed-mail.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database } from "#/lib/server/integrations/database.js";
+import { canChangeOrderStatus, getOrderAccess } from "#/lib/server/lib/order-access.js";
 
 const orders = new Hono();
 
 // Get order
 orders.get("/:id", async (c) => {
   const id = c.req.param("id");
+  if (!getAuth(c).userId) return c.json({ message: "Please login." }, 401);
+  if (!(await getOrderAccess(c, id))) return c.json({ message: "Order not found." }, 404);
 
   const order = await database.query.order.findFirst({
     where: {
@@ -46,12 +49,17 @@ orders.put("/:id", async (c) => {
     return c.json({ message: "Please login." }, 401);
   }
 
+  const id = c.req.param("id");
+  const authorized = await getOrderAccess(c, id);
+  if (!authorized) return c.json({ message: "Order not found." }, 404);
+  if (!authorized.access.provider && !authorized.access.admin) return c.json({ message: "Unauthorized." }, 403);
+
   const body = await c.req.json();
 
   const { success, data } = z
     .object({
       name: z.string().optional(),
-      status: z.string(),
+      status: z.string().optional(),
       description: z.string().optional(),
       instructions: z.string().optional(),
     })
@@ -61,9 +69,17 @@ orders.put("/:id", async (c) => {
     return c.json({ error: "Invalid request body." }, 400);
   }
 
-  const id = c.req.param("id");
+  if (data.status !== undefined && data.status !== authorized.order.status) {
+    return c.json({ message: "Use the order status endpoint to change status." }, 400);
+  }
+  if (data.name === undefined && data.description === undefined && data.instructions === undefined) {
+    return c.json({ message: "No order changes provided." }, 400);
+  }
 
-  await database.update(orderTable).set(data).where(eq(orderTable.id, id));
+  await database
+    .update(orderTable)
+    .set({ name: data.name, description: data.description, instructions: data.instructions })
+    .where(eq(orderTable.id, id));
   const order = await database.query.order.findFirst({
     where: { id },
     with: {
@@ -95,11 +111,15 @@ orders.patch("/:id/status", async (c) => {
     return c.json({ message: "Please login." }, 401);
   }
 
+  const id = c.req.param("id");
+  const authorized = await getOrderAccess(c, id);
+  if (!authorized) return c.json({ message: "Order not found." }, 404);
+
   const body = await c.req.json();
 
   const { success, data } = z
     .object({
-      status: z.string(),
+      status: z.enum(["draft", "pending", "proposed", "confirmed", "completed", "cancelled", "rejected"]),
     })
     .safeParse(body);
 
@@ -107,9 +127,19 @@ orders.patch("/:id/status", async (c) => {
     return c.json({ error: "Invalid request body." }, 400);
   }
 
-  const id = c.req.param("id");
+  if (
+    data.status === authorized.order.status ||
+    !canChangeOrderStatus(authorized.access, authorized.order.status, data.status)
+  ) {
+    return c.json({ message: "This order status change is not allowed." }, 403);
+  }
 
-  await database.update(orderTable).set(data).where(eq(orderTable.id, id));
+  const updated = await database
+    .update(orderTable)
+    .set(data)
+    .where(and(eq(orderTable.id, id), eq(orderTable.status, authorized.order.status)))
+    .returning({ id: orderTable.id });
+  if (!updated.length) return c.json({ message: "Order changed. Please refresh and try again." }, 409);
   const order = await database.query.order.findFirst({
     where: { id },
     with: {
@@ -131,18 +161,10 @@ orders.patch("/:id/status", async (c) => {
   if (order.status === "proposal") {
     // TODO: Send notification to buyer
   } else if (order.status === "confirmed") {
-    const invoices = await database.query.orderInvoice.findMany({
-      where: {
-        orderId: order.id,
-      },
-      columns: { id: true, status: true },
-    });
-
-    await Promise.all(
-      invoices
-        .filter((invoice) => invoice.status === "draft")
-        .map((invoice) => database.update(orderInvoice).set({ status: "open" }).where(eq(orderInvoice.id, invoice.id))),
-    );
+    await database
+      .update(orderInvoice)
+      .set({ status: "open" })
+      .where(and(eq(orderInvoice.orderId, order.id), eq(orderInvoice.status, "draft")));
 
     if (order.user) {
       // Send notification to user
@@ -201,19 +223,10 @@ orders.patch("/:id/status", async (c) => {
       });
     }
   } else if (order.status === "cancelled") {
-    const invoices = await database.query.orderInvoice.findMany({
-      where: {
-        orderId: order.id,
-      },
-      columns: { id: true, status: true },
-    });
-
-    await Promise.all(
-      invoices.map((invoice) => {
-        const status = invoice.status === "paid" ? "refunded" : invoice.status === "refunded" ? "refunded" : "void";
-        return database.update(orderInvoice).set({ status }).where(eq(orderInvoice.id, invoice.id));
-      }),
-    );
+    await database
+      .update(orderInvoice)
+      .set({ status: "void" })
+      .where(and(eq(orderInvoice.orderId, order.id), inArray(orderInvoice.status, ["draft", "open"])));
 
     if (order.user) {
       // Send notification to user
@@ -226,8 +239,6 @@ orders.patch("/:id/status", async (c) => {
           serviceName: order.service?.name ?? "Unknown",
           orderNumber: order.id,
           cancellationReason: undefined, // Can be added if provided
-          refundAmount: order.plan?.amount ? (order.plan.amount / 100).toFixed(2) : undefined,
-          refundTimeline: "3-5 business days", // Standard refund timeline
         }),
       });
     }

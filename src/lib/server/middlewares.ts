@@ -1,6 +1,8 @@
 import { createMiddleware } from "hono/factory";
 
 import { createAuth, getAuth } from "#/lib/server/integrations/auth.js";
+import { createDatabase } from "#/lib/server/integrations/database.js";
+import { resolveOrganizationAccess } from "#/lib/server/lib/organization-access.js";
 
 export function createSessionMiddleware() {
   return createMiddleware<{ Bindings: Env }>(async (c, next) => {
@@ -8,10 +10,23 @@ export function createSessionMiddleware() {
       headers: c.req.raw.headers,
     });
     const requestedOrganizationId = c.req.header("X-Organization-ID");
+    const userId = session?.user.id ?? null;
+    const organization = await resolveOrganizationAccess(
+      userId,
+      requestedOrganizationId,
+      session?.session.activeOrganizationId ?? null,
+      async (userId, organizationId) => Boolean(await createDatabase(c.env.DB).query.authMember.findFirst({
+        where: { userId, organizationId },
+        columns: { id: true },
+      })),
+    );
+    if (organization.denied) {
+      return c.json({ message: "You are not a member of this organization." }, userId ? 403 : 401);
+    }
 
     c.set("auth", {
-      userId: session?.user.id ?? null,
-      orgId: requestedOrganizationId ?? session?.session.activeOrganizationId ?? null,
+      userId,
+      orgId: organization.organizationId,
     });
 
     await next();

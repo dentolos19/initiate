@@ -33,7 +33,7 @@ export default function PlansTab(props: { data: Service }) {
       });
   }
 
-  useEffect(loadPlans, []);
+  useEffect(loadPlans, [backend.service, props.data.id]);
 
   if (loading) {
     return <Loading />;

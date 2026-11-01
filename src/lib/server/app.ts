@@ -104,7 +104,6 @@ app.route("/orders", orderInvoices);
 app.route("/orders", orderMilestones);
 app.route("/orders", orders);
 app.route("/organization", organizationReviews);
-app.route("/organization", organizationReviews);
 app.route("/organization", organizations);
 app.route("/payments", payments);
 app.route("/preferences", preferences);

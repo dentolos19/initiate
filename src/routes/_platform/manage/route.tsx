@@ -159,7 +159,7 @@ function NestedLayout(props: LayoutProps) {
         console.error(error);
         toast.error(error.message);
       });
-  }, [session.user, session.organization]);
+  }, [session.user, session.organization, backend.user]);
 
   if (session.loading) {
     return <Loading />;

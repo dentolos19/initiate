@@ -9,7 +9,6 @@ import {
 import { communityPost } from "#/lib/database/schema.js";
 import { getAuth } from "#/lib/server/integrations/auth.js";
 import { database, insertEmbedding, searchEmbeddings } from "#/lib/server/integrations/database.js";
-import { generateEmbedding, indexEmbeddings } from "#/lib/server/lib/embeddings.js";
 
 export function slugify(text: string) {
   if (!text) return "";
@@ -22,8 +21,8 @@ export function slugify(text: string) {
     .replace(/--+/g, "_");
 }
 
-export function safeParseInt(value: any, fallback: number = 1) {
-  const parsed = parseInt(value, 10);
+export function safeParseInt(value: string | undefined, fallback: number = 1) {
+  const parsed = parseInt(value ?? "", 10);
   return isNaN(parsed) ? fallback : parsed;
 }
 
@@ -57,7 +56,7 @@ export async function getOrganization(context: Context) {
 }
 
 export function getOrganizationId(context: Context) {
-  return context.req.header("X-Organization-Id") ?? getAuth(context).orgId;
+  return getAuth(context).orgId;
 }
 
 export async function checkMembership(userId: string, organizationId: string) {
@@ -108,6 +107,7 @@ export async function searchServices(context: Context, query: string, page: numb
     .map((service) => mapService(service));
 
   try {
+    const { generateEmbedding } = await import("#/lib/server/lib/embeddings.js");
     const embedding = await generateEmbedding(query);
     const similarities = (await searchEmbeddings("service", embedding.vector, 1, 100)).filter(
       (item) => item.similarity >= 0.55,
@@ -203,6 +203,7 @@ export async function searchUsers(context: Context, query: string, page: number 
     .map((user) => mapUser(user));
 
   try {
+    const { generateEmbedding } = await import("#/lib/server/lib/embeddings.js");
     const embedding = await generateEmbedding(query);
     const similarities = (await searchEmbeddings("user", embedding.vector, 1, 100)).filter(
       (item) => item.similarity >= 0.55,
@@ -263,6 +264,7 @@ export async function searchGrantsWithEmbeddings(
     ? [query, org.type, org.location, ...(org.tags ?? []), org.description].filter(Boolean).join(" ")
     : query;
 
+  const { generateEmbedding } = await import("#/lib/server/lib/embeddings.js");
   const embedding = await generateEmbedding(enhancedQuery);
 
   const similarities = await searchEmbeddings("resourceGrant", embedding.vector, page, limit);
@@ -355,6 +357,7 @@ export async function createCommunityPost(
 
     if (!post) throw new Error("Community post was not found after creation.");
 
+    const { indexEmbeddings } = await import("#/lib/server/lib/embeddings.js");
     await indexEmbeddings(
       (vector) => insertEmbedding("communityPost", post.id, vector),
       post.title,

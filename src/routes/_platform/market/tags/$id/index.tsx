@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronLeftIcon, ChevronRightIcon, HomeIcon, TagIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -29,7 +29,7 @@ export default function Page() {
   const [services, setServices] = useState<Service[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(false);
 
-  function loadServices(page: number) {
+  const loadServices = useCallback((page: number) => {
     if (!tagId) {
       setLoading(false);
       return;
@@ -49,7 +49,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [backend.market, tagId]);
 
   function handlePageChange(newPage: number) {
     const params = new URLSearchParams(searchParams.toString());
@@ -63,7 +63,7 @@ export default function Page() {
 
   useEffect(() => {
     loadServices(currentPage);
-  }, [tagId, currentPage]);
+  }, [currentPage, loadServices]);
 
   if (loading) {
     return (

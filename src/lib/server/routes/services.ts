@@ -334,7 +334,7 @@ services.put("/:id", async (c) => {
   }
 
   await database.update(serviceTable).set(data).where(eq(serviceTable.id, id));
-  let service = await database.query.service.findFirst({
+  const service = await database.query.service.findFirst({
     where: { id },
     extras: serviceCountExtras,
     with: {

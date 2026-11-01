@@ -6,20 +6,23 @@ import { serviceCountExtras } from "#/lib/database/query-fragments.js";
 import { order, organization as organizationTable, service, user as userTable } from "#/lib/database/schema.js";
 import { generationModel } from "#/lib/server/integrations/ai.js";
 import { database } from "#/lib/server/integrations/database.js";
-import { getOrganization, getUser } from "#/lib/server/lib/utils.js";
+import { checkMembership, getOrganization, getUser } from "#/lib/server/lib/utils.js";
 
 const dashboard = new Hono();
 
 //  core financial metrics
 dashboard.get("/metrics", async (c) => {
   const user = await getUser(c);
-  const organization = await getOrganization(c);
-
   if (!user) {
     return c.json({ error: "Unauthorized." }, 401);
   }
 
-  const whereClause = organization ? { order: { service: { organizationId: organization.id } } } : {};
+  const organization = await getOrganization(c);
+  if (!organization || !(await checkMembership(user.id, organization.id))) {
+    return c.json({ error: "Organization membership required." }, 403);
+  }
+
+  const whereClause = { order: { service: { organizationId: organization.id } } };
 
   try {
     //  total revenue from paid invoices
@@ -40,7 +43,7 @@ dashboard.get("/metrics", async (c) => {
     //  total transactions orders
     const totalTransactions = await database.$count(
       order,
-      organization ? eq(order.organizationId, organization.id) : undefined,
+      eq(order.organizationId, organization.id),
     );
 
     //  average order value
@@ -81,13 +84,16 @@ dashboard.get("/metrics", async (c) => {
 //  revenue chart data (last 7 days)
 dashboard.get("/charts/revenue", async (c) => {
   const user = await getUser(c);
-  const organization = await getOrganization(c);
-
   if (!user) {
     return c.json({ error: "Unauthorized." }, 401);
   }
 
-  const whereClause = organization ? { order: { service: { organizationId: organization.id } } } : {};
+  const organization = await getOrganization(c);
+  if (!organization || !(await checkMembership(user.id, organization.id))) {
+    return c.json({ error: "Organization membership required." }, 403);
+  }
+
+  const whereClause = { order: { service: { organizationId: organization.id } } };
 
   try {
     //  last 7 days of revenue
@@ -141,6 +147,9 @@ dashboard.get("/charts/signups", async (c) => {
   if (!user) {
     return c.json({ error: "Unauthorized." }, 401);
   }
+  if (user.type !== "admin") {
+    return c.json({ error: "Admin access required." }, 403);
+  }
 
   try {
     //  7 days of user signups
@@ -184,13 +193,16 @@ dashboard.get("/charts/signups", async (c) => {
 //  top-selling services
 dashboard.get("/services/top", async (c) => {
   const user = await getUser(c);
-  const organization = await getOrganization(c);
-
   if (!user) {
     return c.json({ error: "Unauthorized." }, 401);
   }
 
-  const whereClause = organization ? { organizationId: organization.id } : {};
+  const organization = await getOrganization(c);
+  if (!organization || !(await checkMembership(user.id, organization.id))) {
+    return c.json({ error: "Organization membership required." }, 403);
+  }
+
+  const whereClause = { organizationId: organization.id };
 
   try {
     //  services with order counts and revenue
@@ -241,13 +253,16 @@ dashboard.get("/services/top", async (c) => {
 // get recent transactions
 dashboard.get("/transactions/recent", async (c) => {
   const user = await getUser(c);
-  const organization = await getOrganization(c);
-
   if (!user) {
     return c.json({ error: "Unauthorized." }, 401);
   }
 
-  const whereClause = organization ? { service: { organizationId: organization.id } } : {};
+  const organization = await getOrganization(c);
+  if (!organization || !(await checkMembership(user.id, organization.id))) {
+    return c.json({ error: "Organization membership required." }, 403);
+  }
+
+  const whereClause = { service: { organizationId: organization.id } };
 
   try {
     const recentOrders = await database.query.order.findMany({
@@ -337,13 +352,16 @@ dashboard.get("/admin/stats", async (c) => {
 //  comprehensive insights for AI analysis
 dashboard.get("/insights", async (c) => {
   const user = await getUser(c);
-  const organization = await getOrganization(c);
-
   if (!user) {
     return c.json({ error: "Unauthorized." }, 401);
   }
 
-  const whereClause = organization ? { order: { service: { organizationId: organization.id } } } : {};
+  const organization = await getOrganization(c);
+  if (!organization || !(await checkMembership(user.id, organization.id))) {
+    return c.json({ error: "Organization membership required." }, 403);
+  }
+
+  const whereClause = { order: { service: { organizationId: organization.id } } };
 
   try {
     //  comprehensive dashboard data for AI analysis
@@ -357,14 +375,14 @@ dashboard.get("/insights", async (c) => {
         const totalRevenue = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
         const totalTransactions = await database.$count(
           order,
-          organization ? eq(order.organizationId, organization.id) : undefined,
+          eq(order.organizationId, organization.id),
         );
         return { totalRevenue: totalRevenue / 100, totalTransactions };
       })(),
 
       // service performance
       database.query.service.findMany({
-        where: organization ? { organizationId: organization.id } : {},
+        where: { organizationId: organization.id },
         extras: serviceCountExtras,
         with: {
           orders: {
@@ -378,7 +396,7 @@ dashboard.get("/insights", async (c) => {
 
       // recent activity
       database.query.order.findMany({
-        where: organization ? { service: { organizationId: organization.id } } : {},
+        where: { service: { organizationId: organization.id } },
         with: { service: { columns: { name: true } } },
         orderBy: { createdAt: "desc" },
         limit: 20,
@@ -447,7 +465,7 @@ dashboard.get("/insights", async (c) => {
 
     //  insights
     const orgs = await database.query.organization.findFirst({
-      where: { id: organization?.id || "" },
+      where: { id: organization.id },
     });
 
     const result = await generateText({

@@ -34,7 +34,7 @@ export default function SearchServices() {
       .finally(() => {
         setLoading(false);
       });
-  }, [query]);
+  }, [query, backend.service]);
 
   if (loading) {
     return (

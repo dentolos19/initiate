@@ -1,5 +1,5 @@
 import { CheckIcon, HashIcon, PlusIcon } from "lucide-react";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "#/components/ui/button";
@@ -24,11 +24,7 @@ export default function TopicsCard(props: ComponentProps<typeof Card>) {
   const [topics, setTopics] = useState<TopicItem[]>([]);
   const [followedTopics, setFollowedTopics] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    loadTopics();
-  }, []);
-
-  function loadTopics() {
+  const loadTopics = useCallback(() => {
     setLoading(true);
 
     Promise.all([backend.community.getTopTopics(), user ? backend.community.getFollowedTopics() : Promise.resolve([])])
@@ -50,7 +46,11 @@ export default function TopicsCard(props: ComponentProps<typeof Card>) {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [backend.community, user]);
+  useEffect(() => {
+    loadTopics();
+  }, [loadTopics]);
+
 
   function handleFollowToggle(topicName: string) {
     if (!user) {

@@ -105,13 +105,11 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       const response = await primitives.post("/ai/grant/suitability", {
         grant: grant,
       });
-      console.log("AI response for grant suitability", response);
       return z
         .object({
-          result: z.string(),
-          similarityScore: z.number(),
+          result: z.object({ result: z.string(), similarityScore: z.number() }),
         })
-        .parse(response.result);
+        .parse(response).result;
     },
   };
 }

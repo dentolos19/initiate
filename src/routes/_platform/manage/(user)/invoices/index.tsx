@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CreditCardIcon, DollarSignIcon, ReceiptIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -30,7 +30,7 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
 
-  function loadInvoices(status?: string) {
+  const loadInvoices = useCallback((status?: string) => {
     setLoading(true);
     backend.user
       .getUserInvoices("current", 1, 50, status)
@@ -44,9 +44,9 @@ export default function InvoicesPage() {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [backend.user]);
 
-  function loadStatistics() {
+  const loadStatistics = useCallback(() => {
     backend.user
       .getUserInvoiceStatistics()
       .then((data) => {
@@ -56,16 +56,16 @@ export default function InvoicesPage() {
         console.error(error);
         toast.error(error.message);
       });
-  }
+  }, [backend.user]);
 
   useEffect(() => {
     loadStatistics();
-  }, []);
+  }, [loadStatistics]);
 
   useEffect(() => {
     const statusFilter = activeTab === "all" ? undefined : activeTab;
     loadInvoices(statusFilter);
-  }, [activeTab]);
+  }, [activeTab, loadInvoices]);
 
   if (loading && !statistics) {
     return (

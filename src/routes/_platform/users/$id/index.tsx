@@ -10,7 +10,7 @@ import {
   UserPlusIcon,
   UserXIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "#/components/ui/badge";
@@ -74,7 +74,7 @@ export default function Page() {
     router.push(`/messages/${room.id}`);
   }
 
-  async function loadUserPosts() {
+  const loadUserPosts = useCallback(async () => {
     setPostsLoading(true);
     try {
       const userPosts = await backend.user.getUserPosts(id, 1, 10);
@@ -84,9 +84,9 @@ export default function Page() {
     } finally {
       setPostsLoading(false);
     }
-  }
+  }, [backend.user, id]);
 
-  async function loadUserProposals() {
+  const loadUserProposals = useCallback(async () => {
     setProposalsLoading(true);
     try {
       const userProposals = await backend.user.getUserProposals(id, 1, 10);
@@ -96,7 +96,7 @@ export default function Page() {
     } finally {
       setProposalsLoading(false);
     }
-  }
+  }, [backend.user, id]);
 
   useEffect(() => {
     setLoading(true);
@@ -111,7 +111,7 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-  }, [id]);
+  }, [id, backend.user, loadUserPosts, loadUserProposals]);
 
   if (loading) {
     return <Loading />;

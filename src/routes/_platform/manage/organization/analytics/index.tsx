@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ReactECharts from "echarts-for-react";
 import { Calendar, Sparkles, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 
 import { Button } from "#/components/ui/button";
@@ -41,7 +41,7 @@ export default function DashboardPage() {
     avgOrderValue: "0.00",
   });
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [mRes, rRes, svcRes, txRes] = await Promise.all([
@@ -59,7 +59,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [backend.dashboard]);
 
   const loadInsights = async () => {
     setInsightsLoading(true);
@@ -76,7 +76,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadData();
-  }, [timeFilter]);
+  }, [timeFilter, loadData]);
 
   if (loading) {
     return <Loading />;

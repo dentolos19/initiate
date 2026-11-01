@@ -1,5 +1,5 @@
 import { HeartIcon, MapPinIcon, PlusIcon, RssIcon, SettingsIcon, UserPlusIcon, UsersIcon } from "lucide-react";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "#/components/loading-spinner";
@@ -37,16 +37,7 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
   const [loading, setLoading] = useState<boolean>(true);
   const [stats, setStats] = useState<UserStats | null>(null);
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    loadUserStats();
-  }, [user]);
-
-  function loadUserStats() {
+  const loadUserStats = useCallback(() => {
     setLoading(true);
 
     Promise.all([
@@ -71,7 +62,16 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [backend.community, backend.user, user]);
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    loadUserStats();
+  }, [user, loadUserStats]);
+
 
   if (!user) {
     return (

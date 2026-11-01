@@ -39,7 +39,7 @@ export default function UserRooms() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [backend.messages]);
 
   if (loading) {
     return (

@@ -9,7 +9,7 @@ import {
   TrashIcon,
   XIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
@@ -43,11 +43,7 @@ export default function ProposalItems({ problemId, onProposalUpdate, isProblemOw
   const [proposals, setProposals] = useState<CommunityProposal[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadProposals();
-  }, [problemId]);
-
-  function loadProposals() {
+  const loadProposals = useCallback(() => {
     setLoading(true);
     backend.community
       .getProposals(problemId)
@@ -57,7 +53,11 @@ export default function ProposalItems({ problemId, onProposalUpdate, isProblemOw
         toast.error("Failed to load proposals");
       })
       .finally(() => setLoading(false));
-  }
+  }, [backend.community, problemId]);
+  useEffect(() => {
+    loadProposals();
+  }, [loadProposals]);
+
 
   function handleAcceptProposal(proposalId: string) {
     backend.community

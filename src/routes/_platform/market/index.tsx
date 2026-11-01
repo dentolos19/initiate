@@ -42,7 +42,7 @@ export default function Page() {
     ]).finally(() => {
       setLoading(false);
     });
-  }, []);
+  }, [backend.service]);
 
   if (loading) {
     return <Loading />;

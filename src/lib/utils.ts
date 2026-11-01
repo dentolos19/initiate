@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getLabel(store: { label: string; value: any }[], value: any, defaultValue?: string) {
+export function getLabel(store: { label: string; value: unknown }[], value: unknown, defaultValue?: string) {
   const item = store.find((item) => item.value === value);
   return item ? item.label : defaultValue;
 }
@@ -27,20 +27,6 @@ export function notifyLoading<T>(message: string, action: Promise<T>) {
   return action.finally(() => {
     toast.dismiss(id);
   });
-}
-
-export async function loadingToast(message: string, action: () => Promise<any>) {
-  const id = toast.loading(message);
-  await action();
-  toast.dismiss(id);
-}
-
-export function loadingToastFunction(message: string, action: () => Promise<any>) {
-  return async () => {
-    const id = toast.loading(message);
-    await action();
-    toast.dismiss(id);
-  };
 }
 
 export function formatAmount(amount: number, currency: string) {

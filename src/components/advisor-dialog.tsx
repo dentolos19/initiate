@@ -10,7 +10,7 @@ import {
   Volume2,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { ComponentProps, useEffect, useRef, useState } from "react";
+import { ComponentProps, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import AdvisorMessage from "#/components/advisor-message";
@@ -110,28 +110,26 @@ export default function AdvisorDialog(
   const [currentTranscript, setCurrentTranscript] = useState<string>("");
   const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
   const hasVoiceInitialized = useRef<boolean>(false);
+  const voiceRequestId = useRef(0);
 
   const conversation = useConversation({
-    // apiKey: ELEVENLABS_API_KEY,
     onConnect: () => {
+      setVoiceLoading(false);
       setVoiceConnected(true);
       setVoiceError("");
     },
     onDisconnect: () => {
+      setVoiceLoading(false);
       setVoiceConnected(false);
       setIsAISpeaking(false);
       setCurrentTranscript("");
-      // props.data.append({
-      //   role: "user",
-      //   content: "Please summarize this conversation.",
-      // });
     },
-    onMessage: (message: any) => {
+    onMessage: (message) => {
       if (message.source === "ai") {
         props.data.setMessages((prevMessages) => [
           ...prevMessages,
           {
-            id: message.id,
+            id: crypto.randomUUID(),
             role: "assistant",
             parts: [{ type: "text", text: message.message || "" }],
           },
@@ -142,72 +140,31 @@ export default function AdvisorDialog(
         props.data.setMessages((prevMessages) => [
           ...prevMessages,
           {
-            id: message.id,
+            id: crypto.randomUUID(),
             role: "user",
             parts: [{ type: "text", text: message.message || "" }],
           },
         ]);
       }
-
-      // // Handle user transcript (what the user is saying)
-      // if (message.type === "user_transcript") {
-      //   setCurrentTranscript(message.message || "");
-
-      //   // Add complete user message to chat when transcription is final
-      //   if (message.message && !message.is_partial) {
-      //     props.data.append({
-      //       role: "user",
-      //       content: message.message,
-      //     });
-      //     setCurrentTranscript("");
-      //   }
-      // }
-
-      // // Handle AI agent response
-      // if (message.type === "agent_response" && message.message) {
-      //   props.data.append({
-      //     role: "assistant",
-      //     content: message.message,
-      //   });
-      // }
-
-      // // Handle agent speaking status
-      // if (message.type === "agent_response_started") {
-      //   setIsAISpeaking(true);
-      // }
-
-      // if (message.type === "agent_response_ended") {
-      //   setIsAISpeaking(false);
-      //   // Auto-scroll to bottom when AI finishes speaking
-      //   setTimeout(() => {
-      //     if (messagesEndRef.current) {
-      //       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-      //     }
-      //   }, 100);
-      // }
     },
-    onError: (error: any) => {
-      console.error("ElevenLabs conversation error:", error);
-      const errorMessage = error?.message || error?.toString() || "Voice connection failed";
+    onError: (errorMessage) => {
+      console.error("ElevenLabs conversation error:", errorMessage);
+      setVoiceLoading(false);
+      hasVoiceInitialized.current = false;
       setVoiceError(errorMessage);
       setIsAISpeaking(false);
       setCurrentTranscript("");
       toast.error(`Voice Error: ${errorMessage}`);
     },
-    onModeChange: (mode: any) => {
+    onModeChange: (mode) => {
       setIsListening(mode.mode === "listening");
 
       if (mode.mode !== "listening") {
         setCurrentTranscript("");
       }
     },
-    onAudio: (_audio: any) => {
-      // console.log("Audio:", audio);
-    },
-    onDebug: (debug: any) => {
-      console.log("Debug:", debug);
-    },
   });
+  const { startSession, endSession } = conversation;
 
   const suggestMessages = async (suggestion: string) => {
     // handle special case for summary generation
@@ -248,22 +205,19 @@ export default function AdvisorDialog(
     });
   };
 
-  const initializeVoiceChat = async () => {
+  const initializeVoiceChat = useCallback(async () => {
     if (hasVoiceInitialized.current) return;
     hasVoiceInitialized.current = true;
+    const requestId = ++voiceRequestId.current;
 
     try {
       setVoiceLoading(true);
       setVoiceError("");
 
-      // Check if API key is available
-      // if (!ELEVENLABS_API_KEY) {
-      //   throw new Error("ElevenLabs API key is not configured");
-      // }
-
       const agentId = await backend.ai.getAgent();
+      if (requestId !== voiceRequestId.current) return;
 
-      await conversation.startSession({
+      startSession({
         agentId,
         connectionType: "websocket",
         dynamicVariables: {
@@ -272,31 +226,31 @@ export default function AdvisorDialog(
         },
       });
     } catch (error) {
+      if (requestId !== voiceRequestId.current) return;
       console.error("Failed to start voice chat:", error);
       const errorMessage = error instanceof Error ? error.message : "Voice connection failed";
       setVoiceError(errorMessage);
       toast.error(`Voice setup failed: ${errorMessage}`);
       hasVoiceInitialized.current = false; // Reset so user can try again
-    } finally {
       setVoiceLoading(false);
     }
-  };
+  }, [backend.ai, session.organization?.id, session.user?.id, startSession]);
 
-  const toggleVoice = async () => {
+  const toggleVoice = useCallback(async () => {
     if (!isVoiceEnabled) {
       setIsVoiceEnabled(true);
       await initializeVoiceChat();
     } else {
       setIsVoiceEnabled(false);
-      if (conversation.endSession) {
-        conversation.endSession();
-      }
+      voiceRequestId.current++;
+      endSession();
+      setVoiceLoading(false);
       setVoiceConnected(false);
       setIsAISpeaking(false);
       setCurrentTranscript("");
       hasVoiceInitialized.current = false;
     }
-  };
+  }, [endSession, initializeVoiceChat, isVoiceEnabled]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -308,24 +262,28 @@ export default function AdvisorDialog(
     if (props.data.status !== "ready") return;
     if (props.data.messages.length < 2) return;
 
+    let active = true;
     setSuggestions([]);
     backend.ai
       .generateSuggestions(props.data.messages)
       .then((suggestions) => {
-        setSuggestions(suggestions);
+        if (active) setSuggestions(suggestions);
       })
       .catch((error) => {
         console.error(error);
-        setSuggestions([]);
+        if (active) setSuggestions([]);
       });
-  }, [props.data.status]);
+    return () => {
+      active = false;
+    };
+  }, [props.data.status, props.data.messages, backend.ai]);
 
   useEffect(() => {
     if (!props.open && isVoiceEnabled) {
       setIsVoiceEnabled(false);
-      if (conversation.endSession) {
-        conversation.endSession();
-      }
+      voiceRequestId.current++;
+      endSession();
+      setVoiceLoading(false);
       setVoiceConnected(false);
       setIsAISpeaking(false);
       setCurrentTranscript("");
@@ -337,15 +295,15 @@ export default function AdvisorDialog(
     if (props.open && props.enableVoiceOnOpen && !isVoiceEnabled && !hasVoiceInitialized.current) {
       toggleVoice();
     }
-  }, [props.open, props.enableVoiceOnOpen, isVoiceEnabled]);
+  }, [props.open, props.enableVoiceOnOpen, isVoiceEnabled, endSession, toggleVoice]);
 
   useEffect(() => {
+    const requestId = voiceRequestId;
     return () => {
-      if (conversation.endSession && voiceConnected) {
-        conversation.endSession();
-      }
+      requestId.current++;
+      endSession();
     };
-  }, []);
+  }, [endSession]);
 
   return (
     <Dialog {...props}>

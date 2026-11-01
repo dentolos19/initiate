@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
 
@@ -41,8 +41,9 @@ orderInvoices.put("/invoices/:invoiceId", async (c) => {
   const [updatedInvoice] = await database
     .update(orderInvoice)
     .set(parsed.data)
-    .where(eq(orderInvoice.id, invoice.id))
+    .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "draft")))
     .returning();
+  if (!updatedInvoice) return c.json({ message: "Invoice changed. Please refresh and try again." }, 409);
   return c.json(updatedInvoice);
 });
 
@@ -53,13 +54,20 @@ orderInvoices.delete("/invoices/:invoiceId", async (c) => {
     return c.json({ message: "Invoice not found." }, 404);
   }
 
-  if (invoice.status === "draft") {
-    await database.delete(orderInvoice).where(eq(orderInvoice.id, invoice.id));
-  } else if (invoice.status === "open") {
-    await database.update(orderInvoice).set({ status: "void" }).where(eq(orderInvoice.id, invoice.id));
-  } else {
+  if (invoice.status !== "draft" && invoice.status !== "open") {
     return c.json({ message: "Only draft or open invoices can be removed." }, 400);
   }
+  const [removedInvoice] = invoice.status === "draft"
+    ? await database
+        .delete(orderInvoice)
+        .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "draft")))
+        .returning({ id: orderInvoice.id })
+    : await database
+        .update(orderInvoice)
+        .set({ status: "void" })
+        .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "open")))
+        .returning({ id: orderInvoice.id });
+  if (!removedInvoice) return c.json({ message: "Invoice changed. Please refresh and try again." }, 409);
   return c.json({ message: invoice.status === "draft" ? "Invoice deleted." : "Invoice voided." });
 });
 
@@ -74,8 +82,9 @@ orderInvoices.post("/invoices/:invoiceId/finalize", async (c) => {
   const [updatedInvoice] = await database
     .update(orderInvoice)
     .set({ status: "open" })
-    .where(eq(orderInvoice.id, invoice.id))
+    .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "draft")))
     .returning();
+  if (!updatedInvoice) return c.json({ message: "Invoice changed. Please refresh and try again." }, 409);
   return c.json(updatedInvoice);
 });
 
