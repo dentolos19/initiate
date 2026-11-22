@@ -18,6 +18,12 @@ The interface is compact without feeling cramped. Blue marks actions and selecte
 - One blue action color used for selection, focus, and primary actions.
 - Equal support for light and dark themes.
 
+## Framework
+
+- [shadcn/ui](https://ui.shadcn.com) with the `new-york` style on [Radix UI](https://www.radix-ui.com) primitives. See [`components.json`](components.json). Generated primitives live in [`src/components/ui/`](src/components/ui).
+- Tailwind CSS 4 with `tw-animate-css`, `tailwindcss-motion`, and `@tailwindcss/typography`. Tokens are OKLCH CSS variables in [`src/styles.css`](src/styles.css), with dark values under `.dark`; there is no Tailwind config file.
+- Icons come from `lucide-react`, charts from ECharts, and toasts from Sonner.
+
 ## Colors
 
 The palette is neutral first. A clear cobalt blue provides the only routine accent, while red is reserved for destructive actions and errors.

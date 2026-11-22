@@ -1,4 +1,4 @@
-# Cloudflare development
+# Cloudflare Development
 
 The app uses the beta `cf` CLI and Cloudflare Vite plugin with `cloudflare.config.ts`. `just check` uses Bun's linter, formatter, and type checker; `bunfig.toml` configures import, package, and Tailwind sorting.
 
