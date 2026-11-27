@@ -38,8 +38,6 @@ jobs:
           envkey_BETTER_AUTH_URL: ${{ toJSON(vars.BETTER_AUTH_URL) }}
           envkey_CLOUDFLARE_ACCOUNT_ID: ${{ toJSON(secrets.CLOUDFLARE_ACCOUNT_ID) }}
           envkey_CLOUDFLARE_API_TOKEN: ${{ toJSON(secrets.CLOUDFLARE_API_TOKEN) }}
-          envkey_ELEVENLABS_AGENT_ID: ${{ toJSON(vars.ELEVENLABS_AGENT_ID) }}
-          envkey_ELEVENLABS_API_KEY: ${{ toJSON(secrets.ELEVENLABS_API_KEY) }}
           envkey_EMAIL_FROM_ADDRESS: ${{ toJSON(vars.EMAIL_FROM_ADDRESS) }}
           envkey_EMAIL_FROM_NAME: ${{ toJSON(vars.EMAIL_FROM_NAME) }}
           envkey_OPENROUTER_API_KEY: ${{ toJSON(secrets.OPENROUTER_API_KEY) }}

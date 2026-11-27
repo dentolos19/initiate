@@ -10,7 +10,6 @@ import { createDatabase, runWithDatabase } from "#/lib/server/integrations/datab
 import { createNotificationClient } from "#/lib/server/integrations/notification.js";
 import { createSessionMiddleware } from "#/lib/server/middlewares.js";
 import admin from "#/lib/server/routes/admin.js";
-import aiAgent from "#/lib/server/routes/ai-agent.js";
 import aiChat from "#/lib/server/routes/ai-chat.js";
 import ai from "#/lib/server/routes/ai.js";
 import assets from "#/lib/server/routes/assets.js";
@@ -88,7 +87,6 @@ app.use(async (c, next) => {
 app.route("/", root);
 app.route("/admin", admin);
 app.route("/ai", ai);
-app.route("/ai", aiAgent);
 app.route("/ai", aiChat);
 app.route("/assets", assets);
 app.route("/community", communityComments);

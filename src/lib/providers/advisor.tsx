@@ -19,7 +19,6 @@ const AdvisorContext = createContext<{
   hideAdvisorPopover: () => void;
   showAdvisorDialog: () => void;
   hideAdvisorDialog: () => void;
-  showAdvisorDialogWithVoice: () => void;
   generateSummaryAndApply: (callback?: (summary: string) => void) => Promise<void>;
   askAdvisorWithSummaryCallback: (message?: string, callback?: (summary: string) => void) => void;
   messages: UIMessage[];
@@ -31,7 +30,6 @@ const AdvisorContext = createContext<{
   hideAdvisorPopover: () => {},
   showAdvisorDialog: () => {},
   hideAdvisorDialog: () => {},
-  showAdvisorDialogWithVoice: () => {},
   generateSummaryAndApply: async () => {},
   askAdvisorWithSummaryCallback: () => {},
   messages: [],
@@ -46,7 +44,6 @@ export default function AdvisorProvider(props: LayoutProps) {
   const [buttonVisible, setButtonVisible] = useState<boolean>(true);
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [enableVoiceOnOpen, setEnableVoiceOnOpen] = useState<boolean>(false);
   const [summaryCallback, setSummaryCallback] = useState<((summary: string) => void) | undefined>();
 
   const chat = useChatInternal({
@@ -89,20 +86,12 @@ export default function AdvisorProvider(props: LayoutProps) {
   }
 
   function showAdvisorDialog() {
-    setEnableVoiceOnOpen(false);
-    setDialogOpen(true);
-    setPopoverOpen(false);
-  }
-
-  function showAdvisorDialogWithVoice() {
-    setEnableVoiceOnOpen(true);
     setDialogOpen(true);
     setPopoverOpen(false);
   }
 
   function hideAdvisorDialog() {
     setDialogOpen(false);
-    setEnableVoiceOnOpen(false);
     setSummaryCallback(undefined);
   }
 
@@ -148,7 +137,6 @@ export default function AdvisorProvider(props: LayoutProps) {
         hideAdvisorPopover,
         showAdvisorDialog,
         hideAdvisorDialog,
-        showAdvisorDialogWithVoice,
         generateSummaryAndApply,
         askAdvisorWithSummaryCallback,
         messages: chat.messages,
@@ -172,13 +160,7 @@ export default function AdvisorProvider(props: LayoutProps) {
       </AdvisorPopover>
 
       {/* Advisor Dialog */}
-      <AdvisorDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        data={chat}
-        enableVoiceOnOpen={enableVoiceOnOpen}
-        onSummaryGenerated={summaryCallback}
-      />
+      <AdvisorDialog open={dialogOpen} onOpenChange={setDialogOpen} data={chat} onSummaryGenerated={summaryCallback} />
     </AdvisorContext.Provider>
   );
 }

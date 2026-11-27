@@ -20,8 +20,6 @@
     "@better-auth/drizzle-adapter": "^1.7.14",
     "@cloudflare/realtimekit-react": "^2.0.4",
     "@cloudflare/realtimekit-react-ui": "^2.0.3",
-    "@elevenlabs/elevenlabs-js": "^2.75.0",
-    "@elevenlabs/react": "^1.20.2",
     "@fillout/react": "^3.1.2",
     "@fontsource-variable/fira-code": "^5.3.0",
     "@fontsource-variable/lora": "^5.3.0",

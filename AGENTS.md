@@ -14,7 +14,7 @@ Initiate is an AI-assisted marketplace and collaboration platform where small an
 
 ## Stack
 
-TanStack Start with React 19 and Hono on Cloudflare Workers (D1, R2, Vectorize, Queues, Durable Objects, Workflows, and RealtimeKit) through the `cf` CLI, with Drizzle, Better Auth, the AI SDK with OpenRouter, ElevenLabs, shadcn/ui on Radix UI, Tailwind CSS 4, and Bun.
+TanStack Start with React 19 and Hono on Cloudflare Workers (D1, R2, Vectorize, Queues, Durable Objects, Workflows, and RealtimeKit) through the `cf` CLI, with Drizzle, Better Auth, the AI SDK with OpenRouter, shadcn/ui on Radix UI, Tailwind CSS 4, and Bun.
 
 ## Documentation
 

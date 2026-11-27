@@ -51,17 +51,6 @@ export default function mapConnectors(primitives: BackendPrimitives) {
         .parse(response).result;
     },
 
-    // Agent
-
-    getAgent: async (): Promise<string> => {
-      const response = await primitives.post("/ai/agent");
-      return z
-        .object({
-          id: z.string(),
-        })
-        .parse(response).id;
-    },
-
     // Chat
 
     getChatHistory: async (): Promise<UserChat[]> => {

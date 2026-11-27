@@ -38,8 +38,6 @@ export default defineConfig({
       BETTER_AUTH_URL: bindings.secret(),
       CLOUDFLARE_ACCOUNT_ID: bindings.secret(),
       CLOUDFLARE_API_TOKEN: bindings.secret(),
-      ELEVENLABS_AGENT_ID: bindings.secret(),
-      ELEVENLABS_API_KEY: bindings.secret(),
       EMAIL_FROM_ADDRESS: bindings.secret(),
       EMAIL_FROM_NAME: bindings.secret(),
       OPENROUTER_API_KEY: bindings.secret(),

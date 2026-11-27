@@ -1,4 +1,4 @@
-import { BotMessageSquareIcon, MicIcon, SendIcon, SquareArrowOutUpRightIcon } from "lucide-react";
+import { BotMessageSquareIcon, SendIcon, SquareArrowOutUpRightIcon } from "lucide-react";
 import { ComponentProps } from "react";
 
 import AdvisorMessage from "#/components/advisor-message";
@@ -11,7 +11,7 @@ import { useAdvisor } from "#/lib/providers/advisor";
 export default function AdvisorPopover(
   props: ComponentProps<typeof Popover> & { data: ReturnType<typeof useChatInternal> },
 ) {
-  const { showAdvisorDialog, showAdvisorDialogWithVoice } = useAdvisor();
+  const { showAdvisorDialog } = useAdvisor();
   return (
     <Popover {...props}>
       {props.children}
@@ -45,16 +45,6 @@ export default function AdvisorPopover(
             disabled={props.data.status !== "ready"}
             onChange={props.data.handleInputChange}
           />
-          <Button
-            aria-label="Start Voice Conversation"
-            type={"button"}
-            variant={"outline"}
-            size={"icon"}
-            disabled={props.data.status !== "ready"}
-            onClick={showAdvisorDialogWithVoice}
-          >
-            <MicIcon />
-          </Button>
           <Button
             aria-label="Send Message"
             type={"submit"}

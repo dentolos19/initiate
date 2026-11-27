@@ -20,10 +20,6 @@ export const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN as string;
 export const REALTIMEKIT_APP_ID = process.env.REALTIMEKIT_APP_ID as string;
 export const REALTIMEKIT_PRESET_NAME = "group_call_host";
 
-// ElevenLabs (Voice AI)
-export const ELEVENLABS_AGENT_ID = process.env.ELEVENLABS_AGENT_ID as string;
-export const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY as string;
-
 // OpenRouter
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY as string;
 export const OPENROUTER_EMBEDDING_DIMENSIONS = Number(process.env.OPENROUTER_EMBEDDING_DIMENSIONS || 768);
