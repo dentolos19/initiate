@@ -1,4 +1,4 @@
-import { PhoneCallIcon, VideoIcon, ClockIcon } from "lucide-react";
+import { ClockIcon, PhoneCallIcon, VideoIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -128,11 +128,11 @@ export default function CallHistory() {
   if (!callHistory || callHistory.calls.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <div className="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-          <ClockIcon className="text-muted-foreground h-8 w-8" />
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+          <ClockIcon className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="text-lg font-semibold">No call history</h3>
-        <p className="text-muted-foreground text-sm">Your voice and video call history will appear here</p>
+        <p className="text-sm text-muted-foreground">Your voice and video call history will appear here</p>
       </div>
     );
   }
@@ -152,12 +152,12 @@ export default function CallHistory() {
           return (
             <div
               key={call.id}
-              className="hover:bg-muted/50 flex items-center space-x-3 rounded-lg px-3 py-2 transition-colors"
+              className="flex items-center space-x-3 rounded-lg px-3 py-2 transition-colors hover:bg-muted/50"
             >
               {/* Call Type Icon */}
               <div
                 className={cn(
-                  "p-2 rounded-full",
+                  "rounded-full p-2",
                   isMissed ? "bg-red-100 dark:bg-red-900/30" : "bg-green-100 dark:bg-green-900/30",
                 )}
               >
@@ -198,7 +198,7 @@ export default function CallHistory() {
 
               {/* Time */}
               <div className="text-right">
-                <div className="text-muted-foreground text-xs">{formatCallTime(call.startedAt)}</div>
+                <div className="text-xs text-muted-foreground">{formatCallTime(call.startedAt)}</div>
               </div>
             </div>
           );

@@ -4,9 +4,9 @@ import AppNavigation from "#/components/app-navigation";
 
 export default function AppShell(props: { children?: ReactNode }) {
   return (
-    <div className="bg-background h-dvh w-full overflow-hidden pt-16">
+    <div className="h-dvh w-full overflow-hidden bg-background pt-16">
       <a
-        className="bg-background focus-visible:ring-ring fixed top-2 left-4 z-60 -translate-y-16 rounded-md border px-3 py-2 text-sm font-medium transition-transform focus-visible:translate-y-0 focus-visible:ring-2"
+        className="fixed top-2 left-4 z-60 -translate-y-16 rounded-md border bg-background px-3 py-2 text-sm font-medium transition-transform focus-visible:translate-y-0 focus-visible:ring-2 focus-visible:ring-ring"
         href="#main-content"
       >
         Skip to Main Content

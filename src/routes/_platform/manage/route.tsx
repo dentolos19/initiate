@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import {
   AppWindowIcon,
   BarChart3Icon,
@@ -49,8 +49,7 @@ import useBackend from "#/lib/backend/client";
 import { Organization } from "#/lib/backend/schema";
 import { useIsMobile } from "#/lib/hooks/use-mobile";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { usePathname } from "#/lib/router";
+import Link, { usePathname } from "#/lib/router";
 import { cn } from "#/lib/utils";
 import Loading from "#/routes/-components/loading";
 import { LayoutProps } from "#/types";
@@ -296,7 +295,7 @@ function NestedLayout(props: LayoutProps) {
       <div className={"flex min-w-0 flex-1 flex-col"}>
         <button
           type="button"
-          className={"bg-sidebar min-h-11 border-b px-4 text-center text-sm font-medium md:hidden"}
+          className={"min-h-11 border-b bg-sidebar px-4 text-center text-sm font-medium md:hidden"}
           onClick={toggleSidebar}
         >
           Toggle Sidebar

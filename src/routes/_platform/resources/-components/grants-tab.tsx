@@ -1,5 +1,5 @@
 import { SearchIcon, XIcon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import LoadingSpinner from "#/components/loading-spinner";
 import { Badge } from "#/components/ui/badge";
@@ -84,7 +84,7 @@ export default function GrantsTab() {
       <div className="flex flex-col gap-4 sm:flex-row">
         {/* Search Input */}
         <div className="relative flex-1">
-          <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+          <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
           <Input
             placeholder="Search grants by name, provider, location, description, or funding…"
             value={searchQuery}
@@ -149,14 +149,14 @@ export default function GrantsTab() {
         <div className="py-16 text-center">
           {hasActiveFilters ? (
             <div className="space-y-3">
-              <p className="text-muted-foreground text-lg">No grants match your search</p>
+              <p className="text-lg text-muted-foreground">No grants match your search</p>
               <Button variant="outline" onClick={clearFilters}>
                 <XIcon className="mr-2 h-4 w-4" />
                 Clear filters
               </Button>
             </div>
           ) : (
-            <p className="text-muted-foreground text-lg">No grants available yet.</p>
+            <p className="text-lg text-muted-foreground">No grants available yet.</p>
           )}
         </div>
       )}

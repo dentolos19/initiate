@@ -17,8 +17,7 @@ import ImageWrapper from "#/components/ui/wrappers/image";
 import { useIsMobile } from "#/lib/hooks/use-mobile";
 import { useSession } from "#/lib/providers/session";
 import { useTheme } from "#/lib/providers/theme";
-import Link from "#/lib/router";
-import { usePathname, useRouter, useSearchParams } from "#/lib/router";
+import Link, { usePathname, useRouter, useSearchParams } from "#/lib/router";
 import { cn } from "#/lib/utils";
 
 const items = [
@@ -62,7 +61,7 @@ export default function AppNavigation(props: ComponentProps<"nav">) {
 
   if (isMobile) {
     return (
-      <nav className={cn("bg-background/95 flex h-16 items-center gap-3 border-b px-4 shadow-xs", props.className)}>
+      <nav className={cn("flex h-16 items-center gap-3 border-b bg-background/95 px-4 shadow-xs", props.className)}>
         {/* Left */}
         <div className={"flex flex-1 items-center justify-start md:hidden"}>
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
@@ -108,7 +107,7 @@ export default function AppNavigation(props: ComponentProps<"nav">) {
             aria-label="Search Initiate"
             placeholder={"Search Initiate"}
           />
-          <div className={"text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"}>
+          <div className={"absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"}>
             <SearchIcon className={"size-5"} />
           </div>
         </div>
@@ -120,7 +119,7 @@ export default function AppNavigation(props: ComponentProps<"nav">) {
     );
   } else {
     return (
-      <nav className={cn("bg-background/95 flex h-16 items-center border-b px-5 shadow-xs", props.className)}>
+      <nav className={cn("flex h-16 items-center border-b bg-background/95 px-5 shadow-xs", props.className)}>
         {/* Left */}
         <div className={"flex min-w-0 flex-1 items-center justify-start gap-5"}>
           <Link href={"/"}>
@@ -163,7 +162,7 @@ export default function AppNavigation(props: ComponentProps<"nav">) {
             aria-label="Search Initiate"
             placeholder={"Search services, people, and resources"}
           />
-          <div className={"text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"}>
+          <div className={"absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"}>
             <SearchIcon className={"size-5"} />
           </div>
         </div>

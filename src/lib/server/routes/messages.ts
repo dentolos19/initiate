@@ -21,7 +21,11 @@ async function createMessageRoom(userIds: string[], organizationId?: string) {
   const createRoom = database.insert(messageRoom).values({ id: roomId });
   const addUsers = database.insert(roomUserParticipant).values(userIds.map((userId) => ({ roomId, userId })));
   if (organizationId) {
-    await database.batch([createRoom, addUsers, database.insert(roomOrganizationParticipant).values({ organizationId, roomId })]);
+    await database.batch([
+      createRoom,
+      addUsers,
+      database.insert(roomOrganizationParticipant).values({ organizationId, roomId }),
+    ]);
   } else {
     await database.batch([createRoom, addUsers]);
   }
@@ -69,8 +73,12 @@ messages.post("/rooms", async (c) => {
     if (!organizationId) return c.json({ message: "Organization not found." }, 404);
     data.organizationId = organizationId;
   }
-  if (data.userId && data.organizationId && data.userId !== auth.userId &&
-      !(await checkMembership(auth.userId, data.organizationId))) {
+  if (
+    data.userId &&
+    data.organizationId &&
+    data.userId !== auth.userId &&
+    !(await checkMembership(auth.userId, data.organizationId))
+  ) {
     return c.json({ message: "You are not a participant in this room." }, 403);
   }
   if (data.userId === auth.userId && !data.organizationId) {

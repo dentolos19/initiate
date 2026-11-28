@@ -102,7 +102,7 @@ export default function MilestonesTab(props: { order: Order }) {
 
   return (
     <div>
-      <div className={"bg-sidebar flex h-12 items-center justify-between border-b px-2"}>
+      <div className={"flex h-12 items-center justify-between border-b bg-sidebar px-2"}>
         <h3 className={"font-medium"}>Milestones</h3>
         {(props.order.status === "draft" || props.order.status === "pending") && (
           <Button onClick={openCreateDialog} size={"sm"}>
@@ -159,7 +159,7 @@ export default function MilestonesTab(props: { order: Order }) {
               </TableCell>
               <TableCell>{milestone.dueAt ? formatDate(milestone.dueAt) : "No due date"}</TableCell>
               <TableCell>
-                <span className={"text-muted-foreground text-sm"}>
+                <span className={"text-sm text-muted-foreground"}>
                   {getInvoiceCount(milestone.id)} invoice{getInvoiceCount(milestone.id) === 1 ? "" : "s"}
                 </span>
               </TableCell>

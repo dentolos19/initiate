@@ -98,7 +98,7 @@ export default function AdvisorDialog(
       {props.children}
       <DialogContent className={"flex h-[95%] w-[95%] flex-col gap-0 p-0 sm:max-w-none"}>
         {/* Header */}
-        <div className={"bg-secondary flex items-center justify-between border-b p-4"}>
+        <div className={"flex items-center justify-between border-b bg-secondary p-4"}>
           <div className={"flex flex-1 items-center gap-2"}>
             <BotMessageSquareIcon className={"size-6"} />
             <h1 className={"text-lg font-bold"}>Advisor</h1>
@@ -149,7 +149,7 @@ export default function AdvisorDialog(
         </AnimatePresence>
 
         {/* Input */}
-        <form className={"bg-secondary z-20 flex gap-2 border-t p-4"} onSubmit={props.data.handleSubmit}>
+        <form className={"z-20 flex gap-2 border-t bg-secondary p-4"} onSubmit={props.data.handleSubmit}>
           <Input
             type={"text"}
             placeholder={"Say something…"}

@@ -67,13 +67,13 @@ export default function Page() {
           {randomizedDomains.map((domain) => (
             <CarouselItem key={domain.value} className={"md:basis-1/2 lg:basis-1/4"}>
               <Link href={`/market/tags/${domain.value}`}>
-                <Card className={"hover:bg-muted/30 h-full transition-colors"}>
+                <Card className={"h-full transition-colors hover:bg-muted/30"}>
                   <CardContent>
-                    <div className={"bg-primary text-primary-foreground mb-4 aspect-square w-max rounded-lg p-3"}>
+                    <div className={"mb-4 aspect-square w-max rounded-lg bg-primary p-3 text-primary-foreground"}>
                       <domain.icon className={"size-5"} />
                     </div>
                     <h3 className={"mb-2 text-lg font-medium"}>{domain.label}</h3>
-                    <p className={"text-muted-foreground line-clamp-2 text-sm"}>
+                    <p className={"line-clamp-2 text-sm text-muted-foreground"}>
                       {domain.description || "Explore services in this category."}
                     </p>
                   </CardContent>
@@ -96,7 +96,7 @@ export default function Page() {
                 <PencilRulerIcon className={"size-6"} />
                 <span className={"text-2xl font-bold"}>Recommended Services</span>
               </h2>
-              <p className={"text-muted-foreground text-sm"}>Services matched to your profile and interests.</p>
+              <p className={"text-sm text-muted-foreground"}>Services matched to your profile and interests.</p>
             </div>
             <Button variant={"ghost"} asChild>
               <Link href={"/market/featured"}>
@@ -110,7 +110,7 @@ export default function Page() {
 
         {/* No Items */}
         {relevantServices.length === 0 && (
-          <div className={"text-muted-foreground col-span-full my-10 text-center"}>
+          <div className={"col-span-full my-10 text-center text-muted-foreground"}>
             No recommendations available at the moment.
           </div>
         )}
@@ -142,7 +142,7 @@ export default function Page() {
                 <HeartIcon className={"size-6"} />
                 <span className={"text-2xl font-bold"}>Popular Services</span>
               </h2>
-              <p className={"text-muted-foreground text-sm"}>Currently trending services on our platform.</p>
+              <p className={"text-sm text-muted-foreground"}>Currently trending services on our platform.</p>
             </div>
             <Button variant={"ghost"} asChild>
               <Link href={"/market/popular"}>
@@ -156,7 +156,7 @@ export default function Page() {
 
         {/* No Items */}
         {popularServices.length === 0 && (
-          <div className={"text-muted-foreground col-span-full my-10 text-center"}>
+          <div className={"col-span-full my-10 text-center text-muted-foreground"}>
             No popular services available at the moment.
           </div>
         )}
@@ -188,7 +188,7 @@ export default function Page() {
                 <TimerIcon className={"size-6"} />
                 <span className={"text-2xl font-bold"}>Latest Releases</span>
               </h2>
-              <p className={"text-muted-foreground text-sm"}>Recently added services to our platform.</p>
+              <p className={"text-sm text-muted-foreground"}>Recently added services to our platform.</p>
             </div>
             <Button variant={"ghost"} asChild>
               <Link href={"/market/latest"}>
@@ -202,7 +202,7 @@ export default function Page() {
 
         {/* No Items */}
         {latestServices.length === 0 && (
-          <div className={"text-muted-foreground col-span-full my-10 text-center"}>
+          <div className={"col-span-full my-10 text-center text-muted-foreground"}>
             No latest services available at the moment.
           </div>
         )}

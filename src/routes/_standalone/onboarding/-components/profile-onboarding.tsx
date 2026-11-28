@@ -130,7 +130,7 @@ export default function ProfileOnboarding({ onNext }: { onNext: () => void }) {
                   <FormControl>
                     <Checkbox className="mt-0.5" checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
-                  <FormLabel className="text-muted-foreground block cursor-pointer text-sm leading-5 font-normal">
+                  <FormLabel className="block cursor-pointer text-sm leading-5 font-normal text-muted-foreground">
                     I accept the&nbsp;
                     <a
                       className="text-primary hover:underline"

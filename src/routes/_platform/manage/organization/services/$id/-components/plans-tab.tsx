@@ -45,7 +45,7 @@ export default function PlansTab(props: { data: Service }) {
       {plans.map((plan) => (
         <div
           key={plan.id}
-          className={"bg-card hover:bg-card/80 cursor-pointer rounded-lg border p-4 transition"}
+          className={"cursor-pointer rounded-lg border bg-card p-4 transition hover:bg-card/80"}
           onClick={() => {
             setSelectedPlan(plan);
             setOpen(true);
@@ -62,13 +62,13 @@ export default function PlansTab(props: { data: Service }) {
           </div>
 
           {/* Description */}
-          <div className={"text-muted-foreground text-sm"}>{plan.description ?? "No description available."}</div>
+          <div className={"text-sm text-muted-foreground"}>{plan.description ?? "No description available."}</div>
         </div>
       ))}
 
       {/* Action */}
       <div
-        className={"bg-card hover:bg-card/80 cursor-pointer rounded-lg border transition"}
+        className={"cursor-pointer rounded-lg border bg-card transition hover:bg-card/80"}
         onClick={() => {
           setSelectedPlan(undefined);
           setOpen(true);

@@ -11,8 +11,7 @@ import { Label } from "#/components/ui/label";
 import { PageContent, PageDescription, PageHeader, PageHeading, PageShell, PageTitle } from "#/components/ui/page";
 import useBackend from "#/lib/backend/client";
 import { ResourceGrant } from "#/lib/backend/schema";
-import Link from "#/lib/router";
-import { useParams, useRouter } from "#/lib/router";
+import Link, { useParams, useRouter } from "#/lib/router";
 
 export const Route = createFileRoute("/_platform/manage/platform/resources/grants/$id/")({
   component: GrantPage,
@@ -261,7 +260,7 @@ export default function GrantPage() {
                   onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                   rows={4}
                   disabled={loading}
-                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
 
@@ -383,7 +382,7 @@ export default function GrantPage() {
             <CardContent className="space-y-3">
               {formData.process.map((step, index) => (
                 <div key={index} className="flex gap-2">
-                  <div className="bg-primary text-primary-foreground flex h-10 w-8 flex-shrink-0 items-center justify-center rounded text-sm font-medium">
+                  <div className="flex h-10 w-8 flex-shrink-0 items-center justify-center rounded bg-primary text-sm font-medium text-primary-foreground">
                     {index + 1}
                   </div>
                   <Input

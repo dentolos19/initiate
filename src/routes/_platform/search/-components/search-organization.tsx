@@ -45,11 +45,11 @@ export default function SearchOrganizations() {
   }
 
   if (!query) {
-    return <div className={"text-muted-foreground my-10 text-center"}>Search something to get started!</div>;
+    return <div className={"my-10 text-center text-muted-foreground"}>Search something to get started!</div>;
   }
 
   if (!organizations.length) {
-    return <div className={"text-muted-foreground my-10 text-center"}>No organizations found.</div>;
+    return <div className={"my-10 text-center text-muted-foreground"}>No organizations found.</div>;
   }
 
   return (

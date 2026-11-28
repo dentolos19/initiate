@@ -1,4 +1,4 @@
-import { HeadContent, Link, Outlet, ScriptOnce, Scripts, createRootRoute } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Link, Outlet, ScriptOnce, Scripts } from "@tanstack/react-router";
 
 import AppProvider from "#/components/app-provider";
 import LogoTitle from "#/components/logo-title";
@@ -75,14 +75,14 @@ function Document({ children }: { children: React.ReactNode }) {
 
 function NotFound() {
   return (
-    <main className="bg-background grid min-h-dvh place-items-center px-6">
+    <main className="grid min-h-dvh place-items-center bg-background px-6">
       <section className="max-w-md text-center">
         <LogoTitle className="mx-auto h-10 w-auto" />
-        <p className="text-muted-foreground mt-10 text-sm font-medium">404 · Page not found</p>
+        <p className="mt-10 text-sm font-medium text-muted-foreground">404 · Page not found</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-balance">
           This path has not been initiated yet.
         </h1>
-        <p className="text-muted-foreground mt-4 text-pretty">
+        <p className="mt-4 text-pretty text-muted-foreground">
           Return home to continue discovering people, services, and opportunities.
         </p>
         <Link className={buttonVariants({ className: "mt-8" })} to="/">

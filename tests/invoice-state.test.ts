@@ -5,21 +5,23 @@ import { join } from "node:path";
 import { Hono } from "hono";
 import { Miniflare } from "miniflare";
 
-import { createDatabase, runWithDatabase, type AppDatabase } from "#/lib/database/database.server";
+import { type AppDatabase, createDatabase, runWithDatabase } from "#/lib/database/database.server";
 import orderInvoices from "#/lib/server/routes/order-invoices";
 
 const miniflare = new Miniflare({
-  workers: [{
-    config: {
-      name: "invoice-state-test",
-      compatibilityDate: "2026-10-01",
-      manifest: {
-        mainModule: "index.js",
-        modules: { "index.js": { type: "esm", contents: "export default { fetch: () => new Response('ok') }" } },
+  workers: [
+    {
+      config: {
+        name: "invoice-state-test",
+        compatibilityDate: "2026-10-01",
+        manifest: {
+          mainModule: "index.js",
+          modules: { "index.js": { type: "esm", contents: "export default { fetch: () => new Response('ok') }" } },
+        },
+        env: { DB: { type: "d1", id: "invoice-state-test" } },
       },
-      env: { DB: { type: "d1", id: "invoice-state-test" } },
     },
-  }],
+  ],
 });
 let bindings: Env;
 let database: AppDatabase;
@@ -35,11 +37,15 @@ app.route("/orders", orderInvoices);
 function request(path: string, method: string, body?: unknown, raceStatus?: string) {
   changedStatus = raceStatus;
   return runWithDatabase(raceStatus ? racedDatabase : database, undefined, () =>
-    app.request(path, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    }, bindings),
+    app.request(
+      path,
+      {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      },
+      bindings,
+    ),
   );
 }
 
@@ -53,7 +59,8 @@ beforeAll(async () => {
       if (property !== "prepare") return Reflect.get(target, property, target);
       return (sql: string) => {
         const statement = target.prepare(sql);
-        if (!sql.trimStart().toLowerCase().startsWith("select") || !sql.includes('"service_invoices"')) return statement;
+        if (!sql.trimStart().toLowerCase().startsWith("select") || !sql.includes('"service_invoices"'))
+          return statement;
         return new Proxy(statement, {
           get(statementTarget, key) {
             if (key !== "bind") return Reflect.get(statementTarget, key, statementTarget);
@@ -107,9 +114,14 @@ beforeAll(async () => {
   await bindings.DB.batch([
     bindings.DB.prepare("INSERT INTO users (id, firstName) VALUES ('buyer', 'Buyer'), ('provider', 'Provider')"),
     bindings.DB.prepare("INSERT INTO organizations (id, name) VALUES ('provider-org', 'Provider')"),
-    bindings.DB.prepare("INSERT INTO auth_members (id, organizationId, userId) VALUES ('member', 'provider-org', 'provider')"),
-    bindings.DB.prepare("INSERT INTO service_orders (id, userId, organizationId, name) VALUES ('order', 'buyer', 'provider-org', 'Order')"),
-    bindings.DB.prepare(`INSERT INTO service_invoices (id, orderId, userId, amount, status, paymentAccountId, customerReference, reference)
+    bindings.DB.prepare(
+      "INSERT INTO auth_members (id, organizationId, userId) VALUES ('member', 'provider-org', 'provider')",
+    ),
+    bindings.DB.prepare(
+      "INSERT INTO service_orders (id, userId, organizationId, name) VALUES ('order', 'buyer', 'provider-org', 'Order')",
+    ),
+    bindings.DB
+      .prepare(`INSERT INTO service_invoices (id, orderId, userId, amount, status, paymentAccountId, customerReference, reference)
       VALUES ('invoice', 'order', 'buyer', 10000, 'draft', 'account', 'customer', 'reference')`),
   ]);
 });
@@ -125,19 +137,29 @@ describe("invoice state changes", () => {
       { initial: "open", changed: "paid", method: "DELETE", path: "/orders/invoices/invoice" },
     ];
     for (const action of cases) {
-      await bindings.DB.prepare("UPDATE service_invoices SET status = ?, amount = 10000 WHERE id = 'invoice'").bind(action.initial).run();
+      await bindings.DB.prepare("UPDATE service_invoices SET status = ?, amount = 10000 WHERE id = 'invoice'")
+        .bind(action.initial)
+        .run();
       const response = await request(action.path, action.method, action.body, action.changed);
       expect(response.status).toBe(409);
-      expect(await bindings.DB.prepare("SELECT status, amount FROM service_invoices WHERE id = 'invoice'").first()).toEqual({
+      expect(
+        await bindings.DB.prepare("SELECT status, amount FROM service_invoices WHERE id = 'invoice'").first(),
+      ).toEqual({
         status: action.changed,
         amount: 10000,
       });
       if (action.changed === "paid") {
-        expect(await bindings.DB.prepare("SELECT amount, refundedAmount FROM payment_charges WHERE id = 'charge'").first()).toEqual({
+        expect(
+          await bindings.DB.prepare("SELECT amount, refundedAmount FROM payment_charges WHERE id = 'charge'").first(),
+        ).toEqual({
           amount: 10000,
           refundedAmount: 0,
         });
-        expect(await bindings.DB.prepare("SELECT amount FROM payment_balance_transactions WHERE id = 'balance'").first("amount")).toBe(10000);
+        expect(
+          await bindings.DB.prepare("SELECT amount FROM payment_balance_transactions WHERE id = 'balance'").first(
+            "amount",
+          ),
+        ).toBe(10000);
       }
     }
   });
@@ -152,7 +174,9 @@ describe("invoice state changes", () => {
     expect((await request("/orders/invoices/invoice", "PUT", { amount: 20000 })).status).toBe(200);
     expect((await request("/orders/invoices/invoice/finalize", "POST")).status).toBe(200);
     expect((await request("/orders/invoices/invoice", "DELETE")).status).toBe(200);
-    expect(await bindings.DB.prepare("SELECT status, amount FROM service_invoices WHERE id = 'invoice'").first()).toEqual({
+    expect(
+      await bindings.DB.prepare("SELECT status, amount FROM service_invoices WHERE id = 'invoice'").first(),
+    ).toEqual({
       status: "void",
       amount: 20000,
     });

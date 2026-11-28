@@ -1,7 +1,7 @@
-import { WorkflowEntrypoint, WorkflowStep, type WorkflowEvent } from "cloudflare:workers";
+import { WorkflowEntrypoint, type WorkflowEvent, WorkflowStep } from "cloudflare:workers";
 
 import { createDatabase, insertEmbedding } from "#/lib/server/integrations/database.js";
-import { generateEmbeddings, aggregateEmbeddings } from "#/lib/server/lib/embeddings.js";
+import { aggregateEmbeddings, generateEmbeddings } from "#/lib/server/lib/embeddings.js";
 import { forceSerializable } from "#/lib/server/lib/utils.js";
 
 export class Synchronizer extends WorkflowEntrypoint<Env, unknown> {

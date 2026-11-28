@@ -37,7 +37,7 @@ export default function Page() {
       backend.orders
         .confirmOrder(id)
         .then((order) => {
-          setOrder((current) => current?.id === order.id ? order : current);
+          setOrder((current) => (current?.id === order.id ? order : current));
           toast.success("Order confirmed successfully.");
         })
         .catch((error: Error) => {
@@ -54,7 +54,7 @@ export default function Page() {
       backend.orders
         .cancelOrder(id)
         .then((order) => {
-          setOrder((current) => current?.id === order.id ? order : current);
+          setOrder((current) => (current?.id === order.id ? order : current));
           toast.success("Order cancelled successfully.");
         })
         .catch((error: Error) => {
@@ -71,7 +71,7 @@ export default function Page() {
       backend.orders
         .rejectOrder(id)
         .then((order) => {
-          setOrder((current) => current?.id === order.id ? order : current);
+          setOrder((current) => (current?.id === order.id ? order : current));
           toast.success("Order rejected successfully.");
         })
         .catch((error: Error) => {
@@ -129,7 +129,7 @@ export default function Page() {
             <div className={"flex flex-col"}>
               <h1
                 className={
-                  "text-foreground mb-1 flex flex-col items-start gap-2 text-lg font-semibold sm:flex-row sm:items-center sm:text-xl"
+                  "mb-1 flex flex-col items-start gap-2 text-lg font-semibold text-foreground sm:flex-row sm:items-center sm:text-xl"
                 }
               >
                 <span className={"break-words"}>{order.service?.name || order.name}</span>
@@ -137,7 +137,7 @@ export default function Page() {
                   {getLabel(orderStatus, order.status, "Unknown")}
                 </Badge>
               </h1>
-              <p className={"text-muted-foreground text-sm"}>Order #{order.id}</p>
+              <p className={"text-sm text-muted-foreground"}>Order #{order.id}</p>
             </div>
           </div>
           <div className={"flex flex-wrap items-center gap-2"}>
@@ -181,7 +181,7 @@ export default function Page() {
       </div>
 
       <Tabs defaultValue={"overview"}>
-        <TabsList className={"bg-background w-full rounded-none border-b"}>
+        <TabsList className={"w-full rounded-none border-b bg-background"}>
           <TabsTrigger value={"overview"}>Overview</TabsTrigger>
           <TabsTrigger value={"milestones"}>Milestones</TabsTrigger>
           <TabsTrigger value={"invoices"}>Invoices</TabsTrigger>

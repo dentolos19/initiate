@@ -10,8 +10,14 @@ if (action !== "migrate") throw new Error("Expected migrate.");
 if (args.includes("--remote") && args.includes("--local")) throw new Error("Choose --local or --remote.");
 
 const command = [
-  "d1", "migrations", "apply", config.worker.env.DB.id!,
-  "--dir", "migrations", "--pattern", "migrations/*/migration.sql",
+  "d1",
+  "migrations",
+  "apply",
+  config.worker.env.DB.id!,
+  "--dir",
+  "migrations",
+  "--pattern",
+  "migrations/*/migration.sql",
 ];
 if (!args.includes("--remote")) {
   command.push("--local");

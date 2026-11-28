@@ -28,7 +28,7 @@ export default function ProposalSection(props: { data: CommunityPost }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <FileTextIcon className="text-primary h-5 w-5" />
+              <FileTextIcon className="h-5 w-5 text-primary" />
               <CardTitle className="text-lg">Proposals</CardTitle>
             </div>
             <Badge variant="outline" className="text-xs">

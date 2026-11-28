@@ -38,7 +38,7 @@ export default function InvoiceTable({ invoices, loading, emptyMessage }: Invoic
       <TableBody>
         {invoices.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={6} className={"text-muted-foreground py-8 text-center"}>
+            <TableCell colSpan={6} className={"py-8 text-center text-muted-foreground"}>
               {emptyMessage || "No invoices found."}
             </TableCell>
           </TableRow>
@@ -49,7 +49,7 @@ export default function InvoiceTable({ invoices, loading, emptyMessage }: Invoic
               <TableCell>
                 <div className={"space-y-1"}>
                   <div className={"font-medium"}>{invoice.order?.service?.name || "Unknown Service"}</div>
-                  <div className={"text-muted-foreground text-sm"}>
+                  <div className={"text-sm text-muted-foreground"}>
                     {invoice.order?.service?.organization?.name || "Unknown Organization"}
                   </div>
                 </div>

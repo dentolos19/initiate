@@ -45,21 +45,21 @@ export default function SimilarSection() {
               <PencilRulerIcon className={"size-6"} />
               <span className={"text-2xl font-bold"}>Similar Services</span>
             </h2>
-            <p className={"text-muted-foreground text-sm"}>Find other similar services to this service right now.</p>
+            <p className={"text-sm text-muted-foreground"}>Find other similar services to this service right now.</p>
           </div>
         </div>
         <Separator className={"my-4"} />
       </div>
 
       {loading && (
-        <div className={"text-muted-foreground my-10 text-center"}>
+        <div className={"my-10 text-center text-muted-foreground"}>
           <LoadingSpinner />
         </div>
       )}
 
       {/* No Items */}
       {!loading && services.length === 0 && (
-        <div className={"text-muted-foreground my-10 text-center"}>No services available.</div>
+        <div className={"my-10 text-center text-muted-foreground"}>No services available.</div>
       )}
 
       {/* Services */}

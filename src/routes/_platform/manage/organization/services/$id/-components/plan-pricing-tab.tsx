@@ -40,7 +40,7 @@ export default function PlanPricingTab(props: { form: UseFormReturn<z.infer<type
                   {/* TODO: Implement recurring plans */}
                   <SelectItem value={"recurring"} disabled>
                     <span>Recurring</span>
-                    <span className={"text-muted-foreground text-xs"}>Not Supported Yet</span>
+                    <span className={"text-xs text-muted-foreground"}>Not Supported Yet</span>
                   </SelectItem>
                 </SelectContent>
               </Select>

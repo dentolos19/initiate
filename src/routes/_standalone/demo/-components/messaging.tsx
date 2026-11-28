@@ -22,11 +22,11 @@ export default function Messaging() {
           </CardHeader>
           <CardContent className={"flex-1"}>
             <div className={"flex flex-col gap-2"}>
-              <div className={"bg-muted w-max max-w-[80%] rounded-lg p-3"}>Let agree on this deal?</div>
-              <div className={"bg-primary text-primary-foreground w-max max-w-[80%] self-end rounded-lg p-3"}>
+              <div className={"w-max max-w-[80%] rounded-lg bg-muted p-3"}>Let agree on this deal?</div>
+              <div className={"w-max max-w-[80%] self-end rounded-lg bg-primary p-3 text-primary-foreground"}>
                 Yes, please!
               </div>
-              <div className={"bg-muted w-max max-w-[80%] rounded-lg p-3"}>
+              <div className={"w-max max-w-[80%] rounded-lg bg-muted p-3"}>
                 <div className={"mb-3 text-3xl font-medium"}>S$1000</div>
                 <div className={"flex gap-2"}>
                   <Button variant={"default"} size={"sm"} disabled title={"Static payment preview"}>

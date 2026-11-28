@@ -1,4 +1,4 @@
-import { isToolUIPart, getToolName, type UIMessage as Message } from "ai";
+import { getToolName, isToolUIPart, type UIMessage as Message } from "ai";
 import Markdown from "react-markdown";
 
 import ImageWrapper from "#/components/ui/wrappers/image";
@@ -12,13 +12,13 @@ function SearchServicesWidget(props: { data: Service[] }) {
       {props.data.map((service) => (
         <Link
           key={service.id}
-          className={"bg-card hover:bg-card/80 flex overflow-hidden rounded-lg border shadow-lg"}
+          className={"flex overflow-hidden rounded-lg border bg-card shadow-lg hover:bg-card/80"}
           href={`/services/${service.id}`}
         >
           <ImageWrapper className={"size-16"} src={service.imageUrl} />
           <div className={"p-2"}>
             <h3 className={"line-clamp-1 text-lg font-bold"}>{service.name}</h3>
-            <p className={"text-muted-foreground line-clamp-1 text-sm"}>{service.tagline || "No tagline available."}</p>
+            <p className={"line-clamp-1 text-sm text-muted-foreground"}>{service.tagline || "No tagline available."}</p>
           </div>
         </Link>
       ))}
@@ -32,7 +32,7 @@ export default function AdvisorMessage(props: { data: Message }) {
       <div className={cn("w-max max-w-[80%]", props.data.role === "user" && "self-end")}>
         <div
           className={cn(
-            "bg-secondary prose prose-sm dark:prose-invert rounded-lg p-2 shadow-lg",
+            "prose prose-sm rounded-lg bg-secondary p-2 shadow-lg dark:prose-invert",
             props.data.role === "user" && "bg-primary text-primary-foreground",
           )}
         >

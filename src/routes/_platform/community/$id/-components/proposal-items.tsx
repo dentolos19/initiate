@@ -58,7 +58,6 @@ export default function ProposalItems({ problemId, onProposalUpdate, isProblemOw
     loadProposals();
   }, [loadProposals]);
 
-
   function handleAcceptProposal(proposalId: string) {
     backend.community
       .acceptProposal(proposalId)
@@ -142,9 +141,9 @@ export default function ProposalItems({ problemId, onProposalUpdate, isProblemOw
     return (
       <Card>
         <CardContent className={"flex flex-col items-center justify-center py-12"}>
-          <FileTextIcon className={"text-muted-foreground mb-4 h-12 w-12"} />
+          <FileTextIcon className={"mb-4 h-12 w-12 text-muted-foreground"} />
           <h3 className={"mb-2 text-lg font-semibold"}>No Proposals Yet</h3>
-          <p className={"text-muted-foreground text-center"}>
+          <p className={"text-center text-muted-foreground"}>
             When people offer solutions to your problem, their proposals will appear here.
           </p>
         </CardContent>
@@ -223,7 +222,7 @@ export default function ProposalItems({ problemId, onProposalUpdate, isProblemOw
             {proposal.title && (
               <div>
                 <h4 className={"mb-2 font-medium"}>Proposal Title</h4>
-                <p className={"text-muted-foreground text-sm"}>{proposal.title}</p>
+                <p className={"text-sm text-muted-foreground"}>{proposal.title}</p>
               </div>
             )}
 
@@ -246,7 +245,7 @@ export default function ProposalItems({ problemId, onProposalUpdate, isProblemOw
                     <ClockIcon className={"h-4 w-4"} />
                     Duration
                   </h4>
-                  <p className={"text-muted-foreground text-sm"}>{proposal.duration} days</p>
+                  <p className={"text-sm text-muted-foreground"}>{proposal.duration} days</p>
                 </div>
               )}
               {proposal.cost && (
@@ -255,7 +254,7 @@ export default function ProposalItems({ problemId, onProposalUpdate, isProblemOw
                     <DollarSignIcon className={"h-4 w-4"} />
                     Total Cost
                   </h4>
-                  <p className={"text-muted-foreground text-sm"}>${proposal.cost.toFixed(2)}</p>
+                  <p className={"text-sm text-muted-foreground"}>${proposal.cost.toFixed(2)}</p>
                 </div>
               )}
             </div>

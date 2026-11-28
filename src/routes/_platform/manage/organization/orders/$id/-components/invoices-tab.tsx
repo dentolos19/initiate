@@ -136,7 +136,7 @@ export default function InvoicesTab(props: { order: Order }) {
 
   return (
     <div>
-      <div className={"bg-sidebar flex h-12 items-center justify-between border-b px-2"}>
+      <div className={"flex h-12 items-center justify-between border-b bg-sidebar px-2"}>
         <h3 className={"font-medium"}>Invoices</h3>
         <Button variant={"outline"} size={"sm"} onClick={handleCreateInvoice}>
           <PlusIcon />
@@ -157,7 +157,7 @@ export default function InvoicesTab(props: { order: Order }) {
         <TableBody>
           {invoices.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className={"text-muted-foreground py-8 text-center"}>
+              <TableCell colSpan={6} className={"py-8 text-center text-muted-foreground"}>
                 No invoices found. Create your first invoice to get started.
               </TableCell>
             </TableRow>

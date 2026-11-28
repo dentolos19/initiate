@@ -58,11 +58,11 @@ export default function NotificationDialog({
             )}
           </div>
           <DialogDescription>{notification.description}</DialogDescription>
-          <p className={"text-muted-foreground text-xs"}>{formatDateTime(notification.createdAt)}</p>
+          <p className={"text-xs text-muted-foreground"}>{formatDateTime(notification.createdAt)}</p>
         </DialogHeader>
 
         <div
-          className={"prose dark:prose-invert max-w-none"}
+          className={"prose max-w-none dark:prose-invert"}
           dangerouslySetInnerHTML={{ __html: notification.content || "" }}
         />
       </DialogContent>

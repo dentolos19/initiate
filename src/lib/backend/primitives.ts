@@ -30,9 +30,10 @@ export interface BackendPrimitives {
 async function parseResponse(res: Response) {
   if (!res.ok) {
     const error: unknown = await res.json();
-    const message = typeof error === "object" && error !== null && "message" in error && typeof error.message === "string"
-      ? error.message
-      : "Failed to request from backend.";
+    const message =
+      typeof error === "object" && error !== null && "message" in error && typeof error.message === "string"
+        ? error.message
+        : "Failed to request from backend.";
     throw new Error(message);
   }
   return res.json();

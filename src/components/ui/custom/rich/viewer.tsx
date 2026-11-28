@@ -5,7 +5,7 @@ import { ComponentProps } from "react";
 export function RichViewer(props: ComponentProps<"article"> & { content: string }) {
   return (
     <article
-      className={"prose prose-sm dark:prose-invert max-w-none"}
+      className={"prose prose-sm max-w-none dark:prose-invert"}
       dangerouslySetInnerHTML={{ __html: props.content }}
     />
   );

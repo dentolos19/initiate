@@ -19,8 +19,7 @@ import useBackend from "#/lib/backend/client";
 import { Order } from "#/lib/backend/connectors/orders";
 import { OrderStatus } from "#/lib/backend/schema";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { useRouter, useSearchParams } from "#/lib/router";
+import Link, { useRouter, useSearchParams } from "#/lib/router";
 import orderStatus from "#/lib/store/order-status";
 import serviceTypes from "#/lib/store/service-types";
 import { formatDateTime, getLabel } from "#/lib/utils";
@@ -100,31 +99,31 @@ export default function Page() {
         <div className={"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4"}>
           <div className={"flex items-center justify-between border-r p-6 last:border-r-0"}>
             <div>
-              <h2 className={"text-muted-foreground text-sm font-medium"}>Total Orders</h2>
+              <h2 className={"text-sm font-medium text-muted-foreground"}>Total Orders</h2>
               <p className={"mt-1 text-2xl font-semibold tabular-nums"}>{statistics.totalOrders}</p>
             </div>
-            <PackageIcon className={"text-muted-foreground h-8 w-8"} />
+            <PackageIcon className={"h-8 w-8 text-muted-foreground"} />
           </div>
           <div className={"flex items-center justify-between border-r p-6 last:border-r-0"}>
             <div>
-              <h2 className={"text-muted-foreground text-sm font-medium"}>Pending Confirmation</h2>
+              <h2 className={"text-sm font-medium text-muted-foreground"}>Pending Confirmation</h2>
               <p className={"mt-1 text-2xl font-semibold tabular-nums"}>{statistics.pendingConfirmation}</p>
             </div>
-            <PackageSearchIcon className={"text-muted-foreground h-8 w-8"} />
+            <PackageSearchIcon className={"h-8 w-8 text-muted-foreground"} />
           </div>
           <div className={"flex items-center justify-between border-r p-6 last:border-r-0"}>
             <div>
-              <h2 className={"text-muted-foreground text-sm font-medium"}>Pending Completion</h2>
+              <h2 className={"text-sm font-medium text-muted-foreground"}>Pending Completion</h2>
               <p className={"mt-1 text-2xl font-semibold tabular-nums"}>{statistics.pendingCompletion}</p>
             </div>
-            <PackageOpenIcon className={"text-muted-foreground h-8 w-8"} />
+            <PackageOpenIcon className={"h-8 w-8 text-muted-foreground"} />
           </div>
           <div className={"flex items-center justify-between p-6"}>
             <div>
-              <h2 className={"text-muted-foreground text-sm font-medium"}>Completed Orders</h2>
+              <h2 className={"text-sm font-medium text-muted-foreground"}>Completed Orders</h2>
               <p className={"mt-1 text-2xl font-semibold tabular-nums"}>{statistics.completedOrders}</p>
             </div>
-            <PackageCheckIcon className={"text-muted-foreground h-8 w-8"} />
+            <PackageCheckIcon className={"h-8 w-8 text-muted-foreground"} />
           </div>
         </div>
       </div>
@@ -153,9 +152,9 @@ export default function Page() {
       </div>
 
       {/* Orders */}
-      <div className={"bg-background flex-1 overflow-auto"}>
+      <div className={"flex-1 overflow-auto bg-background"}>
         <Table>
-          <TableHeader className={"bg-background sticky top-0"}>
+          <TableHeader className={"sticky top-0 bg-background"}>
             <TableRow>
               <TableHead className={"font-semibold"}>Service</TableHead>
               <TableHead className={"font-semibold"}>Type</TableHead>
@@ -169,7 +168,7 @@ export default function Page() {
             {/* While Loading */}
             {loading && (
               <TableRow>
-                <TableCell colSpan={7} className={"text-muted-foreground py-12 text-center"}>
+                <TableCell colSpan={7} className={"py-12 text-center text-muted-foreground"}>
                   <LoadingSpinner />
                 </TableCell>
               </TableRow>
@@ -178,9 +177,9 @@ export default function Page() {
             {/* No Items */}
             {!loading && orders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className={"text-muted-foreground py-12 text-center"}>
+                <TableCell colSpan={7} className={"py-12 text-center text-muted-foreground"}>
                   <div className={"flex flex-col items-center gap-2"}>
-                    <PackageIcon className={"text-muted-foreground/50 h-12 w-12"} />
+                    <PackageIcon className={"h-12 w-12 text-muted-foreground/50"} />
                     <p className={"font-medium"}>No Orders Found</p>
                     <p className={"text-sm"}>No orders have been placed for your services yet.</p>
                   </div>
@@ -194,7 +193,7 @@ export default function Page() {
                   <Link className={"mb-1 font-medium hover:underline"} href={`/services/${order.service?.id}`}>
                     {order.service?.name || order.name}
                   </Link>
-                  <p className={"text-muted-foreground font-mono text-xs"}>{order.id}</p>
+                  <p className={"font-mono text-xs text-muted-foreground"}>{order.id}</p>
                 </TableCell>
                 <TableCell>
                   <Badge variant={"outline"}>{getLabel(serviceTypes, order.service?.type, "Custom")}</Badge>

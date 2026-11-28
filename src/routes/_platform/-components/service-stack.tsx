@@ -12,7 +12,7 @@ export default function ServiceStack(props: ComponentProps<"a"> & { data: Servic
   return (
     <Link
       {...props}
-      className={cn("bg-card group flex overflow-hidden rounded-lg border", props.className)}
+      className={cn("group flex overflow-hidden rounded-lg border bg-card", props.className)}
       href={`/services/${service.id}`}
     >
       <div className={"relative aspect-square overflow-hidden"}>
@@ -28,7 +28,7 @@ export default function ServiceStack(props: ComponentProps<"a"> & { data: Servic
           {/* Name */}
           <div className={"flex-1"}>
             <h3 className={"text-2xl font-bold"}>{service.name}</h3>
-            <p className={"text-muted-foreground text-sm"}>{service.tagline || "No tagline available."}</p>
+            <p className={"text-sm text-muted-foreground"}>{service.tagline || "No tagline available."}</p>
           </div>
 
           {/* Verified Badge */}

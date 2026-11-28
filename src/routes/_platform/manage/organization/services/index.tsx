@@ -87,7 +87,7 @@ export default function Page() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div className={"text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"}>
+          <div className={"pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"}>
             <SearchIcon className={"size-4"} aria-hidden="true" />
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function Page() {
           <TableBody>
             {filteredServices.length === 0 && (
               <TableRow>
-                <TableCell colSpan={10} className={"text-muted-foreground py-4 text-center"}>
+                <TableCell colSpan={10} className={"py-4 text-center text-muted-foreground"}>
                   {searchTerm ? "No services match your search." : "No services found."}
                 </TableCell>
               </TableRow>
@@ -125,7 +125,7 @@ export default function Page() {
               <TableRow key={service.id}>
                 <TableCell>
                   <h3 className={"font-medium"}>{service.name}</h3>
-                  <p className={"text-muted-foreground text-xs"}>{service.tagline || "No tagline available."}</p>
+                  <p className={"text-xs text-muted-foreground"}>{service.tagline || "No tagline available."}</p>
                 </TableCell>
                 <TableCell>{getLabel(serviceTypes, service.type, "Unknown")}</TableCell>
                 <TableCell>{getLabel(serviceStatus, service.status, "Unknown")}</TableCell>
@@ -154,7 +154,7 @@ export default function Page() {
                     </PopoverTrigger>
                     <PopoverContent className={"w-60"}>
                       <h3 className={"mb-1 font-semibold"}>Delete Service?</h3>
-                      <p className={"text-muted-foreground mb-3 text-sm"}>This action cannot be undone.</p>
+                      <p className={"mb-3 text-sm text-muted-foreground"}>This action cannot be undone.</p>
                       <Button variant={"destructive"} size={"sm"} onClick={() => deleteService(service.id)}>
                         Delete Service
                       </Button>

@@ -51,7 +51,6 @@ export default function TopicsCard(props: ComponentProps<typeof Card>) {
     loadTopics();
   }, [loadTopics]);
 
-
   function handleFollowToggle(topicName: string) {
     if (!user) {
       router.push(`/auth?redirect=${encodeURIComponent(`/community?topic=${topicName}`)}`);
@@ -106,10 +105,10 @@ export default function TopicsCard(props: ComponentProps<typeof Card>) {
             {[...Array(5)].map((_, i) => (
               <div key={i} className={"flex items-center justify-between gap-3 py-2"}>
                 <div className={"flex items-center gap-2"}>
-                  <div className={"bg-muted h-6 w-6 animate-pulse rounded-full"}></div>
-                  <div className={"bg-muted h-4 w-20 animate-pulse rounded"}></div>
+                  <div className={"h-6 w-6 animate-pulse rounded-full bg-muted"}></div>
+                  <div className={"h-4 w-20 animate-pulse rounded bg-muted"}></div>
                 </div>
-                <div className={"bg-muted h-6 w-14 animate-pulse rounded"}></div>
+                <div className={"h-6 w-14 animate-pulse rounded bg-muted"}></div>
               </div>
             ))}
           </div>
@@ -129,7 +128,7 @@ export default function TopicsCard(props: ComponentProps<typeof Card>) {
       </CardHeader>
       <CardContent className={"space-y-3"}>
         {topics.length === 0 ? (
-          <div className={"text-muted-foreground py-4 text-center text-sm"}>No topics found</div>
+          <div className={"py-4 text-center text-sm text-muted-foreground"}>No topics found</div>
         ) : (
           topics.map((topic) => (
             <div key={topic.name} className={"flex items-center justify-between gap-3 py-2"}>
@@ -142,7 +141,7 @@ export default function TopicsCard(props: ComponentProps<typeof Card>) {
                 <div className={"flex items-center gap-2"}>
                   <div
                     className={
-                      "bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium"
+                      "flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary"
                     }
                   >
                     #

@@ -17,7 +17,7 @@ export default function AdvisorPopover(
       {props.children}
       <PopoverContent className={"mr-4 mb-2 flex max-h-[80vh] min-h-100 w-[95vw] flex-col p-0 sm:w-120"}>
         {/* Header */}
-        <div className={"bg-secondary flex border-b p-4"}>
+        <div className={"flex border-b bg-secondary p-4"}>
           <div className={"flex flex-1 items-center gap-2"}>
             <BotMessageSquareIcon className={"size-6"} />
             <h1 className={"text-lg font-bold"}>Advisor</h1>
@@ -30,14 +30,14 @@ export default function AdvisorPopover(
         </div>
 
         {/* Messages */}
-        <div className={"bg-background flex flex-1 flex-col gap-4 overflow-y-auto p-4"}>
+        <div className={"flex flex-1 flex-col gap-4 overflow-y-auto bg-background p-4"}>
           {props.data.messages.map((message) => (
             <AdvisorMessage key={message.id} data={message} />
           ))}
         </div>
 
         {/* Input */}
-        <form className={"bg-secondary flex gap-2 border-t p-4"} onSubmit={props.data.handleSubmit}>
+        <form className={"flex gap-2 border-t bg-secondary p-4"} onSubmit={props.data.handleSubmit}>
           <Input
             type={"text"}
             placeholder={"I need help with…"}

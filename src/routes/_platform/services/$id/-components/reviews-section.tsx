@@ -11,8 +11,7 @@ import ImageWrapper from "#/components/ui/wrappers/image";
 import useBackend from "#/lib/backend/client";
 import { ServiceReview } from "#/lib/backend/schema";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { useParams } from "#/lib/router";
+import Link, { useParams } from "#/lib/router";
 import { formatDateTime, notifyLoading } from "#/lib/utils";
 import Loading from "#/routes/-components/loading";
 import ReviewDialog from "#/routes/_platform/services/$id/-components/review-dialog";
@@ -93,7 +92,7 @@ export default function ReviewsSection() {
             <PencilRulerIcon className={"size-6"} />
             <span className={"text-2xl font-bold"}>Reviews</span>
           </h2>
-          <p className={"text-muted-foreground text-sm"}>Verified reviews by people who had bought the service.</p>
+          <p className={"text-sm text-muted-foreground"}>Verified reviews by people who had bought the service.</p>
         </div>
         <Button variant={"ghost"} onClick={openNewDialog}>
           <PlusIcon />
@@ -110,7 +109,7 @@ export default function ReviewsSection() {
 
         {/* No Reviews */}
         {!loading && reviews.length <= 0 && (
-          <div className={"text-muted-foreground my-10 text-center sm:col-span-full"}>
+          <div className={"my-10 text-center text-muted-foreground sm:col-span-full"}>
             No reviews yet. Be the first to review this service!
           </div>
         )}
@@ -129,12 +128,12 @@ export default function ReviewsSection() {
                   <Link className={"font-medium hover:underline"} href={`/users/${review.userId}`}>
                     {review.user.firstName} {review.user.lastName}
                   </Link>
-                  <div className={"text-muted-foreground mb-1 text-xs"}>
+                  <div className={"mb-1 text-xs text-muted-foreground"}>
                     {Array.from({ length: review.stars }, (_, i) => (
                       <span key={i}>⭐</span>
                     ))}
                   </div>
-                  <div className={"text-muted-foreground text-xs"}>{formatDateTime(review.createdAt)}</div>
+                  <div className={"text-xs text-muted-foreground"}>{formatDateTime(review.createdAt)}</div>
                 </div>
                 {review.userId === user?.id && (
                   <div className={"flex gap-1"}>
@@ -154,7 +153,7 @@ export default function ReviewsSection() {
                       </PopoverTrigger>
                       <PopoverContent className={"w-60"}>
                         <div className={"font-medium"}>Are you sure?</div>
-                        <div className={"text-muted-foreground mb-2 text-sm"}>This action is permanent!</div>
+                        <div className={"mb-2 text-sm text-muted-foreground"}>This action is permanent!</div>
                         <Button variant={"destructive"} onClick={() => deleteReview(review.id)}>
                           Delete
                         </Button>

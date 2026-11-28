@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
 import { EyeIcon, Loader2Icon, SaveIcon } from "lucide-react";
-import { useEffect, useState, type ChangeEvent } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -178,7 +178,7 @@ export default function Page() {
                       />
                       <ImageWrapper className="size-full object-cover" src={field.value} alt="Avatar" />
                       {uploading === "avatar" && (
-                        <span className="bg-background/80 absolute inset-0 grid place-content-center">
+                        <span className="absolute inset-0 grid place-content-center bg-background/80">
                           <Loader2Icon className="animate-spin motion-reduce:animate-none" />
                         </span>
                       )}
@@ -206,7 +206,7 @@ export default function Page() {
                       />
                       <ImageWrapper className="h-40 w-auto max-w-full object-cover" src={field.value} alt="Banner" />
                       {uploading === "banner" && (
-                        <span className="bg-background/80 absolute inset-0 grid place-content-center">
+                        <span className="absolute inset-0 grid place-content-center bg-background/80">
                           <Loader2Icon className="animate-spin motion-reduce:animate-none" />
                         </span>
                       )}

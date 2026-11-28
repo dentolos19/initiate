@@ -11,8 +11,7 @@ import { Label } from "#/components/ui/label";
 import { PageContent, PageDescription, PageHeader, PageHeading, PageShell, PageTitle } from "#/components/ui/page";
 import useBackend from "#/lib/backend/client";
 import { ResourceDocumentation } from "#/lib/backend/schema";
-import Link from "#/lib/router";
-import { useParams, useRouter } from "#/lib/router";
+import Link, { useParams, useRouter } from "#/lib/router";
 
 export const Route = createFileRoute("/_platform/manage/platform/resources/documentation/$id/")({
   component: DocumentationPage,
@@ -155,7 +154,7 @@ export default function DocumentationPage() {
                   onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                   rows={4}
                   disabled={loading}
-                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
             </CardContent>

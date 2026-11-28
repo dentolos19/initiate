@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { Hono } from "hono";
@@ -7,24 +7,26 @@ import { Miniflare } from "miniflare";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { createDatabase, runWithDatabase, type AppDatabase } from "#/lib/database/database.server";
+import { type AppDatabase, createDatabase, runWithDatabase } from "#/lib/database/database.server";
 import { createBucketClient } from "#/lib/server/integrations/bucket";
 import { createNotificationClient } from "#/lib/server/integrations/notification";
 import orderMilestones from "#/lib/server/routes/order-milestones";
 import orders from "#/lib/server/routes/orders";
 
 const miniflare = new Miniflare({
-  workers: [{
-    config: {
-      name: "order-access-test",
-      compatibilityDate: "2026-10-01",
-      manifest: {
-        mainModule: "index.js",
-        modules: { "index.js": { type: "esm", contents: "export default { fetch: () => new Response('ok') }" } },
+  workers: [
+    {
+      config: {
+        name: "order-access-test",
+        compatibilityDate: "2026-10-01",
+        manifest: {
+          mainModule: "index.js",
+          modules: { "index.js": { type: "esm", contents: "export default { fetch: () => new Response('ok') }" } },
+        },
+        env: { DB: { type: "d1", id: "order-access-test" } },
       },
-      env: { DB: { type: "d1", id: "order-access-test" } },
     },
-  }],
+  ],
 });
 let bindings: Env;
 let database: AppDatabase;
@@ -73,7 +75,9 @@ beforeAll(async () => {
       ('buyer', 'Buyer', 'user'), ('provider', 'Provider', 'user'),
       ('stranger', 'Stranger', 'user'), ('admin', 'Admin', 'admin')`),
     bindings.DB.prepare("INSERT INTO organizations (id, name) VALUES ('provider-org', 'Provider')"),
-    bindings.DB.prepare("INSERT INTO auth_members (id, organizationId, userId) VALUES ('member', 'provider-org', 'provider')"),
+    bindings.DB.prepare(
+      "INSERT INTO auth_members (id, organizationId, userId) VALUES ('member', 'provider-org', 'provider')",
+    ),
     bindings.DB.prepare(`INSERT INTO service_orders (id, userId, organizationId, name, status)
       VALUES ('order', 'buyer', 'provider-org', 'Order', 'proposed')`),
     bindings.DB.prepare(`INSERT INTO order_milestones (id, orderId, name, status)
@@ -130,9 +134,15 @@ describe("order authorization", () => {
       expect((await request("buyer", path, method, body)).status).toBe(403);
     }
     expect((await request("provider", "/orders/order/milestones", "POST", { name: "Created" })).status).toBe(200);
-    expect((await request("provider", "/orders/order/milestones/milestone", "PUT", { name: "Revised" })).status).toBe(200);
-    expect((await request("admin", "/orders/order/milestones/milestone", "PATCH", { status: "completed" })).status).toBe(200);
-    expect((await request("provider", "/orders/order", "PUT", { name: "Updated", status: "confirmed" })).status).toBe(400);
+    expect((await request("provider", "/orders/order/milestones/milestone", "PUT", { name: "Revised" })).status).toBe(
+      200,
+    );
+    expect(
+      (await request("admin", "/orders/order/milestones/milestone", "PATCH", { status: "completed" })).status,
+    ).toBe(200);
+    expect((await request("provider", "/orders/order", "PUT", { name: "Updated", status: "confirmed" })).status).toBe(
+      400,
+    );
     expect((await request("provider", "/orders/order", "PUT", { name: "Updated" })).status).toBe(200);
     expect((await request("provider", "/orders/order/milestones/milestone", "DELETE")).status).toBe(200);
   });
@@ -148,15 +158,26 @@ describe("order authorization", () => {
 
   test("confirmation opens only invoices that are still drafts", async () => {
     await bindings.DB.batch([
-      bindings.DB.prepare("INSERT INTO service_orders (id, userId, organizationId, name, status) VALUES ('confirm-order', 'buyer', 'provider-org', 'Confirm', 'pending')"),
-      bindings.DB.prepare(`INSERT INTO service_invoices (id, orderId, userId, amount, status, paymentAccountId, customerReference, reference) VALUES
+      bindings.DB.prepare(
+        "INSERT INTO service_orders (id, userId, organizationId, name, status) VALUES ('confirm-order', 'buyer', 'provider-org', 'Confirm', 'pending')",
+      ),
+      bindings.DB
+        .prepare(`INSERT INTO service_invoices (id, orderId, userId, amount, status, paymentAccountId, customerReference, reference) VALUES
         ('confirm-draft', 'confirm-order', 'buyer', 10000, 'draft', 'acct', 'customer', 'ref-confirm-draft'),
         ('confirm-void', 'confirm-order', 'buyer', 10000, 'void', 'acct', 'customer', 'ref-confirm-void'),
         ('confirm-paid', 'confirm-order', 'buyer', 10000, 'paid', 'acct', 'customer', 'ref-confirm-paid')`),
     ]);
 
-    expect((await request("provider", "/orders/confirm-order/status", "PATCH", { status: "confirmed" })).status).toBe(200);
-    expect((await bindings.DB.prepare("SELECT id, status FROM service_invoices WHERE orderId = 'confirm-order' ORDER BY id").all()).results).toEqual([
+    expect((await request("provider", "/orders/confirm-order/status", "PATCH", { status: "confirmed" })).status).toBe(
+      200,
+    );
+    expect(
+      (
+        await bindings.DB.prepare(
+          "SELECT id, status FROM service_invoices WHERE orderId = 'confirm-order' ORDER BY id",
+        ).all()
+      ).results,
+    ).toEqual([
       { id: "confirm-draft", status: "open" },
       { id: "confirm-paid", status: "paid" },
       { id: "confirm-void", status: "void" },
@@ -170,36 +191,49 @@ describe("order authorization", () => {
 
   test("cancellation voids only unpaid invoices without claiming or recording a refund", async () => {
     await bindings.DB.batch([
-      bindings.DB.prepare("INSERT INTO services (id, organizationId, name) VALUES ('service', 'provider-org', 'Service')"),
-      bindings.DB.prepare("INSERT INTO service_plans (id, serviceId, name, amount) VALUES ('plan', 'service', 'Plan', 10000)"),
-      bindings.DB.prepare("UPDATE service_orders SET status = 'pending', serviceId = 'service', planId = 'plan' WHERE id = 'order'"),
-      bindings.DB.prepare("INSERT INTO service_orders (id, userId, organizationId, name, status) VALUES ('other', 'buyer', 'provider-org', 'Other', 'pending')"),
-      bindings.DB.prepare(`INSERT INTO service_invoices (id, orderId, userId, amount, status, paymentAccountId, customerReference, reference) VALUES
+      bindings.DB.prepare(
+        "INSERT INTO services (id, organizationId, name) VALUES ('service', 'provider-org', 'Service')",
+      ),
+      bindings.DB.prepare(
+        "INSERT INTO service_plans (id, serviceId, name, amount) VALUES ('plan', 'service', 'Plan', 10000)",
+      ),
+      bindings.DB.prepare(
+        "UPDATE service_orders SET status = 'pending', serviceId = 'service', planId = 'plan' WHERE id = 'order'",
+      ),
+      bindings.DB.prepare(
+        "INSERT INTO service_orders (id, userId, organizationId, name, status) VALUES ('other', 'buyer', 'provider-org', 'Other', 'pending')",
+      ),
+      bindings.DB
+        .prepare(`INSERT INTO service_invoices (id, orderId, userId, amount, status, paymentAccountId, customerReference, reference) VALUES
         ('draft', 'order', 'buyer', 10000, 'draft', 'acct', 'customer', 'ref-draft'),
         ('open', 'order', 'buyer', 10000, 'open', 'acct', 'customer', 'ref-open'),
         ('paid', 'order', 'buyer', 10000, 'paid', 'acct', 'customer', 'ref-paid'),
         ('refunded', 'order', 'buyer', 10000, 'refunded', 'acct', 'customer', 'ref-refunded'),
         ('void', 'order', 'buyer', 10000, 'void', 'acct', 'customer', 'ref-void'),
         ('other-open', 'other', 'buyer', 10000, 'open', 'acct', 'customer', 'ref-other')`),
-      bindings.DB.prepare(`INSERT INTO payment_intents (id, invoiceId, paymentAccountId, customerReference, amount, currency, status, latestChargeId) VALUES
+      bindings.DB
+        .prepare(`INSERT INTO payment_intents (id, invoiceId, paymentAccountId, customerReference, amount, currency, status, latestChargeId) VALUES
         ('intent-paid', 'paid', 'acct', 'customer', 10000, 'sgd', 'succeeded', 'charge-paid'),
         ('intent-refunded', 'refunded', 'acct', 'customer', 10000, 'sgd', 'succeeded', 'charge-refunded')`),
-      bindings.DB.prepare(`INSERT INTO payment_charges (id, paymentIntentId, invoiceId, amount, currency, status, refundedAmount) VALUES
+      bindings.DB
+        .prepare(`INSERT INTO payment_charges (id, paymentIntentId, invoiceId, amount, currency, status, refundedAmount) VALUES
         ('charge-paid', 'intent-paid', 'paid', 10000, 'sgd', 'succeeded', 0),
         ('charge-refunded', 'intent-refunded', 'refunded', 10000, 'sgd', 'succeeded', 10000)`),
       bindings.DB.prepare(`INSERT INTO payment_refunds (id, chargeId, invoiceId, amount, currency) VALUES
         ('refund', 'charge-refunded', 'refunded', 10000, 'sgd')`),
-      bindings.DB.prepare(`INSERT INTO payment_balance_transactions (id, paymentAccountId, sourceId, type, amount, currency) VALUES
+      bindings.DB
+        .prepare(`INSERT INTO payment_balance_transactions (id, paymentAccountId, sourceId, type, amount, currency) VALUES
         ('charge-balance', 'acct', 'charge-paid', 'charge', 10000, 'sgd'),
         ('refund-balance', 'acct', 'refund', 'refund', -10000, 'sgd')`),
     ]);
 
-    const ledger = async () => Promise.all([
-      bindings.DB.prepare("SELECT * FROM payment_intents ORDER BY id").all(),
-      bindings.DB.prepare("SELECT * FROM payment_charges ORDER BY id").all(),
-      bindings.DB.prepare("SELECT * FROM payment_refunds ORDER BY id").all(),
-      bindings.DB.prepare("SELECT * FROM payment_balance_transactions ORDER BY id").all(),
-    ]).then((results) => results.map((result) => result.results));
+    const ledger = async () =>
+      Promise.all([
+        bindings.DB.prepare("SELECT * FROM payment_intents ORDER BY id").all(),
+        bindings.DB.prepare("SELECT * FROM payment_charges ORDER BY id").all(),
+        bindings.DB.prepare("SELECT * FROM payment_refunds ORDER BY id").all(),
+        bindings.DB.prepare("SELECT * FROM payment_balance_transactions ORDER BY id").all(),
+      ]).then((results) => results.map((result) => result.results));
     const before = await ledger();
 
     expect((await request("buyer", "/orders/order/status", "PATCH", { status: "cancelled" })).status).toBe(200);

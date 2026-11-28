@@ -41,10 +41,7 @@ dashboard.get("/metrics", async (c) => {
     const totalRevenue = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
 
     //  total transactions orders
-    const totalTransactions = await database.$count(
-      order,
-      eq(order.organizationId, organization.id),
-    );
+    const totalTransactions = await database.$count(order, eq(order.organizationId, organization.id));
 
     //  average order value
     const avgOrderValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
@@ -373,10 +370,7 @@ dashboard.get("/insights", async (c) => {
           columns: { amount: true, currency: true, paidAt: true },
         });
         const totalRevenue = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
-        const totalTransactions = await database.$count(
-          order,
-          eq(order.organizationId, organization.id),
-        );
+        const totalTransactions = await database.$count(order, eq(order.organizationId, organization.id));
         return { totalRevenue: totalRevenue / 100, totalTransactions };
       })(),
 

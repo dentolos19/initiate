@@ -54,13 +54,13 @@ export default function MilestonesTab(props: { order: Order }) {
     <div className={"flex h-full w-full flex-col gap-4 p-4"}>
       <div className={"flex items-center justify-between"}>
         <h3 className={"text-lg font-semibold"}>Order Milestones</h3>
-        <div className={"text-muted-foreground text-sm"}>
+        <div className={"text-sm text-muted-foreground"}>
           {milestones.length} milestone{milestones.length !== 1 ? "s" : ""}
         </div>
       </div>
 
       {milestones.length === 0 ? (
-        <div className={"text-muted-foreground flex h-64 items-center justify-center"}>
+        <div className={"flex h-64 items-center justify-center text-muted-foreground"}>
           <div className={"text-center"}>
             <p>No milestones have been created for this order yet.</p>
             <p className={"text-sm"}>The service provider will add milestones to track progress.</p>

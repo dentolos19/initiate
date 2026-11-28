@@ -22,8 +22,7 @@ import useBackend from "#/lib/backend/client";
 import { CommunityPost, CommunityProposal } from "#/lib/backend/connectors/community";
 import { User } from "#/lib/backend/schema";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { useParams, useRouter } from "#/lib/router";
+import Link, { useParams, useRouter } from "#/lib/router";
 import Loading from "#/routes/-components/loading";
 
 export const Route = createFileRoute("/_platform/users/$id/")({ component: Page });
@@ -124,7 +123,7 @@ export default function Page() {
   return (
     <div>
       {/* Header */}
-      <div className={"bg-secondary border-b"}>
+      <div className={"border-b bg-secondary"}>
         {/* Banner */}
         <ImageWrapper className={"h-50 w-full"} alt={"Banner"} />
 
@@ -210,22 +209,22 @@ export default function Page() {
               <CardContent className={"space-y-4"}>
                 {user.description ? (
                   <div>
-                    <h3 className={"text-muted-foreground mb-2 text-sm font-medium"}>Description</h3>
+                    <h3 className={"mb-2 text-sm font-medium text-muted-foreground"}>Description</h3>
                     <p className={"text-sm leading-relaxed"}>{user.description}</p>
                   </div>
                 ) : (
-                  <p className={"text-muted-foreground text-sm"}>No description available.</p>
+                  <p className={"text-sm text-muted-foreground"}>No description available.</p>
                 )}
 
                 {user.location && (
                   <div>
-                    <h3 className={"text-muted-foreground mb-2 text-sm font-medium"}>Location</h3>
+                    <h3 className={"mb-2 text-sm font-medium text-muted-foreground"}>Location</h3>
                     <p className={"text-sm"}>{user.location}</p>
                   </div>
                 )}
 
                 <div>
-                  <h3 className={"text-muted-foreground mb-2 text-sm font-medium"}>Stats</h3>
+                  <h3 className={"mb-2 text-sm font-medium text-muted-foreground"}>Stats</h3>
                   <div className={"flex gap-4 text-sm"}>
                     <div className={"flex items-center gap-1"}>
                       <HeartIcon className={"size-4"} />
@@ -261,14 +260,14 @@ export default function Page() {
                           <CardContent className={"p-4"}>
                             <div className={"mb-2 flex items-start justify-between"}>
                               <h3 className={"text-lg font-semibold"}>{post.title}</h3>
-                              <span className={"text-muted-foreground text-xs"}>
+                              <span className={"text-xs text-muted-foreground"}>
                                 {new Date(post.createdAt).toLocaleDateString()}
                               </span>
                             </div>
 
-                            {post.excerpt && <p className={"text-muted-foreground mb-3 text-sm"}>{post.excerpt}</p>}
+                            {post.excerpt && <p className={"mb-3 text-sm text-muted-foreground"}>{post.excerpt}</p>}
 
-                            <div className={"text-muted-foreground flex items-center gap-4 text-sm"}>
+                            <div className={"flex items-center gap-4 text-sm text-muted-foreground"}>
                               <div className={"flex items-center gap-1"}>
                                 <Badge>
                                   {post.type === "general" && "General Discussion"}
@@ -290,7 +289,7 @@ export default function Page() {
                     ))}
                   </div>
                 ) : (
-                  <p className={"text-muted-foreground py-8 text-center"}>No community posts found.</p>
+                  <p className={"py-8 text-center text-muted-foreground"}>No community posts found.</p>
                 )}
               </TabsContent>
               <TabsContent value={"proposals"}>
@@ -305,14 +304,14 @@ export default function Page() {
                         <CardContent className={"p-4"}>
                           <div className={"mb-2 flex items-start justify-between"}>
                             <h3 className={"text-lg font-semibold"}>{proposal.title}</h3>
-                            <span className={"text-muted-foreground text-xs"}>
+                            <span className={"text-xs text-muted-foreground"}>
                               {new Date(proposal.createdAt).toLocaleDateString()}
                             </span>
                           </div>
 
-                          <p className={"text-muted-foreground mb-3 line-clamp-2 text-sm"}>{proposal.content}</p>
+                          <p className={"mb-3 line-clamp-2 text-sm text-muted-foreground"}>{proposal.content}</p>
 
-                          <div className={"text-muted-foreground flex items-center gap-4 text-sm"}>
+                          <div className={"flex items-center gap-4 text-sm text-muted-foreground"}>
                             {proposal.duration && (
                               <div className={"flex items-center gap-1"}>
                                 <ClockIcon className={"size-4"} />
@@ -344,7 +343,7 @@ export default function Page() {
                     ))}
                   </div>
                 ) : (
-                  <p className={"text-muted-foreground py-8 text-center"}>No proposals found.</p>
+                  <p className={"py-8 text-center text-muted-foreground"}>No proposals found.</p>
                 )}
               </TabsContent>
             </Tabs>

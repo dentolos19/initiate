@@ -43,7 +43,7 @@ export default function DeleteDialog({ item, onConfirm, onCancel }: DeleteDialog
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangleIcon className="text-destructive h-5 w-5" />
+            <AlertTriangleIcon className="h-5 w-5 text-destructive" />
             Delete {item.type === "grant" ? "Grant" : "Documentation"}
           </DialogTitle>
           <DialogDescription>

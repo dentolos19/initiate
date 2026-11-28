@@ -12,8 +12,7 @@ import ImageWrapper from "#/components/ui/wrappers/image";
 import useBackend from "#/lib/backend/client";
 import { CommunityPost } from "#/lib/backend/connectors/community";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { useRouter } from "#/lib/router";
+import Link, { useRouter } from "#/lib/router";
 import { cn } from "#/lib/utils";
 
 interface PostCardProps {
@@ -145,11 +144,11 @@ export default function PostCard({ post }: PostCardProps) {
                 <ImageWrapper src={post.user.imageUrl} avatar />
                 <AvatarFallback>X</AvatarFallback>
               </Avatar>
-              <span className={"text-muted-foreground text-xs"}>
+              <span className={"text-xs text-muted-foreground"}>
                 {post.user.firstName} {post.user.lastName}
               </span>
             </div>
-            <div className={"text-muted-foreground text-xs"}>{timeAgo}</div>
+            <div className={"text-xs text-muted-foreground"}>{timeAgo}</div>
           </div>
           <h1 className={"text-2xl font-medium"}>{post.title}</h1>
           {(post.type !== "general" || post.tags.length > 0) && (

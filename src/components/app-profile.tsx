@@ -73,7 +73,7 @@ export default function AppProfile() {
             </Avatar>
             <div className={"grid flex-1"}>
               <div>{user ? `${user?.firstName} ${user?.lastName}` : "Guest User"}</div>
-              <div className={"text-muted-foreground text-xs"}>{getLabel(userTypes, user?.type)}</div>
+              <div className={"text-xs text-muted-foreground"}>{getLabel(userTypes, user?.type)}</div>
             </div>
           </div>
         </DropdownMenuLabel>
@@ -94,7 +94,7 @@ export default function AppProfile() {
                           </Avatar>
                           <div className={"grid flex-1"}>
                             <div>{organization.name}</div>
-                            <div className={"text-muted-foreground text-xs"}>Current Organization</div>
+                            <div className={"text-xs text-muted-foreground"}>Current Organization</div>
                           </div>
                         </div>
                       </DropdownMenuLabel>

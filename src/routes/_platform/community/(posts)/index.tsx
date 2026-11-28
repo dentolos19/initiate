@@ -33,19 +33,22 @@ export default function Page() {
   const [topic] = useStateUrl("topic", "");
 
   // Function to check if user is following the current topic
-  const checkFollowingStatus = useCallback(async (topicName: string) => {
-    if (!topicName) {
-      setIsFollowingTopic(false);
-      return;
-    }
+  const checkFollowingStatus = useCallback(
+    async (topicName: string) => {
+      if (!topicName) {
+        setIsFollowingTopic(false);
+        return;
+      }
 
-    try {
-      const following = await backend.community.isFollowingTopic(topicName);
-      setIsFollowingTopic(following);
-    } catch (error) {
-      console.error("Failed to check following status:", error);
-    }
-  }, [backend.community]);
+      try {
+        const following = await backend.community.isFollowingTopic(topicName);
+        setIsFollowingTopic(following);
+      } catch (error) {
+        console.error("Failed to check following status:", error);
+      }
+    },
+    [backend.community],
+  );
 
   // Function to handle follow/unfollow
   const handleFollowToggle = async () => {
@@ -118,7 +121,7 @@ export default function Page() {
               </Avatar>
               <Button
                 className={
-                  "text-muted-foreground hover:text-foreground h-12 w-full flex-1 justify-start transition-colors"
+                  "h-12 w-full flex-1 justify-start text-muted-foreground transition-colors hover:text-foreground"
                 }
                 variant={"outline"}
                 asChild
@@ -134,7 +137,7 @@ export default function Page() {
                   <span>Raise Problem</span>
                 </Link>
               </Button>
-              <div className={"text-muted-foreground text-xs"}>Share your thoughts with the community</div>
+              <div className={"text-xs text-muted-foreground"}>Share your thoughts with the community</div>
             </div>
           </CardHeader>
         </Card>
@@ -145,7 +148,7 @@ export default function Page() {
             <div className={"flex items-center justify-between"}>
               <div className={"flex items-center gap-2"}>
                 <span className={"text-sm font-medium"}>Filtered by topic:</span>
-                <span className={"bg-primary/10 text-primary rounded-full px-2 py-1 text-xs font-medium"}>{topic}</span>
+                <span className={"rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary"}>{topic}</span>
               </div>
               <div className={"flex items-center gap-2"}>
                 <Button
@@ -188,7 +191,7 @@ export default function Page() {
 
         {/* Empty */}
         {!loading && posts.length === 0 && (
-          <div className={"text-muted-foreground my-10 text-center"}>
+          <div className={"my-10 text-center text-muted-foreground"}>
             {topic ? `No posts found for topic "${topic}".` : "No posts found."}
           </div>
         )}

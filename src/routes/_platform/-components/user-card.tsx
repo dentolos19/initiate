@@ -9,7 +9,7 @@ import { cn } from "#/lib/utils";
 export default function UserCard(props: ComponentProps<"div"> & { data: User }) {
   return (
     <Link
-      className={cn("bg-card group overflow-hidden rounded-lg border", props.className)}
+      className={cn("group overflow-hidden rounded-lg border bg-card", props.className)}
       href={`/users/${props.data.id}`}
     >
       {/* Image */}

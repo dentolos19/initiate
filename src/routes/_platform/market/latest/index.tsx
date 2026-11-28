@@ -42,7 +42,7 @@ export default function Page() {
   return (
     <div className={"w-full space-y-4 p-4 sm:p-6"}>
       <header className="flex items-start gap-3 border-b pb-5">
-        <TimerIcon className="text-primary mt-1 size-5" aria-hidden="true" />
+        <TimerIcon className="mt-1 size-5 text-primary" aria-hidden="true" />
         <div>
           <h1 className={"text-2xl font-semibold tracking-tight text-balance"}>Latest Releases</h1>
           <p className={"text-muted-foreground"}>

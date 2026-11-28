@@ -2,14 +2,13 @@
 *.tsbuildinfo
 .DS_Store
 .cloudflare/
-.dev.vars*
 .env*
 .idea/
+.playwright-cli/
 .tanstack/
 .tmp/
 .vs/
 .wrangler/
-/.postgres/
 /src/routeTree.gen.ts
 Desktop.ini
 Thumbs.db
@@ -19,6 +18,5 @@ dist/
 node_modules/
 out/
 
-!.dev.vars*.template
 !.env*.template
 !.gitkeep

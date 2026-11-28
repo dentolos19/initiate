@@ -21,8 +21,7 @@ import { Label } from "#/components/ui/label";
 import { Separator } from "#/components/ui/separator";
 import useBackend from "#/lib/backend/client";
 import { OrderInvoice } from "#/lib/backend/connectors/orders";
-import Link from "#/lib/router";
-import { useParams, useRouter } from "#/lib/router";
+import Link, { useParams, useRouter } from "#/lib/router";
 import invoiceStatus from "#/lib/store/invoice-status";
 import { formatAmount, formatDate, getLabel } from "#/lib/utils";
 
@@ -170,10 +169,10 @@ export default function InvoiceDetailPage() {
             <Badge variant="outline">{getLabel(invoiceStatus, invoice.status, "Unknown")}</Badge>
           </div>
           <h1 className="text-2xl font-bold">{serviceName}</h1>
-          <p className="text-muted-foreground font-mono text-sm">{invoice.reference}</p>
+          <p className="font-mono text-sm text-muted-foreground">{invoice.reference}</p>
         </div>
         <div className="text-right">
-          <p className="text-muted-foreground text-sm">Amount due</p>
+          <p className="text-sm text-muted-foreground">Amount due</p>
           <p className="text-3xl font-semibold">{formatAmount(invoice.amount, invoice.currency)}</p>
         </div>
       </div>
@@ -244,7 +243,7 @@ export default function InvoiceDetailPage() {
               <form className="space-y-4" onSubmit={handlePayment}>
                 <div className="space-y-2">
                   <Label htmlFor="card-number">Card information</Label>
-                  <div className="border-input focus-within:border-ring focus-within:ring-ring/50 overflow-hidden rounded-md border shadow-xs focus-within:ring-[3px]">
+                  <div className="overflow-hidden rounded-md border border-input shadow-xs focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
                     <Input
                       id="card-number"
                       className="h-11 rounded-none border-0 shadow-none focus-visible:ring-0"
@@ -300,16 +299,16 @@ export default function InvoiceDetailPage() {
                 <Button className="h-11 w-full" disabled={processing} type="submit">
                   {processing ? "Processing…" : `Pay ${formatAmount(invoice.amount, invoice.currency)}`}
                 </Button>
-                <p className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
+                <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                   <LockIcon className="size-3.5" />
                   Card details are protected and never stored.
                 </p>
               </form>
             ) : (
-              <div className="bg-muted rounded-lg p-4 text-center">
+              <div className="rounded-lg bg-muted p-4 text-center">
                 <CheckCircle2Icon className="mx-auto mb-2 size-8 text-emerald-600" />
                 <p className="font-semibold">{getLabel(invoiceStatus, invoice.status, "Complete")}</p>
-                <p className="text-muted-foreground text-sm">The invoice status has been updated.</p>
+                <p className="text-sm text-muted-foreground">The invoice status has been updated.</p>
               </div>
             )}
           </CardContent>

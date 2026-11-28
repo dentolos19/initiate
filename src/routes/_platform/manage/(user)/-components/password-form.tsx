@@ -1,5 +1,5 @@
 import { EyeIcon, EyeOffIcon, KeyRoundIcon, Loader2Icon } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "#/components/ui/button";
@@ -54,7 +54,7 @@ export default function PasswordForm() {
     <form className="space-y-4 border-t p-4 pt-6 sm:p-6" onSubmit={submit}>
       <div>
         <h2 className="text-lg font-semibold">Account Security</h2>
-        <p className="text-muted-foreground mt-1 text-sm">Change the password you use to sign in.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Change the password you use to sign in.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -107,7 +107,7 @@ export default function PasswordForm() {
           />
           <div>
             <Label htmlFor="revoke-sessions">Sign Out Other Devices</Label>
-            <p className="text-muted-foreground text-xs">Keep only this device signed in after the change.</p>
+            <p className="text-xs text-muted-foreground">Keep only this device signed in after the change.</p>
           </div>
         </div>
         <Button type="button" variant="outline" onClick={() => setShowPasswords((visible) => !visible)}>
@@ -117,7 +117,7 @@ export default function PasswordForm() {
       </div>
 
       {error && (
-        <p className="text-destructive text-sm" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       )}

@@ -45,11 +45,11 @@ export default function SearchServices() {
   }
 
   if (!query) {
-    return <div className={"text-muted-foreground my-10 text-center"}>Search something to get started!</div>;
+    return <div className={"my-10 text-center text-muted-foreground"}>Search something to get started!</div>;
   }
 
   if (!services.length) {
-    return <div className={"text-muted-foreground my-10 text-center"}>No services found.</div>;
+    return <div className={"my-10 text-center text-muted-foreground"}>No services found.</div>;
   }
 
   return (

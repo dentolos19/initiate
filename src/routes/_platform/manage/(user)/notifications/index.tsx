@@ -98,7 +98,7 @@ export default function Page() {
           setIsDialogOpen(false);
         }}
       >
-        <TabsList className={"bg-sidebar w-full rounded-none border-b"}>
+        <TabsList className={"w-full rounded-none border-b bg-sidebar"}>
           <TabsTrigger value={"inbox"}>Inbox</TabsTrigger>
           <TabsTrigger value={"archived"}>Archived</TabsTrigger>
         </TabsList>
@@ -111,7 +111,7 @@ export default function Page() {
       )}
 
       {!loading && notifications.length === 0 && (
-        <div className={"text-muted-foreground my-20 text-center"}>
+        <div className={"my-20 text-center text-muted-foreground"}>
           <BellIcon className={"mx-auto mb-4 size-12"} />
           <h2 className={"mb-2 text-lg font-medium"}>No notifications yet</h2>
           <p className={"text-sm"}>
@@ -128,7 +128,7 @@ export default function Page() {
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={"hover:bg-muted flex cursor-pointer justify-between border-b p-4 transition"}
+                className={"flex cursor-pointer justify-between border-b p-4 transition hover:bg-muted"}
               >
                 <div
                   className={"flex flex-1 cursor-pointer"}
@@ -142,8 +142,8 @@ export default function Page() {
                       <InfoIcon className={"size-5"} />
                       <h3>{notification.title}</h3>
                     </div>
-                    <p className={"text-muted-foreground text-sm"}>{notification.description}</p>
-                    <p className={"text-muted-foreground text-xs"}>{formatDateTime(notification.createdAt)}</p>
+                    <p className={"text-sm text-muted-foreground"}>{notification.description}</p>
+                    <p className={"text-xs text-muted-foreground"}>{formatDateTime(notification.createdAt)}</p>
                   </div>
                 </div>
 

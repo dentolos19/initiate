@@ -12,8 +12,7 @@ import ImageWrapper from "#/components/ui/wrappers/image";
 import useBackend from "#/lib/backend/client";
 import { Service } from "#/lib/backend/schema";
 import { useAdvisor } from "#/lib/providers/advisor";
-import Link from "#/lib/router";
-import { useRouter, useSearchParams } from "#/lib/router";
+import Link, { useRouter, useSearchParams } from "#/lib/router";
 import domains from "#/lib/store/domains";
 import { getLabel } from "#/lib/utils";
 import SearchOrganizations from "#/routes/_platform/search/-components/search-organization";
@@ -63,7 +62,7 @@ export default function Page() {
     <div className={"w-full space-y-2 p-4 sm:p-6"}>
       {/* Curator Loading */}
       {serviceLoading && (
-        <div className={"bg-card flex h-auto flex-col rounded-lg border-b md:h-40 md:flex-row"}>
+        <div className={"flex h-auto flex-col rounded-lg border-b bg-card md:h-40 md:flex-row"}>
           <Skeleton className={"aspect-square h-40 w-full md:h-full md:w-auto"} />
           <div className={"flex flex-1 flex-col justify-between p-4"}>
             <div>
@@ -79,7 +78,7 @@ export default function Page() {
 
       {/* Curated Result */}
       {!serviceLoading && service && (
-        <div className={"bg-card flex flex-col overflow-hidden rounded-lg border md:flex-row"}>
+        <div className={"flex flex-col overflow-hidden rounded-lg border bg-card md:flex-row"}>
           <ImageWrapper className={"aspect-square h-auto w-full md:w-50"} src={service.imageUrl} alt={"Image"} />
           <div className={"flex flex-1 flex-col justify-between gap-2 p-4"}>
             <div className={"flex flex-col gap-4 lg:flex-row lg:justify-between"}>
@@ -111,7 +110,7 @@ export default function Page() {
               <SparklesIcon />
               <AlertTitle>I have curated this service for you!</AlertTitle>
               <AlertDescription>
-                <div className={"prose prose-sm dark:prose-invert max-w-none"}>
+                <div className={"prose prose-sm max-w-none dark:prose-invert"}>
                   <Markdown>{service.summary}</Markdown>
                 </div>
               </AlertDescription>
@@ -121,7 +120,7 @@ export default function Page() {
       )}
 
       <Tabs value={tab} onValueChange={(value) => setTab(value)}>
-        <TabsList className={"bg-card w-full border-b"}>
+        <TabsList className={"w-full border-b bg-card"}>
           <TabsTrigger value={"services"}>Services</TabsTrigger>
           <TabsTrigger value={"organizations"}>Organizations</TabsTrigger>
           <TabsTrigger value={"users"}>Users</TabsTrigger>

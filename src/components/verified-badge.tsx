@@ -8,7 +8,7 @@ export default function VerifiedBadge(props: ComponentProps<"div">) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className={cn("bg-primary grid size-6 place-content-center rounded-sm", props.className)}>
+        <div className={cn("grid size-6 place-content-center rounded-sm bg-primary", props.className)}>
           <TriangleIcon className={"size-3"} />
         </div>
       </TooltipTrigger>

@@ -1,7 +1,7 @@
-
-import { cn } from "#/lib/utils";
 import { motion, MotionProps } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+
+import { cn } from "#/lib/utils";
 
 interface TypingAnimationProps extends MotionProps {
   children: string;
@@ -77,10 +77,7 @@ export function TypingAnimation({
   return (
     <MotionComponent
       ref={elementRef}
-      className={cn(
-        "text-4xl font-bold leading-[5rem] tracking-[-0.02em]",
-        className,
-      )}
+      className={cn("text-4xl leading-[5rem] font-bold tracking-[-0.02em]", className)}
       {...props}
     >
       {displayedText}

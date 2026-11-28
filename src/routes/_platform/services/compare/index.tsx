@@ -9,8 +9,7 @@ import Image from "#/components/ui/wrappers/image";
 import useBackend from "#/lib/backend/client";
 import { Comparison } from "#/lib/backend/connectors/market";
 import { Service } from "#/lib/backend/schema";
-import Link from "#/lib/router";
-import { useSearchParams } from "#/lib/router";
+import Link, { useSearchParams } from "#/lib/router";
 import { cn } from "#/lib/utils";
 
 export const Route = createFileRoute("/_platform/services/compare/")({ component: Page });
@@ -24,48 +23,51 @@ export default function Page() {
   const [comparison, setComparison] = useState<Comparison>();
   const [comparisonLoading, setComparisonLoading] = useState<boolean>(true);
 
-  const generateComparison = useCallback((ids: string[]) => {
-    setServicesLoading(true);
-    setServices([]);
-    setComparisonLoading(true);
-    setComparison(undefined);
+  const generateComparison = useCallback(
+    (ids: string[]) => {
+      setServicesLoading(true);
+      setServices([]);
+      setComparisonLoading(true);
+      setComparison(undefined);
 
-    if (!ids || ids.length === 0) {
-      setServicesLoading(false);
-      setComparisonLoading(false);
-      return;
-    }
-
-    // Load services
-    Promise.all(ids.map((id) => backend.service.getService(id)))
-      .then((services) => {
-        setServices(services);
-      })
-      .catch((error: Error) => {
-        console.error(error);
-        toast.error(error.message);
-      })
-      .finally(() => {
+      if (!ids || ids.length === 0) {
         setServicesLoading(false);
-      });
+        setComparisonLoading(false);
+        return;
+      }
 
-    if (ids.length < 2) {
-      setComparisonLoading(false);
-    } else {
-      backend.market
-        .compareServices(ids)
-        .then((comparisonData) => {
-          setComparison(comparisonData);
+      // Load services
+      Promise.all(ids.map((id) => backend.service.getService(id)))
+        .then((services) => {
+          setServices(services);
         })
         .catch((error: Error) => {
           console.error(error);
           toast.error(error.message);
         })
         .finally(() => {
-          setComparisonLoading(false);
+          setServicesLoading(false);
         });
-    }
-  }, [backend.market, backend.service]);
+
+      if (ids.length < 2) {
+        setComparisonLoading(false);
+      } else {
+        backend.market
+          .compareServices(ids)
+          .then((comparisonData) => {
+            setComparison(comparisonData);
+          })
+          .catch((error: Error) => {
+            console.error(error);
+            toast.error(error.message);
+          })
+          .finally(() => {
+            setComparisonLoading(false);
+          });
+      }
+    },
+    [backend.market, backend.service],
+  );
 
   function removeService(id: string) {
     if (comparisonLoading) {
@@ -105,7 +107,7 @@ export default function Page() {
         {services.map((service) => (
           <button
             key={service.id}
-            className={"group bg-card relative aspect-square overflow-hidden rounded-lg"}
+            className={"group relative aspect-square overflow-hidden rounded-lg bg-card"}
             onClick={() => removeService(service.id)}
           >
             <Image className={"size-full"} src={service.imageUrl} alt={service.name} />
@@ -113,14 +115,14 @@ export default function Page() {
               className={cn(
                 "absolute inset-0",
                 "flex size-full items-end justify-start p-4",
-                "dark from-background via-background/40 bg-gradient-to-t to-transparent",
+                "dark bg-gradient-to-t from-background via-background/40 to-transparent",
               )}
             >
               <h2 className={"text-lg font-bold"}>{service.name}</h2>
             </div>
             <div
               className={
-                "bg-card/50 absolute inset-0 flex flex-col items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
+                "absolute inset-0 flex flex-col items-center justify-center bg-card/50 opacity-0 transition-opacity group-hover:opacity-100"
               }
             >
               <TrashIcon className={"mb-2 size-8"} />
@@ -131,7 +133,7 @@ export default function Page() {
 
         {!servicesLoading && services.length >= 0 && services.length < 5 && (
           <Link
-            className={"bg-card hover:bg-card/80 flex aspect-square flex-col items-center justify-center rounded-lg"}
+            className={"flex aspect-square flex-col items-center justify-center rounded-lg bg-card hover:bg-card/80"}
             href={"/market"}
           >
             <PlusIcon className={"mb-2 size-8"} />
@@ -143,7 +145,7 @@ export default function Page() {
           Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className={"aspect-square"} />)}
       </div>
       {comparisonLoading ? (
-        <Table className={"bg-card overflow-hidden rounded-lg"}>
+        <Table className={"overflow-hidden rounded-lg bg-card"}>
           <TableHeader>
             <TableRow>
               <TableHead>Feature</TableHead>
@@ -179,7 +181,7 @@ export default function Page() {
           </TableBody>
         </Table>
       ) : comparison ? (
-        <Table className={"bg-card overflow-hidden rounded-lg"}>
+        <Table className={"overflow-hidden rounded-lg bg-card"}>
           <TableHeader>
             <TableRow>
               <TableHead>Feature</TableHead>

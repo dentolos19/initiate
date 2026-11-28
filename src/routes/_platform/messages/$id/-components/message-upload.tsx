@@ -1,5 +1,5 @@
 import { ImagePlus, Paperclip, Upload } from "lucide-react";
-import { ChangeEvent, useRef, useState, DragEvent } from "react";
+import { ChangeEvent, DragEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "#/components/ui/button";
@@ -171,8 +171,8 @@ export function MessageUpload({ onUpload, variant = "file", enableDragDrop = fal
         <input ref={fileInputRef} className="hidden" type="file" accept={acceptTypes} onChange={handleFileUpload} />
         <div className="mx-auto flex max-w-[240px] flex-col items-center justify-center text-center">
           <Upload className={`mx-auto h-10 w-10 ${isDragOver ? "text-primary" : "text-muted-foreground"}`} />
-          <h3 className="text-foreground mt-2 text-sm font-medium">{isDragOver ? "Drop file here" : "Upload file"}</h3>
-          <p className="text-muted-foreground mt-1 text-xs">
+          <h3 className="mt-2 text-sm font-medium text-foreground">{isDragOver ? "Drop file here" : "Upload file"}</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
             {isDragOver
               ? "Release to upload"
               : variant === "image"

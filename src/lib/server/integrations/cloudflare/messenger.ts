@@ -80,9 +80,10 @@ export class Messenger extends DurableObject<Env> {
       if (!room) {
         throw new Error("Room not found.");
       }
-      const isMember = async (userId: string, organizationId: string) => Boolean(
-        await this.database.query.authMember.findFirst({ where: { userId, organizationId }, columns: { id: true } }),
-      );
+      const isMember = async (userId: string, organizationId: string) =>
+        Boolean(
+          await this.database.query.authMember.findFirst({ where: { userId, organizationId }, columns: { id: true } }),
+        );
       if (!(await canAccessRoom(room, identity.data.userId, isMember))) {
         socket.close(1008, "Room access revoked.");
         return;
@@ -135,8 +136,11 @@ export class Messenger extends DurableObject<Env> {
       // Broadcast message to all connected clients
       for (const connectedSocket of this.ctx.getWebSockets()) {
         const connectedIdentity = socketIdentitySchema.safeParse(connectedSocket.deserializeAttachment());
-        if (!connectedIdentity.success || connectedIdentity.data.roomId !== room.id ||
-            !(await canAccessRoom(room, connectedIdentity.data.userId, isMember))) {
+        if (
+          !connectedIdentity.success ||
+          connectedIdentity.data.roomId !== room.id ||
+          !(await canAccessRoom(room, connectedIdentity.data.userId, isMember))
+        ) {
           connectedSocket.close(1008, "Reconnect to authenticate.");
           continue;
         }

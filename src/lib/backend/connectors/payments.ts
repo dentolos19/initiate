@@ -1,4 +1,4 @@
-import { orderInvoiceSchema, OrderInvoice } from "#/lib/backend/connectors/orders";
+import { OrderInvoice, orderInvoiceSchema } from "#/lib/backend/connectors/orders";
 import { BackendPrimitives } from "#/lib/backend/primitives";
 import {
   PaymentAccount,

@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <div>
       <Tabs className={"gap-0"} defaultValue={"likes"}>
-        <TabsList className={"bg-sidebar w-full rounded-none border-b"}>
+        <TabsList className={"w-full rounded-none border-b bg-sidebar"}>
           <TabsTrigger value={"likes"}>Liked Services</TabsTrigger>
           <TabsTrigger value={"reviews"} disabled>
             My Reviews (Coming Soon)

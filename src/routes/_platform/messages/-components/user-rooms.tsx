@@ -5,8 +5,7 @@ import { Avatar, AvatarFallback } from "#/components/ui/avatar";
 import useBackend from "#/lib/backend/client";
 import { MessageRoom } from "#/lib/backend/connectors/messages";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { useParams } from "#/lib/router";
+import Link, { useParams } from "#/lib/router";
 import { cn } from "#/lib/utils";
 
 export default function UserRooms() {
@@ -79,14 +78,14 @@ export default function UserRooms() {
             <Link
               key={`user-room-${room.id}`}
               href={`/messages/${room.id}`}
-              className={cn("hover:bg-muted/50 flex items-center gap-3 border-b p-4", room.id === id && "bg-muted")}
+              className={cn("flex items-center gap-3 border-b p-4 hover:bg-muted/50", room.id === id && "bg-muted")}
             >
               <Avatar className="h-10 w-10">
                 <AvatarFallback className="bg-primary/10">{displayName.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium">{displayName}</div>
-                <div className="text-muted-foreground truncate text-sm">{messagePreview}</div>
+                <div className="truncate text-sm text-muted-foreground">{messagePreview}</div>
               </div>
             </Link>
           );

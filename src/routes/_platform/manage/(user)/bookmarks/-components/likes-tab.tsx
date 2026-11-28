@@ -45,7 +45,7 @@ export default function LikesTab() {
   if (!services || services.length === 0) {
     return (
       <div>
-        <div className={"text-muted-foreground my-20 text-center"}>
+        <div className={"my-20 text-center text-muted-foreground"}>
           <HeartIcon className={"mx-auto mb-4 size-12"} />
           <h3 className={"mb-2 text-lg font-medium"}>No liked services yet</h3>
           <p className={"text-sm"}>

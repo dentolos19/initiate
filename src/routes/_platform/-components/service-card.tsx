@@ -13,7 +13,7 @@ export default function ServiceCard(props: ComponentProps<"div"> & { data: Servi
   const service = props.data;
   return (
     <Link
-      className={cn("bg-card group flex flex-col overflow-hidden rounded-lg border", props.className)}
+      className={cn("group flex flex-col overflow-hidden rounded-lg border bg-card", props.className)}
       href={`/services/${service.id}`}
     >
       <div className={"relative aspect-square overflow-hidden"}>

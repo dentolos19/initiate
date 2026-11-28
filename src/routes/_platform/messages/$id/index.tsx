@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import EmojiPicker, { Theme } from "emoji-picker-react";
-import { Edit, Mic, MicOff, MoreVertical, SendIcon, SmilePlus, Trash2, X, FileText } from "lucide-react";
+import { Edit, FileText, Mic, MicOff, MoreVertical, SendIcon, SmilePlus, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
@@ -404,7 +404,7 @@ export default function Page() {
     <div className={"flex size-full flex-col"}>
       {/* Header - Hidden during calls */}
       {!isInCall && (
-        <header className={"bg-secondary flex h-16 items-center justify-between border-b px-4"}>
+        <header className={"flex h-16 items-center justify-between border-b bg-secondary px-4"}>
           <div>
             <div className={"font-bold"}>{chatName}</div>
             {/* <div className={"text-muted-foreground text-xs"}>Online</div> */}
@@ -453,7 +453,7 @@ export default function Page() {
 
                       {/* Show timestamp only if there are no attachments */}
                       {!hasAttachments && (
-                        <span className="text-muted-foreground ml-2 text-xs">
+                        <span className="ml-2 text-xs text-muted-foreground">
                           {new Date(msg.createdAt).toLocaleTimeString("en-GB", {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -467,23 +467,23 @@ export default function Page() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="hover:bg-muted h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 hover:bg-muted"
                             onClick={() => setShowMenuForMessage(isActive ? null : msg.id)}
                           >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
 
                           {isActive && (
-                            <div className="bg-background border-border absolute top-full right-0 z-50 mt-1 w-40 rounded-md border shadow-lg">
+                            <div className="absolute top-full right-0 z-50 mt-1 w-40 rounded-md border border-border bg-background shadow-lg">
                               <div className="py-1">
                                 <button
-                                  className="hover:bg-muted flex w-full items-center px-3 py-2 text-sm transition-colors"
+                                  className="flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-muted"
                                   onClick={() => handleEditMessage(msg.id, msg.content)}
                                 >
                                   <Edit className="mr-2 h-4 w-4" /> Edit message
                                 </button>
                                 <button
-                                  className="hover:bg-muted text-destructive flex w-full items-center px-3 py-2 text-sm transition-colors"
+                                  className="flex w-full items-center px-3 py-2 text-sm text-destructive transition-colors hover:bg-muted"
                                   onClick={() => handleDeleteMessage(msg.id)}
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" /> Delete message
@@ -504,7 +504,7 @@ export default function Page() {
                       ))}
 
                       {/* Show timestamp on attachments */}
-                      <span className="text-muted-foreground text-xs">
+                      <span className="text-xs text-muted-foreground">
                         {new Date(msg.createdAt).toLocaleTimeString("en-GB", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -517,26 +517,26 @@ export default function Page() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="hover:bg-muted h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 hover:bg-muted"
                             onClick={() => setShowMenuForMessage(isActive ? null : msg.id)}
                           >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
 
                           {isActive && (
-                            <div className="bg-background border-border absolute top-full right-0 z-50 mt-1 w-40 rounded-md border shadow-lg">
+                            <div className="absolute top-full right-0 z-50 mt-1 w-40 rounded-md border border-border bg-background shadow-lg">
                               <div className="py-1">
                                 {/* Show edit option only if there's text content */}
                                 {hasContent && (
                                   <button
-                                    className="hover:bg-muted flex w-full items-center px-3 py-2 text-sm transition-colors"
+                                    className="flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-muted"
                                     onClick={() => handleEditMessage(msg.id, msg.content)}
                                   >
                                     <Edit className="mr-2 h-4 w-4" /> Edit message
                                   </button>
                                 )}
                                 <button
-                                  className="hover:bg-muted text-destructive flex w-full items-center px-3 py-2 text-sm transition-colors"
+                                  className="flex w-full items-center px-3 py-2 text-sm text-destructive transition-colors hover:bg-muted"
                                   onClick={() => handleDeleteMessage(msg.id)}
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" /> Delete
@@ -561,7 +561,7 @@ export default function Page() {
             {selectedMessageId && (
               <div className="flex items-center space-x-2 px-3 py-2">
                 <h3 className="text-sm font-semibold">Editing message:</h3>
-                <span className="text-muted-foreground flex-1 truncate text-sm">{editingOriginal}</span>
+                <span className="flex-1 truncate text-sm text-muted-foreground">{editingOriginal}</span>
                 <Button
                   aria-label="Cancel Editing"
                   variant="ghost"
@@ -578,7 +578,7 @@ export default function Page() {
 
             {/* Attachment Preview */}
             {attachments.length > 0 && (
-              <div className="bg-muted/50 flex flex-wrap gap-2 rounded-lg p-3">
+              <div className="flex flex-wrap gap-2 rounded-lg bg-muted/50 p-3">
                 {attachments.map((attachment) => (
                   <div key={attachment.id} className="relative">
                     <MessageAttachment attachment={attachment} />
@@ -671,7 +671,7 @@ export default function Page() {
 
             {/* Summary Display */}
             {summary && (
-              <div className="bg-muted/50 m-2 rounded-lg border p-4">
+              <div className="m-2 rounded-lg border bg-muted/50 p-4">
                 <div className="mb-2 flex items-center justify-between">
                   <h3 className="flex items-center gap-2 text-sm font-semibold">
                     <FileText className="h-4 w-4" />

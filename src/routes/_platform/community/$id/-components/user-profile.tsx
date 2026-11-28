@@ -9,8 +9,7 @@ import ImageWrapper from "#/components/ui/wrappers/image";
 import useBackend from "#/lib/backend/client";
 import { User } from "#/lib/backend/schema";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { useRouter } from "#/lib/router";
+import Link, { useRouter } from "#/lib/router";
 
 export default function UserProfile(props: { data: User }) {
   const backend = useBackend();
@@ -82,12 +81,12 @@ export default function UserProfile(props: { data: User }) {
             <Link className={"font-bold hover:underline"} href={`/users/${user.id}`}>
               {user.firstName} {user.lastName}
             </Link>
-            <p className={"text-muted-foreground text-xs"}>{user.followers} followers</p>
+            <p className={"text-xs text-muted-foreground"}>{user.followers} followers</p>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <p className={"text-muted-foreground text-sm"}>{user.tagline || "No tagline available."}</p>
+        <p className={"text-sm text-muted-foreground"}>{user.tagline || "No tagline available."}</p>
       </CardContent>
       {session.user && session.user.id !== user.id && (
         <CardFooter className={"mt-4 gap-2 [&>*]:flex-1"}>

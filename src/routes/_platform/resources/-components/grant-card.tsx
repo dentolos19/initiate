@@ -175,7 +175,7 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
             <div className={"min-w-0 flex-1"}>
               <CardTitle
                 className={
-                  "text-primary group-hover:text-primary/80 mb-3 text-2xl leading-tight break-words transition-colors"
+                  "mb-3 text-2xl leading-tight break-words text-primary transition-colors group-hover:text-primary/80"
                 }
               >
                 {grant.name}
@@ -183,20 +183,20 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
 
               <div className={"flex flex-wrap items-center gap-4"}>
                 <div className={"flex items-center gap-2"}>
-                  <Building2 className={"text-muted-foreground h-4 w-4"} />
-                  <span className={"text-muted-foreground text-sm font-medium"}>{grant.provider}</span>
+                  <Building2 className={"h-4 w-4 text-muted-foreground"} />
+                  <span className={"text-sm font-medium text-muted-foreground"}>{grant.provider}</span>
                 </div>
 
                 {grant.location && (
                   <div className={"flex items-center gap-2"}>
-                    <MapPin className={"text-muted-foreground h-4 w-4"} />
-                    <span className={"text-muted-foreground text-sm font-medium"}>{grant.location}</span>
+                    <MapPin className={"h-4 w-4 text-muted-foreground"} />
+                    <span className={"text-sm font-medium text-muted-foreground"}>{grant.location}</span>
                   </div>
                 )}
 
                 <Badge
                   variant={"secondary"}
-                  className={"bg-primary/10 text-primary border-primary/20 px-3 py-1 text-xs font-semibold"}
+                  className={"border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"}
                 >
                   Grant
                 </Badge>
@@ -205,9 +205,9 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
 
             {/* Right side - Funding and deadline */}
             <div className={"flex min-w-fit flex-col items-end gap-3"}>
-              <div className={"bg-primary/5 border-primary/20 flex items-center gap-2 rounded-lg border px-4 py-3"}>
-                <DollarSign className={"text-primary h-5 w-5"} />
-                <span className={"text-primary text-lg font-bold"}>{formatFunding(grant.grant)}</span>
+              <div className={"flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3"}>
+                <DollarSign className={"h-5 w-5 text-primary"} />
+                <span className={"text-lg font-bold text-primary"}>{formatFunding(grant.grant)}</span>
               </div>
 
               {grant.deadlineAt && (
@@ -222,47 +222,47 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
 
         <CardContent className={"pt-0"}>
           {/* Grant description */}
-          <CardDescription className={"text-foreground mb-6 line-clamp-3 text-base leading-relaxed"}>
+          <CardDescription className={"mb-6 line-clamp-3 text-base leading-relaxed text-foreground"}>
             {grant.description}
           </CardDescription>
 
           {/* Quick stats - Full width row */}
           <div className={"mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4"}>
             {grant.criteria && grant.criteria.length > 0 && (
-              <div className={"bg-muted/30 flex items-center gap-2 rounded-lg p-3"}>
-                <Users className={"text-primary h-4 w-4"} />
+              <div className={"flex items-center gap-2 rounded-lg bg-muted/30 p-3"}>
+                <Users className={"h-4 w-4 text-primary"} />
                 <div>
-                  <p className={"text-muted-foreground text-xs"}>Requirements</p>
+                  <p className={"text-xs text-muted-foreground"}>Requirements</p>
                   <p className={"text-sm font-medium"}>{grant.criteria.length} criteria</p>
                 </div>
               </div>
             )}
 
             {grant.process && grant.process.length > 0 && (
-              <div className={"bg-muted/30 flex items-center gap-2 rounded-lg p-3"}>
-                <CheckCircle className={"text-primary h-4 w-4"} />
+              <div className={"flex items-center gap-2 rounded-lg bg-muted/30 p-3"}>
+                <CheckCircle className={"h-4 w-4 text-primary"} />
                 <div>
-                  <p className={"text-muted-foreground text-xs"}>Process</p>
+                  <p className={"text-xs text-muted-foreground"}>Process</p>
                   <p className={"text-sm font-medium"}>{grant.process.length} steps</p>
                 </div>
               </div>
             )}
 
             {grant.deadlineAt && (
-              <div className={"bg-muted/30 flex items-center gap-2 rounded-lg p-3"}>
-                <Calendar className={"text-primary h-4 w-4"} />
+              <div className={"flex items-center gap-2 rounded-lg bg-muted/30 p-3"}>
+                <Calendar className={"h-4 w-4 text-primary"} />
                 <div>
-                  <p className={"text-muted-foreground text-xs"}>Deadline</p>
+                  <p className={"text-xs text-muted-foreground"}>Deadline</p>
                   <p className={"text-sm font-medium"}>{new Date(grant.deadlineAt).toLocaleDateString()}</p>
                 </div>
               </div>
             )}
 
             {grant.location && (
-              <div className={"bg-muted/30 flex items-center gap-2 rounded-lg p-3"}>
-                <MapPin className={"text-primary h-4 w-4"} />
+              <div className={"flex items-center gap-2 rounded-lg bg-muted/30 p-3"}>
+                <MapPin className={"h-4 w-4 text-primary"} />
                 <div>
-                  <p className={"text-muted-foreground text-xs"}>Location</p>
+                  <p className={"text-xs text-muted-foreground"}>Location</p>
                   <p className={"text-sm font-medium"}>{grant.location}</p>
                 </div>
               </div>
@@ -319,12 +319,12 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
 
           {/* AI Analysis Results */}
           {summaryText && (
-            <Card className={"from-primary/5 my-6 border bg-gradient-to-br to-transparent"}>
+            <Card className={"my-6 border bg-gradient-to-br from-primary/5 to-transparent"}>
               <CardHeader className={"pb-3"}>
                 <div className={"flex items-center justify-between"}>
                   <CardTitle className={"flex items-center gap-2 text-lg"}>
-                    <div className={"bg-primary/10 rounded-full p-1"}>
-                      <TrendingUp className={"text-primary h-4 w-4"} />
+                    <div className={"rounded-full bg-primary/10 p-1"}>
+                      <TrendingUp className={"h-4 w-4 text-primary"} />
                     </div>
                     AI Analysis
                   </CardTitle>
@@ -338,7 +338,7 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
               </CardHeader>
 
               <CardContent>
-                <div className={"prose prose-sm dark:prose-invert max-w-none"}>
+                <div className={"prose prose-sm max-w-none dark:prose-invert"}>
                   <Markdown>{summaryText}</Markdown>
                 </div>
               </CardContent>
@@ -355,16 +355,16 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
           <ScrollArea className={"max-h-[85vh] p-6"}>
             {/* Dialog Header */}
             <DialogHeader className={"mb-4"}>
-              <DialogTitle className={"text-primary text-2xl font-bold"}>{grant.name}</DialogTitle>
+              <DialogTitle className={"text-2xl font-bold text-primary"}>{grant.name}</DialogTitle>
               <div className={"mt-2 flex flex-wrap items-center gap-4"}>
                 <div className={"flex items-center gap-2"}>
-                  <Building2 className={"text-muted-foreground h-5 w-5"} />
-                  <span className={"text-muted-foreground text-base"}>{grant.provider}</span>
+                  <Building2 className={"h-5 w-5 text-muted-foreground"} />
+                  <span className={"text-base text-muted-foreground"}>{grant.provider}</span>
                 </div>
                 {grant.location && (
                   <div className={"flex items-center gap-2"}>
-                    <MapPin className={"text-muted-foreground h-5 w-5"} />
-                    <span className={"text-muted-foreground text-base"}>{grant.location}</span>
+                    <MapPin className={"h-5 w-5 text-muted-foreground"} />
+                    <span className={"text-base text-muted-foreground"}>{grant.location}</span>
                   </div>
                 )}
                 <Badge variant={"outline"} className={"ml-auto"}>
@@ -375,22 +375,22 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
 
             {/* Key Information Cards */}
             <div className={"mb-6 grid grid-cols-1 gap-6 md:grid-cols-2"}>
-              <div className={"bg-muted/30 flex items-center gap-3 rounded-md p-4"}>
-                <div className={"bg-primary/10 rounded-full p-2"}>
-                  <DollarSign className={"text-primary h-5 w-5"} />
+              <div className={"flex items-center gap-3 rounded-md bg-muted/30 p-4"}>
+                <div className={"rounded-full bg-primary/10 p-2"}>
+                  <DollarSign className={"h-5 w-5 text-primary"} />
                 </div>
                 <div>
-                  <p className={"text-muted-foreground text-sm"}>Funding</p>
+                  <p className={"text-sm text-muted-foreground"}>Funding</p>
                   <p className={"font-semibold"}>{formatFunding(grant.grant)}</p>
                 </div>
               </div>
 
-              <div className={"bg-muted/30 flex items-center gap-3 rounded-md p-4"}>
-                <div className={"bg-primary/10 rounded-full p-2"}>
-                  <Calendar className={"text-primary h-5 w-5"} />
+              <div className={"flex items-center gap-3 rounded-md bg-muted/30 p-4"}>
+                <div className={"rounded-full bg-primary/10 p-2"}>
+                  <Calendar className={"h-5 w-5 text-primary"} />
                 </div>
                 <div>
-                  <p className={"text-muted-foreground text-sm"}>Deadline</p>
+                  <p className={"text-sm text-muted-foreground"}>Deadline</p>
                   <p className={"font-semibold"}>
                     {grant.deadlineAt ? new Date(grant.deadlineAt).toLocaleDateString() : "No deadline specified"}
                   </p>
@@ -415,7 +415,7 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
                   <ul className={"list-none space-y-2"}>
                     {grant.criteria.map((criteria, index) => (
                       <li key={index} className={"flex items-start gap-2"}>
-                        <CheckCircle className={"text-primary mt-0.5 h-5 w-5 shrink-0"} />
+                        <CheckCircle className={"mt-0.5 h-5 w-5 shrink-0 text-primary"} />
                         <span>{criteria}</span>
                       </li>
                     ))}
@@ -451,12 +451,12 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
                 <div className={"grid grid-cols-1 gap-4 md:grid-cols-3"}>
                   {grant.websiteUrl && (
                     <div className={"flex items-center gap-2"}>
-                      <Globe className={"text-muted-foreground h-4 w-4"} />
+                      <Globe className={"h-4 w-4 text-muted-foreground"} />
                       <a
                         href={grant.websiteUrl.startsWith("http") ? grant.websiteUrl : `https://${grant.websiteUrl}`}
                         target={"_blank"}
                         rel={"noopener noreferrer"}
-                        className={"text-primary truncate hover:underline"}
+                        className={"truncate text-primary hover:underline"}
                       >
                         Website
                       </a>
@@ -465,8 +465,8 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
 
                   {grant.providerEmail && (
                     <div className={"flex items-center gap-2"}>
-                      <Mail className={"text-muted-foreground h-4 w-4"} />
-                      <a href={`mailto:${grant.providerEmail}`} className={"text-primary truncate hover:underline"}>
+                      <Mail className={"h-4 w-4 text-muted-foreground"} />
+                      <a href={`mailto:${grant.providerEmail}`} className={"truncate text-primary hover:underline"}>
                         {grant.providerEmail}
                       </a>
                     </div>
@@ -474,7 +474,7 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
 
                   {grant.providerPhone && (
                     <div className={"flex items-center gap-2"}>
-                      <PhoneCall className={"text-muted-foreground h-4 w-4"} />
+                      <PhoneCall className={"h-4 w-4 text-muted-foreground"} />
                       <a href={`tel:${grant.providerPhone}`} className={"text-primary hover:underline"}>
                         {grant.providerPhone}
                       </a>
@@ -482,7 +482,7 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
                   )}
 
                   {!grant.websiteUrl && !grant.providerEmail && !grant.providerPhone && (
-                    <p className={"text-muted-foreground col-span-3"}>No contact information provided.</p>
+                    <p className={"col-span-3 text-muted-foreground"}>No contact information provided.</p>
                   )}
                 </div>
               </div>
@@ -524,12 +524,12 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
             {summaryText && (
               <div className={"mt-6"} id={"ai-analysis"}>
                 <Separator className={"my-6"} />
-                <Card className={"from-primary/5 border bg-gradient-to-br to-transparent"}>
+                <Card className={"border bg-gradient-to-br from-primary/5 to-transparent"}>
                   <CardHeader className={"pb-3"}>
                     <div className={"flex items-center justify-between"}>
                       <CardTitle className={"flex items-center gap-2 text-lg"}>
-                        <div className={"bg-primary/10 rounded-full p-1"}>
-                          <TrendingUp className={"text-primary h-4 w-4"} />
+                        <div className={"rounded-full bg-primary/10 p-1"}>
+                          <TrendingUp className={"h-4 w-4 text-primary"} />
                         </div>
                         AI Grant Analysis
                       </CardTitle>
@@ -543,7 +543,7 @@ export default function GrantCard({ grant }: { grant: ResourceGrant }) {
                   </CardHeader>
 
                   <CardContent>
-                    <div className={"prose prose-sm dark:prose-invert max-w-none"}>
+                    <div className={"prose prose-sm max-w-none dark:prose-invert"}>
                       <Markdown>{summaryText}</Markdown>
                     </div>
                   </CardContent>

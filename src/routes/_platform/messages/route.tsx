@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
@@ -71,7 +71,7 @@ export default function Layout(props: LayoutProps) {
       <div className={"absolute inset-0 flex h-screen pt-16"}>
         <aside
           className={cn(
-            "bg-sidebar w-80 border-r",
+            "w-80 border-r bg-sidebar",
             "flex flex-col overflow-hidden",
             "max-md:hidden", // Hide on mobile, can be toggled later
           )}
@@ -105,7 +105,7 @@ export default function Layout(props: LayoutProps) {
             </Tabs>
           </div>
         </aside>
-        <main className={"bg-background flex flex-1 flex-col overflow-hidden"}>{props.children}</main>
+        <main className={"flex flex-1 flex-col overflow-hidden bg-background"}>{props.children}</main>
       </div>
     </MessagesContext.Provider>
   );

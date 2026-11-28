@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import {
   BookmarkIcon,
   CalendarIcon,
@@ -153,7 +153,7 @@ function NestedLayout(props: LayoutProps) {
         </SidebarFooter>
       </Sidebar>
       <div className={"flex flex-1 flex-col"}>
-        <button className={"bg-sidebar border-b py-1 text-center md:hidden"} onClick={toggleSidebar}>
+        <button className={"border-b bg-sidebar py-1 text-center md:hidden"} onClick={toggleSidebar}>
           Toggle Sidebar
         </button>
         {props.children}

@@ -144,7 +144,11 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return orderMilestoneSchema.parse(response);
     },
 
-    updateOrderMilestone: async (orderId: string, milestoneId: string, data: Record<string, unknown>): Promise<OrderMilestone> => {
+    updateOrderMilestone: async (
+      orderId: string,
+      milestoneId: string,
+      data: Record<string, unknown>,
+    ): Promise<OrderMilestone> => {
       const response = await primitives.put(`/orders/${orderId}/milestones/${milestoneId}`, data);
       return orderMilestoneSchema.parse(response);
     },

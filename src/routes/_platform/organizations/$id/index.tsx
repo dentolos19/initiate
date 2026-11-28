@@ -105,7 +105,7 @@ export default function Page() {
   return (
     <div>
       {/* Header */}
-      <div className={"bg-secondary border-b"}>
+      <div className={"border-b bg-secondary"}>
         {/* Banner */}
         <ImageWrapper className={"h-50 w-full"} alt={"Banner"} />
 

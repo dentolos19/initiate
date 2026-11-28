@@ -102,7 +102,7 @@ export default function Page() {
     <Form {...form}>
       <form onSubmit={createSaveHandler()}>
         <Tabs className={"gap-0"} defaultValue={"overview"}>
-          <TabsList className={"bg-sidebar w-full rounded-none border-b"}>
+          <TabsList className={"w-full rounded-none border-b bg-sidebar"}>
             <TabsTrigger value={"overview"}>Overview</TabsTrigger>
             <TabsTrigger value={"plans"} disabled={mode === "create"}>
               Plans

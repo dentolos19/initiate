@@ -30,21 +30,24 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
 
-  const loadInvoices = useCallback((status?: string) => {
-    setLoading(true);
-    backend.user
-      .getUserInvoices("current", 1, 50, status)
-      .then((data) => {
-        setInvoices(data);
-      })
-      .catch((error: Error) => {
-        console.error(error);
-        toast.error(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [backend.user]);
+  const loadInvoices = useCallback(
+    (status?: string) => {
+      setLoading(true);
+      backend.user
+        .getUserInvoices("current", 1, 50, status)
+        .then((data) => {
+          setInvoices(data);
+        })
+        .catch((error: Error) => {
+          console.error(error);
+          toast.error(error.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [backend.user],
+  );
 
   const loadStatistics = useCallback(() => {
     backend.user
@@ -88,40 +91,40 @@ export default function InvoicesPage() {
         <div className="grid border-b md:grid-cols-2 lg:grid-cols-4 lg:divide-x">
           <section className="p-5 sm:p-6">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-muted-foreground text-sm font-medium">Total Invoices</h2>
-              <ReceiptIcon className="text-muted-foreground size-4" aria-hidden="true" />
+              <h2 className="text-sm font-medium text-muted-foreground">Total Invoices</h2>
+              <ReceiptIcon className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <div className="mt-1 text-2xl font-semibold tabular-nums">{statistics.totalInvoices}</div>
-            <p className={"text-muted-foreground text-xs"}>
+            <p className={"text-xs text-muted-foreground"}>
               Total amount: {formatAmount(statistics.totalAmount, "usd")}
             </p>
           </section>
 
           <section className="border-t p-5 sm:p-6 md:border-t-0 md:border-l lg:border-l-0">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-muted-foreground text-sm font-medium">Paid Invoices</h2>
-              <DollarSignIcon className="text-muted-foreground size-4" aria-hidden="true" />
+              <h2 className="text-sm font-medium text-muted-foreground">Paid Invoices</h2>
+              <DollarSignIcon className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <div className="mt-1 text-2xl font-semibold tabular-nums">{statistics.paidInvoices}</div>
-            <p className={"text-muted-foreground text-xs"}>Paid amount: {formatAmount(statistics.paidAmount, "usd")}</p>
+            <p className={"text-xs text-muted-foreground"}>Paid amount: {formatAmount(statistics.paidAmount, "usd")}</p>
           </section>
 
           <section className="border-t p-5 sm:p-6 lg:border-t-0">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-muted-foreground text-sm font-medium">Open Invoices</h2>
-              <CreditCardIcon className="text-muted-foreground size-4" aria-hidden="true" />
+              <h2 className="text-sm font-medium text-muted-foreground">Open Invoices</h2>
+              <CreditCardIcon className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <div className="mt-1 text-2xl font-semibold tabular-nums">{statistics.openInvoices}</div>
-            <p className={"text-muted-foreground text-xs"}>Awaiting payment</p>
+            <p className={"text-xs text-muted-foreground"}>Awaiting payment</p>
           </section>
 
           <section className="border-t p-5 sm:p-6 md:border-l lg:border-t-0 lg:border-l-0">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-muted-foreground text-sm font-medium">Refunded</h2>
-              <ReceiptIcon className="text-muted-foreground size-4" aria-hidden="true" />
+              <h2 className="text-sm font-medium text-muted-foreground">Refunded</h2>
+              <ReceiptIcon className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <div className="mt-1 text-2xl font-semibold tabular-nums">{statistics.refundedInvoices}</div>
-            <p className={"text-muted-foreground text-xs"}>{formatAmount(statistics.refundedAmount, "usd")} refunded</p>
+            <p className={"text-xs text-muted-foreground"}>{formatAmount(statistics.refundedAmount, "usd")} refunded</p>
           </section>
         </div>
       )}

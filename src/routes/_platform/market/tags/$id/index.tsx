@@ -7,8 +7,7 @@ import LoadingSpinner from "#/components/loading-spinner";
 import { Button } from "#/components/ui/button";
 import useBackend from "#/lib/backend/client";
 import { Service } from "#/lib/backend/schema";
-import Link from "#/lib/router";
-import { useParams, useRouter, useSearchParams } from "#/lib/router";
+import Link, { useParams, useRouter, useSearchParams } from "#/lib/router";
 import domains from "#/lib/store/domains";
 import { getLabel } from "#/lib/utils";
 import ServiceCard from "#/routes/_platform/-components/service-card";
@@ -29,27 +28,30 @@ export default function Page() {
   const [services, setServices] = useState<Service[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(false);
 
-  const loadServices = useCallback((page: number) => {
-    if (!tagId) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    backend.market
-      .servicesByTag(tagId, page, 24) // Load 24 services per page for better grid layout
-      .then((services) => {
-        setServices(services);
-        setHasMore(services.length === 24); // If we get exactly 24, there might be more
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error(error.message);
-      })
-      .finally(() => {
+  const loadServices = useCallback(
+    (page: number) => {
+      if (!tagId) {
         setLoading(false);
-      });
-  }, [backend.market, tagId]);
+        return;
+      }
+
+      setLoading(true);
+      backend.market
+        .servicesByTag(tagId, page, 24) // Load 24 services per page for better grid layout
+        .then((services) => {
+          setServices(services);
+          setHasMore(services.length === 24); // If we get exactly 24, there might be more
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error(error.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [backend.market, tagId],
+  );
 
   function handlePageChange(newPage: number) {
     const params = new URLSearchParams(searchParams.toString());
@@ -83,8 +85,8 @@ export default function Page() {
   return (
     <div className={"w-full space-y-4 p-4 sm:p-6"}>
       {/* Breadcrumb */}
-      <nav className={"text-muted-foreground flex items-center space-x-2 text-sm"}>
-        <Link href={"/market"} className={"hover:text-foreground flex items-center"}>
+      <nav className={"flex items-center space-x-2 text-sm text-muted-foreground"}>
+        <Link href={"/market"} className={"flex items-center hover:text-foreground"}>
           <HomeIcon className={"mr-1 size-4"} />
           Market
         </Link>
@@ -98,7 +100,7 @@ export default function Page() {
           <h1 className={"text-2xl font-semibold tracking-tight text-balance"}>{domainLabel}</h1>
           <p className={"text-muted-foreground"}>{domainDescription}</p>
           {services.length > 0 && (
-            <p className={"text-muted-foreground mt-2 text-sm"}>
+            <p className={"mt-2 text-sm text-muted-foreground"}>
               Showing {services.length} service{services.length !== 1 ? "s" : ""}
               {currentPage > 1 && ` on page ${currentPage}`}
             </p>
@@ -107,7 +109,7 @@ export default function Page() {
       </header>
 
       {services.length === 0 ? (
-        <div className={"text-muted-foreground my-20 text-center"}>No services found in this category yet.</div>
+        <div className={"my-20 text-center text-muted-foreground"}>No services found in this category yet.</div>
       ) : (
         <>
           <div className={"grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"}>
@@ -123,7 +125,7 @@ export default function Page() {
                 <ChevronLeftIcon className={"size-4"} />
                 Previous
               </Button>
-              <span className={"text-muted-foreground flex items-center px-4 text-sm"}>Page {currentPage}</span>
+              <span className={"flex items-center px-4 text-sm text-muted-foreground"}>Page {currentPage}</span>
               <Button variant={"outline"} onClick={() => handlePageChange(currentPage + 1)} disabled={!hasMore}>
                 Next
                 <ChevronRightIcon className={"size-4"} />

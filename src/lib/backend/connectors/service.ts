@@ -123,7 +123,11 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return servicePlanSchema.parse(response);
     },
 
-    updateServicePlan: async (serviceId: string, planId: string, data: Record<string, unknown>): Promise<ServicePlan> => {
+    updateServicePlan: async (
+      serviceId: string,
+      planId: string,
+      data: Record<string, unknown>,
+    ): Promise<ServicePlan> => {
       const response = await primitives.put(`/service/${serviceId}/plans/${planId}`, data);
       return servicePlanSchema.parse(response);
     },
@@ -160,7 +164,11 @@ export default function mapConnectors(primitives: BackendPrimitives) {
       return serviceReviewSchema.parse(response);
     },
 
-    updateServiceReview: async (serviceId: string, reviewId: string, data: Record<string, unknown>): Promise<ServiceReview> => {
+    updateServiceReview: async (
+      serviceId: string,
+      reviewId: string,
+      data: Record<string, unknown>,
+    ): Promise<ServiceReview> => {
       const response = await primitives.put(`/service/${serviceId}/reviews/${reviewId}`, data);
       return serviceReviewSchema.parse(response);
     },

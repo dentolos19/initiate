@@ -1,6 +1,6 @@
 import { useRealtimeKitClient } from "@cloudflare/realtimekit-react";
 import { RtkMeeting } from "@cloudflare/realtimekit-react-ui";
-import { LogOut, Loader2 } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -48,13 +48,13 @@ export function CallInterface({ callType, realtimeKitRoom, onCallEnd }: CallInte
   if (!meeting) {
     return (
       <div className="grid min-h-[60vh] place-items-center">
-        <Loader2 className="text-primary size-7 animate-spin motion-reduce:animate-none" />
+        <Loader2 className="size-7 animate-spin text-primary motion-reduce:animate-none" />
       </div>
     );
   }
 
   return (
-    <div className="bg-background relative h-[calc(100dvh-4rem)] overflow-hidden">
+    <div className="relative h-[calc(100dvh-4rem)] overflow-hidden bg-background">
       <RtkMeeting className="size-full" meeting={meeting} mode="fill" showSetupScreen />
       <Button
         className="absolute top-4 right-4 z-50 shadow-lg"

@@ -1,7 +1,7 @@
-
-import { AvatarImage } from "#/components/ui/avatar";
 import clsx from "clsx";
 import { type ImgHTMLAttributes, useEffect, useState } from "react";
+
+import { AvatarImage } from "#/components/ui/avatar";
 
 type ImageWrapperProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
   src?: string | null;

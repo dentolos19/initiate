@@ -57,16 +57,17 @@ orderInvoices.delete("/invoices/:invoiceId", async (c) => {
   if (invoice.status !== "draft" && invoice.status !== "open") {
     return c.json({ message: "Only draft or open invoices can be removed." }, 400);
   }
-  const [removedInvoice] = invoice.status === "draft"
-    ? await database
-        .delete(orderInvoice)
-        .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "draft")))
-        .returning({ id: orderInvoice.id })
-    : await database
-        .update(orderInvoice)
-        .set({ status: "void" })
-        .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "open")))
-        .returning({ id: orderInvoice.id });
+  const [removedInvoice] =
+    invoice.status === "draft"
+      ? await database
+          .delete(orderInvoice)
+          .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "draft")))
+          .returning({ id: orderInvoice.id })
+      : await database
+          .update(orderInvoice)
+          .set({ status: "void" })
+          .where(and(eq(orderInvoice.id, invoice.id), eq(orderInvoice.status, "open")))
+          .returning({ id: orderInvoice.id });
   if (!removedInvoice) return c.json({ message: "Invoice changed. Please refresh and try again." }, 409);
   return c.json({ message: invoice.status === "draft" ? "Invoice deleted." : "Invoice voided." });
 });

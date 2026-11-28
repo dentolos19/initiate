@@ -22,12 +22,12 @@ export default function Services() {
   return (
     <motion.section ref={target} className={"h-[500%]"} style={{ opacity: sectionPpacity }}>
       <div className={cn("sticky top-1/2 -translate-y-1/2", "flex justify-center gap-8")}>
-        <div className={"bg-muted/50 flex rounded-lg border"}>
+        <div className={"flex rounded-lg border bg-muted/50"}>
           <Card className={"w-60 gap-0 overflow-hidden p-0"}>
             <ImageWrapper src={"https://nyptech.club/assets/startups/virage.png"} alt={"Virage"} />
             <CardContent className={"py-4"}>
               <h2 className={"mb-1 font-medium"}>Virage</h2>
-              <p className={"text-muted-foreground text-sm"}>
+              <p className={"text-sm text-muted-foreground"}>
                 A vishing simulation platform designed for educational purposes.
               </p>
             </CardContent>
@@ -38,7 +38,7 @@ export default function Services() {
               style={{ opacity: textOpacity }}
             >
               <h2 className={"text-lg font-bold"}>Here's why our AI thinks this matches you!</h2>
-              <p className={"text-muted-foreground text-sm"}>
+              <p className={"text-sm text-muted-foreground"}>
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti, id mollitia. Unde ex ipsa
                 reprehenderit inventore doloremque mollitia ut nulla officia molestias quis fuga, autem nihil, sequi
                 laborum veritatis sapiente.

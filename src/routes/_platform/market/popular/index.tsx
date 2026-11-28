@@ -42,7 +42,7 @@ export default function Page() {
   return (
     <div className={"w-full space-y-4 p-4 sm:p-6"}>
       <header className="flex items-start gap-3 border-b pb-5">
-        <TrendingUpIcon className="text-primary mt-1 size-5" aria-hidden="true" />
+        <TrendingUpIcon className="mt-1 size-5 text-primary" aria-hidden="true" />
         <div>
           <h1 className={"text-2xl font-semibold tracking-tight text-balance"}>Popular Services</h1>
           <p className={"text-muted-foreground"}>Discover the most popular and trending services on our platform.</p>

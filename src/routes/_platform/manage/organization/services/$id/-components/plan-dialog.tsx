@@ -250,7 +250,7 @@ export default function PlanDialog(props: {
               </PopoverTrigger>
               <PopoverContent className={"w-60"}>
                 <h3 className={"mb-1 font-bold"}>Are you sure?</h3>
-                <p className={"text-muted-foreground mb-2 text-sm"}>This action is permanent!</p>
+                <p className={"mb-2 text-sm text-muted-foreground"}>This action is permanent!</p>
                 <Button variant={"destructive"} onClick={createDeleteHandler()}>
                   Delete
                 </Button>

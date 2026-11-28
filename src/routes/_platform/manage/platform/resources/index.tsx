@@ -12,7 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import useBackend from "#/lib/backend/client";
 import { ResourceDocumentation, ResourceGrant } from "#/lib/backend/schema";
 import Link from "#/lib/router";
-import DeleteDialog, { type DeleteTarget } from "#/routes/_platform/manage/platform/resources/-components/delete-dialog";
+import DeleteDialog, {
+  type DeleteTarget,
+} from "#/routes/_platform/manage/platform/resources/-components/delete-dialog";
 
 export const Route = createFileRoute("/_platform/manage/platform/resources/")({ component: ResourcesPage });
 
@@ -101,20 +103,20 @@ export default function ResourcesPage() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {grants.map((grant) => (
-              <Card key={grant.id} className="hover:bg-muted/30 shadow-none transition-colors">
+              <Card key={grant.id} className="shadow-none transition-colors hover:bg-muted/30">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <AwardIcon className="text-primary h-6 w-6" />
+                    <AwardIcon className="h-6 w-6 text-primary" />
                     <Badge variant="secondary">Grant</Badge>
                   </div>
                   <CardTitle className="line-clamp-2 text-lg">{grant.name}</CardTitle>
-                  <p className="text-muted-foreground text-sm">{grant.provider}</p>
+                  <p className="text-sm text-muted-foreground">{grant.provider}</p>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <p className="text-muted-foreground line-clamp-2 text-sm">{grant.description || "No description."}</p>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{grant.description || "No description."}</p>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-xs text-muted-foreground">
                       Created {new Date(grant.createdAt).toLocaleDateString()}
                     </span>
                     <div className="flex gap-2">
@@ -139,9 +141,9 @@ export default function ResourcesPage() {
           </div>
 
           {grants.length === 0 && (
-            <div className="border-muted border-y border-dashed py-16 text-center">
-              <AwardIcon className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-              <p className="text-muted-foreground mb-2 text-lg">No grants yet</p>
+            <div className="border-y border-dashed border-muted py-16 text-center">
+              <AwardIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="mb-2 text-lg text-muted-foreground">No grants yet</p>
               <Button asChild>
                 <Link href="/manage/platform/resources/grants/new">
                   <PlusIcon className="mr-2 h-4 w-4" />
@@ -165,19 +167,19 @@ export default function ResourcesPage() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {documentation.map((doc) => (
-              <Card key={doc.id} className="hover:bg-muted/30 shadow-none transition-colors">
+              <Card key={doc.id} className="shadow-none transition-colors hover:bg-muted/30">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <FileTextIcon className="text-primary h-6 w-6" />
+                    <FileTextIcon className="h-6 w-6 text-primary" />
                     <Badge variant="outline">Document</Badge>
                   </div>
                   <CardTitle className="line-clamp-2 text-lg">{doc.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <p className="text-muted-foreground line-clamp-2 text-sm">{doc.description || "No description."}</p>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{doc.description || "No description."}</p>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-xs text-muted-foreground">
                       Created {new Date(doc.createdAt).toLocaleDateString()}
                     </span>
                     <div className="flex gap-2">
@@ -205,9 +207,9 @@ export default function ResourcesPage() {
           </div>
 
           {documentation.length === 0 && (
-            <div className="border-muted border-y border-dashed py-16 text-center">
-              <FileTextIcon className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-              <p className="text-muted-foreground mb-2 text-lg">No documentation yet</p>
+            <div className="border-y border-dashed border-muted py-16 text-center">
+              <FileTextIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="mb-2 text-lg text-muted-foreground">No documentation yet</p>
               <Button asChild>
                 <Link href="/manage/platform/resources/documentation/new">
                   <PlusIcon className="mr-2 h-4 w-4" />

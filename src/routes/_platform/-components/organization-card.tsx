@@ -11,7 +11,7 @@ import { cn, getLabel } from "#/lib/utils";
 export default function OrganizationCard(props: ComponentProps<"div"> & { data: Organization }) {
   return (
     <Link
-      className={cn("bg-card group overflow-hidden rounded-lg border", props.className)}
+      className={cn("group overflow-hidden rounded-lg border bg-card", props.className)}
       href={`/organizations/${props.data.id}`}
     >
       {/* Image */}

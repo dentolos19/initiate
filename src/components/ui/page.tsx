@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "#/lib/utils";
 
 function PageShell({ className, ...props }: React.ComponentProps<"main">) {
-  return <main className={cn("min-w-0 w-full", className)} {...props} />;
+  return <main className={cn("w-full min-w-0", className)} {...props} />;
 }
 
 function PageHeader({ className, ...props }: React.ComponentProps<"header">) {
@@ -27,11 +27,11 @@ function PageTitle({ className, ...props }: React.ComponentProps<"h1">) {
 }
 
 function PageDescription({ className, ...props }: React.ComponentProps<"p">) {
-  return <p className={cn("text-muted-foreground max-w-3xl text-sm leading-6 text-pretty", className)} {...props} />;
+  return <p className={cn("max-w-3xl text-sm leading-6 text-pretty text-muted-foreground", className)} {...props} />;
 }
 
 function PageContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("min-w-0 w-full p-4 sm:p-6", className)} {...props} />;
+  return <div className={cn("w-full min-w-0 p-4 sm:p-6", className)} {...props} />;
 }
 
 function PageSection({ className, ...props }: React.ComponentProps<"section">) {

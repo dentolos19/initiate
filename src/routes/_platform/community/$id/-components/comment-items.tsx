@@ -141,7 +141,7 @@ function CommentThread({
   const isCurrentUserComment = currentUser && currentUser.id === comment.user.id;
 
   return (
-    <div className={`${level === 1 ? "border-muted ml-6 border-l-2 pl-4" : ""}`}>
+    <div className={`${level === 1 ? "ml-6 border-l-2 border-muted pl-4" : ""}`}>
       <div className="mb-3 flex items-start gap-3">
         <Avatar className="h-8 w-8 flex-shrink-0">
           <ImageWrapper src={comment.user.imageUrl} alt={comment.user.firstName} avatar />
@@ -155,7 +155,7 @@ function CommentThread({
             <span className="text-sm font-medium">
               {comment.user.firstName} {comment.user.lastName}
             </span>
-            <span className={"text-muted-foreground text-xs"}>{timeAgo}</span>
+            <span className={"text-xs text-muted-foreground"}>{timeAgo}</span>
           </div>
 
           {isEditing ? (
@@ -186,7 +186,7 @@ function CommentThread({
           ) : (
             <div className="mb-2 text-sm break-words">
               {level > 0 && comment.replyingTo && (
-                <span className={"text-primary font-medium"}>@{comment.replyingTo.firstName} </span>
+                <span className={"font-medium text-primary"}>@{comment.replyingTo.firstName} </span>
               )}
               {localContent}
             </div>
@@ -197,7 +197,7 @@ function CommentThread({
               variant="ghost"
               size="sm"
               onClick={toggleReplyBox}
-              className={"text-muted-foreground hover:text-foreground h-6 px-2 text-xs"}
+              className={"h-6 px-2 text-xs text-muted-foreground hover:text-foreground"}
               disabled={isEditing}
             >
               <MessageCircle className={"mr-1 h-3 w-3"} />
@@ -210,7 +210,7 @@ function CommentThread({
                   variant="ghost"
                   size="sm"
                   onClick={startEdit}
-                  className={"text-muted-foreground h-6 px-2 text-xs hover:text-blue-500"}
+                  className={"h-6 px-2 text-xs text-muted-foreground hover:text-blue-500"}
                   disabled={isEditing}
                 >
                   <PencilIcon className={"mr-1 h-3 w-3"} />
@@ -221,7 +221,7 @@ function CommentThread({
                   variant="ghost"
                   size="sm"
                   onClick={() => onDeleteComment?.(comment.id)}
-                  className={"text-muted-foreground hover:text-destructive h-6 px-2 text-xs"}
+                  className={"h-6 px-2 text-xs text-muted-foreground hover:text-destructive"}
                   disabled={isEditing}
                 >
                   <Trash2Icon className={"mr-1 h-3 w-3"} />

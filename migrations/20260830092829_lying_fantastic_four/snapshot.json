@@ -2,9 +2,7 @@
   "version": "7",
   "dialect": "sqlite",
   "id": "c9773360-29ec-47e6-890a-d7ba23a72700",
-  "prevIds": [
-    "00000000-0000-0000-0000-000000000000"
-  ],
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
   "ddl": [
     {
       "name": "assets",
@@ -3067,13 +3065,9 @@
       "table": "user_follows"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3082,13 +3076,9 @@
       "table": "auth_accounts"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3097,13 +3087,9 @@
       "table": "auth_invitations"
     },
     {
-      "columns": [
-        "inviterId"
-      ],
+      "columns": ["inviterId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3112,13 +3098,9 @@
       "table": "auth_invitations"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3127,13 +3109,9 @@
       "table": "auth_members"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3142,13 +3120,9 @@
       "table": "auth_members"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3157,13 +3131,9 @@
       "table": "auth_sessions"
     },
     {
-      "columns": [
-        "activeOrganizationId"
-      ],
+      "columns": ["activeOrganizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3172,13 +3142,9 @@
       "table": "auth_sessions"
     },
     {
-      "columns": [
-        "messageRoomId"
-      ],
+      "columns": ["messageRoomId"],
       "tableTo": "communication_rooms",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3187,13 +3153,9 @@
       "table": "communication_calls"
     },
     {
-      "columns": [
-        "initiatorId"
-      ],
+      "columns": ["initiatorId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3202,13 +3164,9 @@
       "table": "communication_calls"
     },
     {
-      "columns": [
-        "callId"
-      ],
+      "columns": ["callId"],
       "tableTo": "communication_calls",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3217,13 +3175,9 @@
       "table": "call_participants"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3232,13 +3186,9 @@
       "table": "call_participants"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3247,13 +3197,9 @@
       "table": "community_comments"
     },
     {
-      "columns": [
-        "postId"
-      ],
+      "columns": ["postId"],
       "tableTo": "community_posts",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3262,13 +3208,9 @@
       "table": "community_comments"
     },
     {
-      "columns": [
-        "parentId"
-      ],
+      "columns": ["parentId"],
       "tableTo": "community_comments",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": true,
@@ -3277,13 +3219,9 @@
       "table": "community_comments"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3292,13 +3230,9 @@
       "table": "community_follows"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3307,13 +3241,9 @@
       "table": "community_likes"
     },
     {
-      "columns": [
-        "postId"
-      ],
+      "columns": ["postId"],
       "tableTo": "community_posts",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3322,13 +3252,9 @@
       "table": "community_likes"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3337,13 +3263,9 @@
       "table": "community_posts"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3352,13 +3274,9 @@
       "table": "community_posts"
     },
     {
-      "columns": [
-        "postId"
-      ],
+      "columns": ["postId"],
       "tableTo": "community_posts",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3367,13 +3285,9 @@
       "table": "community_proposals"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3382,13 +3296,9 @@
       "table": "community_proposals"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3397,13 +3307,9 @@
       "table": "community_proposals"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3412,13 +3318,9 @@
       "table": "communication_messages"
     },
     {
-      "columns": [
-        "roomId"
-      ],
+      "columns": ["roomId"],
       "tableTo": "communication_rooms",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3427,13 +3329,9 @@
       "table": "communication_messages"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3442,13 +3340,9 @@
       "table": "user_notifications"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3457,13 +3351,9 @@
       "table": "service_orders"
     },
     {
-      "columns": [
-        "serviceId"
-      ],
+      "columns": ["serviceId"],
       "tableTo": "services",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3472,13 +3362,9 @@
       "table": "service_orders"
     },
     {
-      "columns": [
-        "planId"
-      ],
+      "columns": ["planId"],
       "tableTo": "service_plans",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3487,13 +3373,9 @@
       "table": "service_orders"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3502,13 +3384,9 @@
       "table": "service_orders"
     },
     {
-      "columns": [
-        "orderId"
-      ],
+      "columns": ["orderId"],
       "tableTo": "service_orders",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3517,13 +3395,9 @@
       "table": "order_disputes"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3532,13 +3406,9 @@
       "table": "service_invoices"
     },
     {
-      "columns": [
-        "orderId"
-      ],
+      "columns": ["orderId"],
       "tableTo": "service_orders",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3547,13 +3417,9 @@
       "table": "service_invoices"
     },
     {
-      "columns": [
-        "milestoneId"
-      ],
+      "columns": ["milestoneId"],
       "tableTo": "order_milestones",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "nameExplicit": false,
@@ -3562,13 +3428,9 @@
       "table": "service_invoices"
     },
     {
-      "columns": [
-        "orderId"
-      ],
+      "columns": ["orderId"],
       "tableTo": "service_orders",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3577,13 +3439,9 @@
       "table": "order_milestones"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3592,13 +3450,9 @@
       "table": "organization_likes"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3607,13 +3461,9 @@
       "table": "organization_likes"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3622,13 +3472,9 @@
       "table": "organization_notifications"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3637,13 +3483,9 @@
       "table": "organization_reviews"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3652,13 +3494,9 @@
       "table": "organization_reviews"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3667,13 +3505,9 @@
       "table": "organization_participants"
     },
     {
-      "columns": [
-        "roomId"
-      ],
+      "columns": ["roomId"],
       "tableTo": "communication_rooms",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3682,13 +3516,9 @@
       "table": "organization_participants"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3697,13 +3527,9 @@
       "table": "user_participants"
     },
     {
-      "columns": [
-        "roomId"
-      ],
+      "columns": ["roomId"],
       "tableTo": "communication_rooms",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3712,13 +3538,9 @@
       "table": "user_participants"
     },
     {
-      "columns": [
-        "organizationId"
-      ],
+      "columns": ["organizationId"],
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3727,13 +3549,9 @@
       "table": "services"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3742,13 +3560,9 @@
       "table": "service_likes"
     },
     {
-      "columns": [
-        "serviceId"
-      ],
+      "columns": ["serviceId"],
       "tableTo": "services",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3757,13 +3571,9 @@
       "table": "service_likes"
     },
     {
-      "columns": [
-        "serviceId"
-      ],
+      "columns": ["serviceId"],
       "tableTo": "services",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3772,13 +3582,9 @@
       "table": "service_plans"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3787,13 +3593,9 @@
       "table": "service_reviews"
     },
     {
-      "columns": [
-        "serviceId"
-      ],
+      "columns": ["serviceId"],
       "tableTo": "services",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3802,13 +3604,9 @@
       "table": "service_reviews"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3817,13 +3615,9 @@
       "table": "user_chats"
     },
     {
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3832,13 +3626,9 @@
       "table": "user_follows"
     },
     {
-      "columns": [
-        "followId"
-      ],
+      "columns": ["followId"],
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "nameExplicit": false,
@@ -3847,321 +3637,245 @@
       "table": "user_follows"
     },
     {
-      "columns": [
-        "userId",
-        "postId"
-      ],
+      "columns": ["userId", "postId"],
       "nameExplicit": true,
       "name": "community_likes_pkey",
       "entityType": "pks",
       "table": "community_likes"
     },
     {
-      "columns": [
-        "userId",
-        "organizationId"
-      ],
+      "columns": ["userId", "organizationId"],
       "nameExplicit": true,
       "name": "organization_likes_pkey",
       "entityType": "pks",
       "table": "organization_likes"
     },
     {
-      "columns": [
-        "organizationId",
-        "roomId"
-      ],
+      "columns": ["organizationId", "roomId"],
       "nameExplicit": true,
       "name": "organization_participants_pkey",
       "entityType": "pks",
       "table": "organization_participants"
     },
     {
-      "columns": [
-        "userId",
-        "roomId"
-      ],
+      "columns": ["userId", "roomId"],
       "nameExplicit": true,
       "name": "user_participants_pkey",
       "entityType": "pks",
       "table": "user_participants"
     },
     {
-      "columns": [
-        "userId",
-        "serviceId"
-      ],
+      "columns": ["userId", "serviceId"],
       "nameExplicit": true,
       "name": "service_likes_pkey",
       "entityType": "pks",
       "table": "service_likes"
     },
     {
-      "columns": [
-        "userId",
-        "followId"
-      ],
+      "columns": ["userId", "followId"],
       "nameExplicit": true,
       "name": "user_follows_pkey",
       "entityType": "pks",
       "table": "user_follows"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "assets_pk",
       "table": "assets",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_accounts_pk",
       "table": "auth_accounts",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_invitations_pk",
       "table": "auth_invitations",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_members_pk",
       "table": "auth_members",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_sessions_pk",
       "table": "auth_sessions",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_verifications_pk",
       "table": "auth_verifications",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "communication_calls_pk",
       "table": "communication_calls",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "call_participants_pk",
       "table": "call_participants",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "community_comments_pk",
       "table": "community_comments",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "community_follows_pk",
       "table": "community_follows",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "community_posts_pk",
       "table": "community_posts",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "community_proposals_pk",
       "table": "community_proposals",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "communication_messages_pk",
       "table": "communication_messages",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "communication_rooms_pk",
       "table": "communication_rooms",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "user_notifications_pk",
       "table": "user_notifications",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "service_orders_pk",
       "table": "service_orders",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "order_disputes_pk",
       "table": "order_disputes",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "service_invoices_pk",
       "table": "service_invoices",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "order_milestones_pk",
       "table": "order_milestones",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "organizations_pk",
       "table": "organizations",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "organization_notifications_pk",
       "table": "organization_notifications",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "organization_reviews_pk",
       "table": "organization_reviews",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "resource_documentation_pk",
       "table": "resource_documentation",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "resource_grant_pk",
       "table": "resource_grant",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "services_pk",
       "table": "services",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "service_plans_pk",
       "table": "service_plans",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "service_reviews_pk",
       "table": "service_reviews",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "users_pk",
       "table": "users",
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "user_chats_pk",
       "table": "user_chats",
@@ -4324,27 +4038,21 @@
       "table": "community_follows"
     },
     {
-      "columns": [
-        "token"
-      ],
+      "columns": ["token"],
       "nameExplicit": false,
       "name": "auth_sessions_token_unique",
       "entityType": "uniques",
       "table": "auth_sessions"
     },
     {
-      "columns": [
-        "slug"
-      ],
+      "columns": ["slug"],
       "nameExplicit": false,
       "name": "organizations_slug_unique",
       "entityType": "uniques",
       "table": "organizations"
     },
     {
-      "columns": [
-        "email"
-      ],
+      "columns": ["email"],
       "nameExplicit": false,
       "name": "users_email_unique",
       "entityType": "uniques",

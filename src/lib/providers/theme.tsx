@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 
 type ResolvedTheme = "dark" | "light";
 type Theme = ResolvedTheme | "system";

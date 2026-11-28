@@ -1,4 +1,4 @@
-import { AlertCircle, Archive, Download, File, Presentation, FileSpreadsheet, FileText, X } from "lucide-react";
+import { AlertCircle, Archive, Download, File, FileSpreadsheet, FileText, Presentation, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "#/components/ui/button";
@@ -37,7 +37,7 @@ export function MessageAttachment({ attachment }: MessageAttachmentProps) {
   if (fileType === "image") {
     if (imageError) {
       return (
-        <div className="text-destructive flex items-center gap-2">
+        <div className="flex items-center gap-2 text-destructive">
           <AlertCircle className="h-4 w-4" aria-hidden="true" />
           <span className="text-sm">Failed to load image: {name}</span>
           <Button aria-label={`Download ${name}`} variant="ghost" size="sm" onClick={handleDownload}>

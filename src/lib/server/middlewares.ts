@@ -15,10 +15,13 @@ export function createSessionMiddleware() {
       userId,
       requestedOrganizationId,
       session?.session.activeOrganizationId ?? null,
-      async (userId, organizationId) => Boolean(await createDatabase(c.env.DB).query.authMember.findFirst({
-        where: { userId, organizationId },
-        columns: { id: true },
-      })),
+      async (userId, organizationId) =>
+        Boolean(
+          await createDatabase(c.env.DB).query.authMember.findFirst({
+            where: { userId, organizationId },
+            columns: { id: true },
+          }),
+        ),
     );
     if (organization.denied) {
       return c.json({ message: "You are not a member of this organization." }, userId ? 403 : 401);

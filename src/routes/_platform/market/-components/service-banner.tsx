@@ -28,7 +28,7 @@ export default function ServiceBanner(props: ComponentProps<"div"> & { data: Ser
           className={cn(
             "absolute inset-0",
             "flex flex-col justify-end p-6",
-            "dark from-background via-background/40 bg-gradient-to-t to-transparent",
+            "dark bg-gradient-to-t from-background via-background/40 to-transparent",
           )}
         >
           {/* Tags */}

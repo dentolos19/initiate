@@ -38,13 +38,23 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
   const [service, setService] = useState<Service>();
   const [plan, setPlan] = useState<ServicePlan>();
-  const [loadedSelection, setLoadedSelection] = useState<{ id: string; planId: string; backend: typeof backend.service }>();
+  const [loadedSelection, setLoadedSelection] = useState<{
+    id: string;
+    planId: string;
+    backend: typeof backend.service;
+  }>();
 
   const form = useForm({ resolver: zodResolver(schema) });
 
   function createSubmitHandler() {
     return form.handleSubmit(async (values) => {
-      if (!planId || loadedSelection?.id !== id || loadedSelection.planId !== planId || loadedSelection.backend !== backend.service) return;
+      if (
+        !planId ||
+        loadedSelection?.id !== id ||
+        loadedSelection.planId !== planId ||
+        loadedSelection.backend !== backend.service
+      )
+        return;
       await backend.service
         .orderServicePlan(id, planId, values)
         .then((result) => {
@@ -74,10 +84,7 @@ export default function Page() {
     setLoading(true);
     setService(undefined);
     setPlan(undefined);
-    Promise.all([
-      backend.service.getService(id),
-      backend.service.getServicePlan(id, planId),
-    ])
+    Promise.all([backend.service.getService(id), backend.service.getServicePlan(id, planId)])
       .then(([service, plan]) => {
         if (!active) return;
         setService(service);
@@ -102,7 +109,12 @@ export default function Page() {
     return <div className={"my-20 text-center"}>No plan selected.</div>;
   }
 
-  if (loading || loadedSelection?.id !== id || loadedSelection.planId !== planId || loadedSelection.backend !== backend.service) {
+  if (
+    loading ||
+    loadedSelection?.id !== id ||
+    loadedSelection.planId !== planId ||
+    loadedSelection.backend !== backend.service
+  ) {
     return (
       <div className={"my-20"}>
         <LoadingSpinner />
@@ -125,12 +137,12 @@ export default function Page() {
             <CardDescription>This is what you are going to be purchasing.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className={"bg-card flex border"}>
+            <div className={"flex border bg-card"}>
               <Image className={"aspect-square size-30"} src={service.imageUrl} alt={service.name} />
               <div className={"flex flex-1 flex-col justify-between p-4"}>
                 <div>
                   <h2 className={"text-lg font-bold"}>{service.name}</h2>
-                  <p className={"text-muted-foreground text-sm"}>{service.tagline || "No tagline available."}</p>
+                  <p className={"text-sm text-muted-foreground"}>{service.tagline || "No tagline available."}</p>
                 </div>
                 <div className={"flex gap-1"}>
                   {service.tags.map((tag) => (
@@ -180,7 +192,7 @@ export default function Page() {
           </CardHeader>
           <CardContent>
             <div className={"flex justify-between"}>
-              <span className={"text-muted-foreground text-sm"}>{plan.name}</span>
+              <span className={"text-sm text-muted-foreground"}>{plan.name}</span>
               <span className={"text-sm font-bold"}>{plan.priceData ? formatPrice(plan.priceData) : "Unknown"}</span>
             </div>
           </CardContent>

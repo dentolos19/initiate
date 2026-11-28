@@ -38,7 +38,7 @@ export default function Page() {
       backend.orders
         .proposeOrder(id)
         .then((order) => {
-          setOrder((current) => current?.id === order.id ? order : current);
+          setOrder((current) => (current?.id === order.id ? order : current));
           toast.success("Order sent to buyer!");
         })
         .catch((error: Error) => {
@@ -55,7 +55,7 @@ export default function Page() {
       backend.orders
         .confirmOrder(id)
         .then((order) => {
-          setOrder((current) => current?.id === order.id ? order : current);
+          setOrder((current) => (current?.id === order.id ? order : current));
           toast.success("Order accepted successfully.");
         })
         .catch((error: Error) => {
@@ -72,7 +72,7 @@ export default function Page() {
       backend.orders
         .cancelOrder(id)
         .then((order) => {
-          setOrder((current) => current?.id === order.id ? order : current);
+          setOrder((current) => (current?.id === order.id ? order : current));
           toast.success("Order rejected successfully.");
         })
         .catch((error: Error) => {
@@ -87,7 +87,7 @@ export default function Page() {
     await backend.orders
       .completeOrder(id)
       .then((order) => {
-        setOrder((current) => current?.id === order.id ? order : current);
+        setOrder((current) => (current?.id === order.id ? order : current));
         toast.success("Order completed successfully.");
       })
       .catch((error: Error) => {
@@ -144,7 +144,7 @@ export default function Page() {
             <div className={"flex flex-col"}>
               <h1
                 className={
-                  "text-foreground mb-1 flex flex-col items-start gap-2 text-lg font-semibold sm:flex-row sm:items-center sm:text-xl"
+                  "mb-1 flex flex-col items-start gap-2 text-lg font-semibold text-foreground sm:flex-row sm:items-center sm:text-xl"
                 }
               >
                 <span className={"break-words"}>{order.service?.name || order.name}</span>
@@ -152,7 +152,7 @@ export default function Page() {
                   {getLabel(orderStatus, order.status, "Unknown")}
                 </Badge>
               </h1>
-              <p className={"text-muted-foreground text-sm"}>Order #{order.id}</p>
+              <p className={"text-sm text-muted-foreground"}>Order #{order.id}</p>
             </div>
           </div>
           <div className={"flex flex-wrap items-center gap-2"}>
@@ -216,7 +216,7 @@ export default function Page() {
         </div>
       </div>
 
-      <div className={"bg-background flex-1"}>
+      <div className={"flex-1 bg-background"}>
         <Tabs defaultValue={"overview"}>
           <TabsList className={"w-full border-b bg-transparent"}>
             <TabsTrigger value={"overview"}>Overview</TabsTrigger>

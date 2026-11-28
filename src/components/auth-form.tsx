@@ -1,5 +1,5 @@
 import { ArrowRight, Loader2 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "#/components/ui/card";
@@ -64,9 +64,9 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   };
 
   return (
-    <Card className="border-border/70 bg-background/90 shadow-primary/10 relative z-10 w-full max-w-md shadow-2xl backdrop-blur-xl">
+    <Card className="relative z-10 w-full max-w-md border-border/70 bg-background/90 shadow-2xl shadow-primary/10 backdrop-blur-xl">
       <CardHeader className="space-y-3 pb-5 text-center">
-        <div className="bg-primary font-heading text-primary-foreground mx-auto flex size-11 items-center justify-center rounded-2xl text-lg font-bold">
+        <div className="font-heading mx-auto flex size-11 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-primary-foreground">
           I
         </div>
         <div>
@@ -117,7 +117,7 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
             />
           </div>
           {error && (
-            <p className="text-destructive text-sm" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               {error}
             </p>
           )}
@@ -133,7 +133,7 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
           </Button>
         </CardContent>
       </form>
-      <CardFooter className="border-border/60 text-muted-foreground justify-center border-t pt-5 text-sm">
+      <CardFooter className="justify-center border-t border-border/60 pt-5 text-sm text-muted-foreground">
         {isSignUp ? "Already have an account?" : "New to Initiate?"}
         <Button asChild variant="link" className="px-2">
           <Link href={alternateDestination}>{isSignUp ? "Sign in" : "Create one"}</Link>

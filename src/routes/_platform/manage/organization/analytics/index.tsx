@@ -91,7 +91,7 @@ export default function DashboardPage() {
         </PageHeading>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <Calendar className="text-muted-foreground h-5 w-5" />
+            <Calendar className="h-5 w-5 text-muted-foreground" />
             <Select value={timeFilter} onValueChange={setTimeFilter}>
               <SelectTrigger className="w-36">
                 <SelectValue placeholder="Filter" />
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                 style={{ height: "100%", width: "100%" }}
               />
             ) : (
-              <p className={"text-muted-foreground text-center"}>No revenue data yet.</p>
+              <p className={"text-center text-muted-foreground"}>No revenue data yet.</p>
             )}
           </CardContent>
         </Card>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-muted-foreground text-center">
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
                       No service records yet.
                     </TableCell>
                   </TableRow>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-muted-foreground text-center">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
                       No transaction records yet.
                     </TableCell>
                   </TableRow>
@@ -264,12 +264,12 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     Based on <strong>{insights?.dataAnalyzed.totalTransactions}</strong> transactions,{" "}
                     <strong>${insights?.dataAnalyzed.totalRevenue}</strong> revenue, and{" "}
                     <strong>{insights?.dataAnalyzed.servicesAnalyzed}</strong> services.
                   </p>
-                  <div className={"prose prose-sm dark:prose-invert max-w-none"}>
+                  <div className={"prose prose-sm max-w-none dark:prose-invert"}>
                     <Markdown>{insights?.insights}</Markdown>
                   </div>
                 </div>

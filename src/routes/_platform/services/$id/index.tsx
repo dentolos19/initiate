@@ -12,8 +12,7 @@ import VerifiedBadge from "#/components/verified-badge";
 import useBackend from "#/lib/backend/client";
 import { Service, ServicePlan } from "#/lib/backend/schema";
 import { useSession } from "#/lib/providers/session";
-import Link from "#/lib/router";
-import { useParams, useRouter } from "#/lib/router";
+import Link, { useParams, useRouter } from "#/lib/router";
 import domains from "#/lib/store/domains";
 import { formatPrice, formatPriceModel, getLabel } from "#/lib/utils";
 import Loading from "#/routes/-components/loading";
@@ -97,10 +96,7 @@ export default function Page() {
     setService(undefined);
     setPlans([]);
     setSelectedPlanId(undefined);
-    Promise.allSettled([
-      backend.service.getService(id),
-      backend.service.getServicePlans(id),
-    ])
+    Promise.allSettled([backend.service.getService(id), backend.service.getServicePlans(id)])
       .then(([serviceResult, plansResult]) => {
         if (!active) return;
         if (serviceResult.status === "fulfilled") {
@@ -141,7 +137,7 @@ export default function Page() {
   return (
     <div>
       {/* Header */}
-      <div className={"bg-card border-b"}>
+      <div className={"border-b bg-card"}>
         <ImageWrapper className={"h-50 w-full border-b"} src={service.bannerUrl} alt={"Banner"} />
         <div className={"relative flex w-full justify-between gap-4 p-4 pt-12 max-sm:flex-col sm:px-6"}>
           <ImageWrapper className={"absolute -top-30 size-40"} src={service.imageUrl} alt={service.name} />
@@ -221,7 +217,7 @@ export default function Page() {
                   {servicePlans.map((plan) => (
                     <SelectItem key={plan.id} value={plan.id}>
                       <span>{plan.name}</span>
-                      <span className={"text-muted-foreground text-xs"}>
+                      <span className={"text-xs text-muted-foreground"}>
                         {plan.priceData ? formatPrice(plan.priceData) : "Unknown Price"}
                       </span>
                     </SelectItem>

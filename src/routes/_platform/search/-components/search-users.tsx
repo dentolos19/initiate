@@ -45,11 +45,11 @@ export default function SearchUsers() {
   }
 
   if (!query) {
-    return <div className={"text-muted-foreground my-10 text-center"}>Search something to get started!</div>;
+    return <div className={"my-10 text-center text-muted-foreground"}>Search something to get started!</div>;
   }
 
   if (!users.length) {
-    return <div className={"text-muted-foreground my-10 text-center"}>No users found.</div>;
+    return <div className={"my-10 text-center text-muted-foreground"}>No users found.</div>;
   }
 
   return (

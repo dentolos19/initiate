@@ -65,7 +65,7 @@ export default function Page() {
               width={873}
             />
           </h1>
-          <p className={"text-muted-foreground mx-auto mt-3 max-w-2xl text-base text-pretty sm:mt-4 sm:text-lg"}>
+          <p className={"mx-auto mt-3 max-w-2xl text-base text-pretty text-muted-foreground sm:mt-4 sm:text-lg"}>
             The Digital Marketplace for AI Solutions
           </p>
         </header>
@@ -74,7 +74,7 @@ export default function Page() {
           {/* Our Mission */}
           <article className={"min-w-0"}>
             <h2 className={"mb-3 text-xl font-semibold text-balance sm:text-2xl"}>Our Mission</h2>
-            <p className={"text-muted-foreground text-base leading-7 text-pretty sm:text-lg"}>
+            <p className={"text-base leading-7 text-pretty text-muted-foreground sm:text-lg"}>
               Our mission at Initiate is to be a digital marketplace for AI solutions. We connect businesses, startups,
               and investors with AI-driven matchmaking, fostering growth and successful partnerships through our
               platform.
@@ -84,7 +84,7 @@ export default function Page() {
           {/* Our Vision */}
           <article className={"min-w-0"}>
             <h2 className={"mb-3 text-xl font-semibold text-balance sm:text-2xl"}>Our Vision</h2>
-            <p className={"text-muted-foreground text-base leading-7 text-pretty sm:text-lg"}>
+            <p className={"text-base leading-7 text-pretty text-muted-foreground sm:text-lg"}>
               Our vision is to be the leading digital marketplace for AI solutions, empowering businesses and startups
               to thrive through innovative AI-driven matchmaking and collaboration.
             </p>
@@ -102,7 +102,7 @@ export default function Page() {
             >
               <EqualIcon aria-hidden={true} className={"mb-3 size-8 shrink-0"} />
               <h3 className={"mb-2 text-lg font-semibold text-balance"}>AI Matchmaking</h3>
-              <p className={"text-muted-foreground text-sm"}>
+              <p className={"text-sm text-muted-foreground"}>
                 Our AI matches startups, investors, and businesses, tailoring connections to your needs.
               </p>
             </article>
@@ -113,7 +113,7 @@ export default function Page() {
             >
               <StoreIcon aria-hidden={true} className={"mb-3 size-8 shrink-0"} />
               <h3 className={"mb-2 text-lg font-semibold text-balance"}>Unified AI Marketplace</h3>
-              <p className={"text-muted-foreground text-sm"}>
+              <p className={"text-sm text-muted-foreground"}>
                 Explore a central hub for AI solutions, connecting businesses and investors with AI-driven insights.
               </p>
             </article>
@@ -124,7 +124,7 @@ export default function Page() {
             >
               <TrendingUpIcon aria-hidden={true} className={"mb-3 size-8 shrink-0"} />
               <h3 className={"mb-2 text-lg font-semibold text-balance"}>Collaborative Growth</h3>
-              <p className={"text-muted-foreground text-sm"}>
+              <p className={"text-sm text-muted-foreground"}>
                 Join a community of businesses, startups, and investors for shared knowledge and growth in Singapore.
               </p>
             </article>
@@ -137,7 +137,7 @@ export default function Page() {
         {/* Header */}
         <header className={"mb-8 text-center sm:mb-12"}>
           <h2 className={"mb-3 text-3xl font-bold text-balance sm:mb-4 sm:text-4xl"}>Meet The Team</h2>
-          <p className={"text-muted-foreground text-base text-pretty sm:text-lg"}>
+          <p className={"text-base text-pretty text-muted-foreground sm:text-lg"}>
             The people behind Initiate, driving innovation.
           </p>
         </header>
@@ -158,7 +158,7 @@ export default function Page() {
                   <h3 className={"text-lg font-semibold text-balance sm:text-xl"}>
                     <Link
                       className={
-                        "focus-visible:ring-ring inline-flex min-h-11 items-center rounded-md px-2 break-words hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                        "inline-flex min-h-11 items-center rounded-md px-2 break-words hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                       }
                       href={member.profileUrl}
                     >

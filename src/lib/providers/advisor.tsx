@@ -1,5 +1,5 @@
-import { BotMessageSquareIcon } from "lucide-react";
 import type { UIMessage } from "ai";
+import { BotMessageSquareIcon } from "lucide-react";
 import { createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 
@@ -149,7 +149,7 @@ export default function AdvisorProvider(props: LayoutProps) {
         <PopoverTrigger asChild>
           <button
             className={cn(
-              "bg-secondary absolute right-4 bottom-4 z-50 cursor-pointer rounded-lg border p-3 transition",
+              "absolute right-4 bottom-4 z-50 cursor-pointer rounded-lg border bg-secondary p-3 transition",
               buttonVisible || "hidden",
             )}
             onClick={() => setPopoverOpen(true)}

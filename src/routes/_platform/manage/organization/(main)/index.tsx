@@ -158,7 +158,13 @@ export default function Page() {
     };
   }, [organizationId, backend.organization, reset]);
 
-  if (sessionLoading || !organizationId || loading || loadedFor?.id !== organizationId || loadedFor.backend !== backend.organization) {
+  if (
+    sessionLoading ||
+    !organizationId ||
+    loading ||
+    loadedFor?.id !== organizationId ||
+    loadedFor.backend !== backend.organization
+  ) {
     return <Loading />;
   }
   if (loadFailed) return <div className={"my-20 text-center"}>Could not load the organization.</div>;

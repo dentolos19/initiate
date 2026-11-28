@@ -72,7 +72,6 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
     loadUserStats();
   }, [user, loadUserStats]);
 
-
   if (!user) {
     return (
       <Card {...props}>
@@ -83,7 +82,7 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={"text-muted-foreground py-4 text-center text-sm"}>Please log in to view your profile</div>
+          <div className={"py-4 text-center text-sm text-muted-foreground"}>Please log in to view your profile</div>
         </CardContent>
       </Card>
     );
@@ -112,14 +111,14 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
             <div className={"truncate font-medium"}>
               {user.firstName} {user.lastName}
             </div>
-            {user.tagline && <div className={"text-muted-foreground text-xs"}>{getLabel(userTypes, user?.type)}</div>}
+            {user.tagline && <div className={"text-xs text-muted-foreground"}>{getLabel(userTypes, user?.type)}</div>}
           </div>
         </div>
 
         {/* Location */}
         {user.location && (
           <div className={"flex items-center gap-2 text-sm"}>
-            <MapPinIcon className={"text-muted-foreground h-4 w-4"} />
+            <MapPinIcon className={"h-4 w-4 text-muted-foreground"} />
             <span className={"text-muted-foreground"}>{user.location}</span>
           </div>
         )}
@@ -134,7 +133,7 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
         ) : stats ? (
           <div className={"space-y-2"}>
             <div className={"flex items-center justify-between text-sm"}>
-              <div className={"text-muted-foreground flex items-center gap-2"}>
+              <div className={"flex items-center gap-2 text-muted-foreground"}>
                 <HeartIcon className={"size-4"} />
                 <span>Followers</span>
               </div>
@@ -144,7 +143,7 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
             </div>
 
             <div className={"flex items-center justify-between text-sm"}>
-              <div className={"text-muted-foreground flex items-center gap-2"}>
+              <div className={"flex items-center gap-2 text-muted-foreground"}>
                 <UsersIcon className={"size-4"} />
                 <span>Following</span>
               </div>
@@ -154,7 +153,7 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
             </div>
 
             <div className={"flex items-center justify-between text-sm"}>
-              <div className={"text-muted-foreground flex items-center gap-2"}>
+              <div className={"flex items-center gap-2 text-muted-foreground"}>
                 <RssIcon className={"size-4"} />
                 <span>Recent Posts</span>
               </div>
@@ -164,7 +163,7 @@ export default function ProfileCard(props: ComponentProps<typeof Card>) {
             </div>
           </div>
         ) : (
-          <div className={"text-muted-foreground py-4 text-center text-sm"}>Failed to load statistics</div>
+          <div className={"py-4 text-center text-sm text-muted-foreground"}>Failed to load statistics</div>
         )}
 
         <Separator />

@@ -2,13 +2,25 @@ import { BubbleMenu } from "@tiptap/react/menus";
 
 import "#/components/ui/custom/rich/rich.styles.css";
 
-import { Button } from "#/components/ui/button";
-import { Card, CardContent, CardHeader } from "#/components/ui/card";
-import { Iframe } from "#/components/ui/custom/rich/extensions";
-import { Toggle } from "#/components/ui/toggle";
-import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/ui/tooltip";
-import useBackend from "#/lib/backend/client";
-import { cn } from "#/lib/utils";
+import Blockquote from "@tiptap/extension-blockquote";
+import Bold from "@tiptap/extension-bold";
+import BulletList from "@tiptap/extension-bullet-list";
+import Code from "@tiptap/extension-code";
+import CodeBlock from "@tiptap/extension-code-block";
+import Document from "@tiptap/extension-document";
+import Dropcursor from "@tiptap/extension-dropcursor";
+import Gapcursor from "@tiptap/extension-gapcursor";
+import HardBreak from "@tiptap/extension-hard-break";
+import Heading from "@tiptap/extension-heading";
+import History from "@tiptap/extension-history";
+import Image from "@tiptap/extension-image";
+import Italic from "@tiptap/extension-italic";
+import ListItem from "@tiptap/extension-list-item";
+import OrderedList from "@tiptap/extension-ordered-list";
+import Paragraph from "@tiptap/extension-paragraph";
+import Strike from "@tiptap/extension-strike";
+import Text from "@tiptap/extension-text";
+import Youtube from "@tiptap/extension-youtube";
 import { EditorContent, useEditor } from "@tiptap/react";
 import {
   BoldIcon,
@@ -31,26 +43,14 @@ import {
 import { useEffect } from "react";
 import { toast } from "sonner";
 
+import { Button } from "#/components/ui/button";
+import { Card, CardContent, CardHeader } from "#/components/ui/card";
+import { Iframe } from "#/components/ui/custom/rich/extensions";
+import { Toggle } from "#/components/ui/toggle";
+import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/ui/tooltip";
+import useBackend from "#/lib/backend/client";
 import { usePrompt } from "#/lib/providers/prompt";
-import Blockquote from "@tiptap/extension-blockquote";
-import Bold from "@tiptap/extension-bold";
-import BulletList from "@tiptap/extension-bullet-list";
-import Code from "@tiptap/extension-code";
-import CodeBlock from "@tiptap/extension-code-block";
-import Document from "@tiptap/extension-document";
-import Dropcursor from "@tiptap/extension-dropcursor";
-import Gapcursor from "@tiptap/extension-gapcursor";
-import HardBreak from "@tiptap/extension-hard-break";
-import Heading from "@tiptap/extension-heading";
-import History from "@tiptap/extension-history";
-import Image from "@tiptap/extension-image";
-import Italic from "@tiptap/extension-italic";
-import ListItem from "@tiptap/extension-list-item";
-import OrderedList from "@tiptap/extension-ordered-list";
-import Paragraph from "@tiptap/extension-paragraph";
-import Strike from "@tiptap/extension-strike";
-import Text from "@tiptap/extension-text";
-import Youtube from "@tiptap/extension-youtube";
+import { cn } from "#/lib/utils";
 
 interface RichEditorProps {
   className?: string;
@@ -165,7 +165,7 @@ export function RichEditor(props: RichEditorProps) {
 
   return (
     <Card className={"gap-0 overflow-hidden p-0"}>
-      <CardHeader className={"bg-muted flex justify-between overflow-x-auto border-b !p-2"}>
+      <CardHeader className={"flex justify-between overflow-x-auto border-b bg-muted !p-2"}>
         {/* Left */}
         <div className={"flex gap-1"}>
           {/* Undo */}
@@ -392,7 +392,7 @@ export function RichEditor(props: RichEditorProps) {
         {/* Content */}
         <EditorContent
           className={cn(
-            "prose prose-sm dark:prose-invert max-w-none [&_.ProseMirror]:p-4 [&_.ProseMirror]:focus:outline-none",
+            "prose prose-sm max-w-none dark:prose-invert [&_.ProseMirror]:p-4 [&_.ProseMirror]:focus:outline-none",
             props.disabled && "pointer-events-none opacity-50",
             props.className,
           )}
@@ -400,7 +400,7 @@ export function RichEditor(props: RichEditorProps) {
         />
 
         {/* Menu */}
-        <BubbleMenu className={"bg-card overflow-hidden rounded-lg shadow-lg"} editor={editor}>
+        <BubbleMenu className={"overflow-hidden rounded-lg bg-card shadow-lg"} editor={editor}>
           {/* Heading 1 */}
           <Tooltip>
             <TooltipTrigger asChild>

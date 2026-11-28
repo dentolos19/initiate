@@ -66,7 +66,7 @@ export default function Page() {
       </PageHeader>
 
       {members.length === 0 ? (
-        <p className="text-muted-foreground border-b px-4 py-12 text-center sm:px-6">No members found.</p>
+        <p className="border-b px-4 py-12 text-center text-muted-foreground sm:px-6">No members found.</p>
       ) : (
         <div className="divide-y border-b">
           {members.map((member) => (
@@ -77,7 +77,7 @@ export default function Page() {
               </Avatar>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{member.user.name}</p>
-                <p className="text-muted-foreground truncate text-sm">{member.user.email}</p>
+                <p className="truncate text-sm text-muted-foreground">{member.user.email}</p>
               </div>
               <Badge variant="outline" className="capitalize">
                 {member.role}

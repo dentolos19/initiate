@@ -140,12 +140,12 @@ export default function EmailPreferencesPage() {
         <div className="divide-y border-b">
           {Array.from({ length: emailTypes.length }).map((_, index) => (
             <div key={index} className="flex items-center gap-4 px-4 py-4 sm:px-6">
-              <div className="bg-muted size-10 animate-pulse rounded-md motion-reduce:animate-none" />
+              <div className="size-10 animate-pulse rounded-md bg-muted motion-reduce:animate-none" />
               <div className="min-w-0 flex-1 space-y-2">
-                <div className="bg-muted h-4 w-48 animate-pulse rounded motion-reduce:animate-none" />
-                <div className="bg-muted h-3 w-full max-w-md animate-pulse rounded motion-reduce:animate-none" />
+                <div className="h-4 w-48 animate-pulse rounded bg-muted motion-reduce:animate-none" />
+                <div className="h-3 w-full max-w-md animate-pulse rounded bg-muted motion-reduce:animate-none" />
               </div>
-              <div className="bg-muted h-6 w-11 animate-pulse rounded-full motion-reduce:animate-none" />
+              <div className="h-6 w-11 animate-pulse rounded-full bg-muted motion-reduce:animate-none" />
             </div>
           ))}
         </div>
@@ -162,7 +162,7 @@ export default function EmailPreferencesPage() {
             <PageDescription>Choose which messages Initiate sends to your email address.</PageDescription>
           </PageHeading>
         </PageHeader>
-        <p className="text-destructive border-b px-4 py-6 text-sm sm:px-6" role="alert">
+        <p className="border-b px-4 py-6 text-sm text-destructive sm:px-6" role="alert">
           {loadError} Reload the page to try again.
         </p>
       </PageShell>
@@ -177,7 +177,7 @@ export default function EmailPreferencesPage() {
           <PageDescription>Choose which messages Initiate sends to your email address.</PageDescription>
         </PageHeading>
         {saving && (
-          <p className="text-muted-foreground text-sm" aria-live="polite">
+          <p className="text-sm text-muted-foreground" aria-live="polite">
             Saving…
           </p>
         )}
@@ -190,7 +190,7 @@ export default function EmailPreferencesPage() {
 
           return (
             <div key={type.key} className="flex min-w-0 items-center gap-4 px-4 py-4 sm:px-6">
-              <div className="bg-muted text-muted-foreground grid size-10 shrink-0 place-items-center rounded-md">
+              <div className="grid size-10 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
                 <Icon className="size-5" aria-hidden="true" />
               </div>
               <div className="min-w-0 flex-1">
@@ -198,7 +198,7 @@ export default function EmailPreferencesPage() {
                   <h2 className="font-medium">{type.title}</h2>
                   {type.required && <Badge variant="secondary">Required</Badge>}
                 </div>
-                <p className="text-muted-foreground mt-1 text-sm text-pretty">{type.description}</p>
+                <p className="mt-1 text-sm text-pretty text-muted-foreground">{type.description}</p>
               </div>
               <Switch
                 aria-label={`${type.title} email preference`}
@@ -211,7 +211,7 @@ export default function EmailPreferencesPage() {
         })}
       </div>
 
-      <p className="text-muted-foreground px-4 py-4 text-sm sm:px-6">
+      <p className="px-4 py-4 text-sm text-muted-foreground sm:px-6">
         Security and payment confirmation emails are required for account protection and transaction records.
       </p>
     </PageShell>

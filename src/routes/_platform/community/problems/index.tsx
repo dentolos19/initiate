@@ -44,7 +44,7 @@ export default function Page() {
 
         {/* No Items */}
         {!loading && posts.length === 0 && (
-          <div className={"text-muted-foreground my-10 text-center"}>No posts found.</div>
+          <div className={"my-10 text-center text-muted-foreground"}>No posts found.</div>
         )}
 
         {/* With Items */}

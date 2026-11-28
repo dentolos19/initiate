@@ -49,7 +49,7 @@ export default function Page() {
         </PageHeading>
       </PageHeader>
       {error ? (
-        <p className="text-destructive border-b px-4 py-6 text-sm sm:px-6" role="alert">
+        <p className="border-b px-4 py-6 text-sm text-destructive sm:px-6" role="alert">
           {error} Reload the page to try again.
         </p>
       ) : (
@@ -60,7 +60,7 @@ export default function Page() {
             { label: "Services", value: statistics?.counts.services ?? 0 },
           ].map((item, index) => (
             <div key={item.label} className={index > 0 ? "border-t p-5 sm:border-t-0 sm:p-6" : "p-5 sm:p-6"}>
-              <h2 className="text-muted-foreground text-sm font-medium">{item.label}</h2>
+              <h2 className="text-sm font-medium text-muted-foreground">{item.label}</h2>
               <p className="mt-1 text-2xl font-semibold tabular-nums">{item.value}</p>
             </div>
           ))}

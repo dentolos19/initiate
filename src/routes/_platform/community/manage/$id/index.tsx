@@ -396,7 +396,7 @@ export default function Page() {
             {/* Proposals */}
             {type === "problem" && (
               <TabsContent value={"proposals"}>
-                <div className={"text-muted-foreground text-center"}>
+                <div className={"text-center text-muted-foreground"}>
                   <p>Proposals functionality will be implemented here.</p>
                   <p className={"mt-2 text-sm"}>
                     This section will allow users to submit and manage proposals for this problem statement.
@@ -417,8 +417,8 @@ export default function Page() {
               </PopoverTrigger>
               <PopoverContent className={"w-80"}>
                 <div className={"space-y-3"}>
-                  <h4 className={"text-destructive font-medium"}>Delete Post</h4>
-                  <p className={"text-muted-foreground text-sm"}>
+                  <h4 className={"font-medium text-destructive"}>Delete Post</h4>
+                  <p className={"text-sm text-muted-foreground"}>
                     This action cannot be undone. This will permanently delete your post and all its comments.
                   </p>
                   <Button

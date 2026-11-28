@@ -128,7 +128,7 @@ export default function CommentSection(props: { data: CommunityPost }) {
         {/* No Items */}
         {!loading && comments.length === 0 && (
           <div className={"my-5 text-center"}>
-            <p className={"text-muted-foreground text-sm"}>No comments yet.</p>
+            <p className={"text-sm text-muted-foreground"}>No comments yet.</p>
           </div>
         )}
 

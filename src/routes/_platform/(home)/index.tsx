@@ -9,7 +9,7 @@ import {
   TimerIcon,
   UsersIcon,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Button } from "#/components/ui/button";
@@ -76,7 +76,7 @@ export default function Page() {
     <main className="w-full space-y-10 px-4 py-6 sm:px-6 lg:space-y-14 lg:py-10">
       {session.user && !session.user.location ? (
         <Link className="block" href="/onboarding">
-          <Alert className="bg-primary/5 hover:bg-primary/8 border-primary/20 transition-colors">
+          <Alert className="border-primary/20 bg-primary/5 transition-colors hover:bg-primary/8">
             <SparklesIcon />
             <AlertTitle>Complete your profile</AlertTitle>
             <AlertDescription>
@@ -101,7 +101,7 @@ export default function Page() {
             <h2 id="next-move-heading" className="text-2xl font-semibold tracking-tight md:text-3xl">
               Choose Your Next Move
             </h2>
-            <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-6 sm:text-base">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
               Start with a clear path, or ask the advisor when you need help narrowing the options.
             </p>
           </div>
@@ -117,14 +117,14 @@ export default function Page() {
             return (
               <Link
                 key={pathway.href}
-                className="hover:bg-accent/60 focus-visible:ring-ring group relative flex min-h-44 flex-col p-6 transition-colors focus-visible:z-10 focus-visible:ring-2 focus-visible:outline-none [&:not(:last-child)]:border-b lg:[&:not(:last-child)]:border-r sm:[&:nth-child(-n+2)]:border-b lg:[&:nth-child(-n+2)]:border-b-0 sm:[&:nth-child(odd)]:border-r"
+                className="group relative flex min-h-44 flex-col p-6 transition-colors hover:bg-accent/60 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&:not(:last-child)]:border-b lg:[&:not(:last-child)]:border-r sm:[&:nth-child(-n+2)]:border-b lg:[&:nth-child(-n+2)]:border-b-0 sm:[&:nth-child(odd)]:border-r"
                 href={pathway.href}
               >
-                <Icon className="text-primary size-5" aria-hidden="true" />
+                <Icon className="size-5 text-primary" aria-hidden="true" />
                 <h3 className="mt-8 font-medium">{pathway.label}</h3>
-                <p className="text-muted-foreground mt-2 text-sm leading-6">{pathway.description}</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{pathway.description}</p>
                 <ArrowRightIcon
-                  className="text-muted-foreground mt-auto size-4 translate-x-0 transition-transform group-hover:translate-x-1"
+                  className="mt-auto size-4 translate-x-0 text-muted-foreground transition-transform group-hover:translate-x-1"
                   aria-hidden="true"
                 />
               </Link>
@@ -191,7 +191,7 @@ function ServiceRail({
             <span className="text-primary [&>svg]:size-5">{icon}</span>
             {title}
           </h2>
-          <p className="text-muted-foreground mt-2 text-sm leading-6">{description}</p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
         </div>
         <Button variant="ghost" asChild>
           <Link href={href}>
@@ -220,7 +220,7 @@ function ServiceRail({
           <CarouselNext className="hidden sm:inline-flex" />
         </Carousel>
       ) : (
-        <div className="bg-muted/45 text-muted-foreground grid min-h-36 place-items-center rounded-xl border border-dashed px-6 text-center text-sm">
+        <div className="grid min-h-36 place-items-center rounded-xl border border-dashed bg-muted/45 px-6 text-center text-sm text-muted-foreground">
           {empty}
         </div>
       )}
